@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Meu Gestor</title>
+    <style>
+        :root { --primary: #2563eb; --bg: #f8fafc; --text: #1e293b; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: auto; }
+        
+        /* Card de Aviso Editável */
+        .aviso-card { background: #fef9c3; border-left: 5px solid #f59e0b; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .aviso-card h3 { margin: 0 0 5px 0; font-size: 14px; color: #b45309; }
+        #textoAviso { font-weight: bold; font-size: 16px; border: none; background: transparent; width: 100%; outline: none; }
+
+        /* Lista de Clientes */
+        .cliente-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .info h4 { margin: 0; font-size: 17px; }
+        .info p { margin: 3px 0 0; font-size: 13px; color: #64748b; }
+        .data-tag { background: #e2e8f0; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; }
+
+        /* Login Simples */
+        #loginOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:100; }
+        input[type="password"] { padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; }
+        button { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="loginOverlay">
+        <h2>Acesso Restrito</h2>
+        <input type="password" id="senhaInput" placeholder="Digite sua senha">
+        <button onclick="verificarSenha()">Entrar</button>
+    </div>
+
+    <div class="container" id="conteudo" style="display:none;">
+        <header>
+            <h1 style="font-size: 24px;">Olá, Bem-vindo!</h1>
+        </header>
+
+        <div class="aviso-card">
+            <h3>⚠️ LEMBRETE IMPORTANTE (Toque para editar)</h3>
+            <input type="text" id="textoAviso" value="Clique aqui para escrever seu aviso..." onchange="salvarAviso()">
+        </div>
+
+        <h3>Meus Clientes</h3>
+        <div id="listaClientes">
+            </div>
+    </div>
+
+    <script>
+        // 1. Dados dos Clientes (Organizados por Data)
+        const clientes = [
+            { nome: "João Silva", data: "2024-05-20", painel: "Painel Alpha" },
+            { nome: "Maria Oliveira", data: "2024-05-22", painel: "Painel Beta" },
+            { nome: "Carlos Souza", data: "2024-06-01", painel: "Painel Premium" }
+        ];
+
+        // 2. Função de Segurança (Senha)
+        function verificarSenha() {
+            const senha = document.getElementById('senhaInput').value;
+            if(senha === "1234") { // <--- ALTERE SUA SENHA AQUI
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('conteudo').style.display = 'block';
+                renderizarClientes();
+            } else { alert("Senha incorreta!"); }
+        }
+
+        // 3. Renderizar Lista
+        function renderizarClientes() {
+            const lista = document.getElementById('listaClientes');
+            // Ordena por data automaticamente
+            clientes.sort((a, b) => new Date(a.data) - new Date(b.data));
+            
+            lista.innerHTML = clientes.map(c => `
+                <div class="cliente-item">
+                    <div class="info">
+                        <h4>${c.nome}</h4>
+                        <p>Painel: ${c.painel}</p>
+                    </div>
+                    <div class="data-tag">${c.data.split('-').reverse().join('/')}</div>
+                </div>
+            `).join('');
+        }
+
+        // 4. Salvar Aviso no Navegador
+        function salvarAviso() {
+            localStorage.setItem('meuAviso', document.getElementById('textoAviso').value);
+        }
+
+        window.onload = () => {
+            if(localStorage.getItem('meuAviso')) {
+                document.getElementById('textoAviso').value = localStorage.getItem('meuAviso');
+            }
+        };
+    </script>
+</body>
+</html>
