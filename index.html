@@ -3,14 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Gestor Elite V6</title>
+    <title>Gestor Elite V7</title>
     <style>
         :root { --bg: #000; --card: #1a1a1a; --text: #fff; --accent: #3b82f6; --danger: #ff4d4d; --warning: #f59e0b; --success: #10b981; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-top: 80px; }
+        
         .header { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); padding: 15px; z-index: 100; border-bottom: 1px solid #333; display: flex; justify-content: center; }
         .btn-add { background: var(--accent); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-weight: bold; }
-        .aviso-card { background: var(--card); border-left: 4px solid var(--warning); padding: 15px; border-radius: 12px; margin-bottom: 25px; }
-        #textoAviso { border: none; background: transparent; width: 100%; color: var(--warning); font-size: 16px; font-weight: bold; outline: none; }
+
+        /* SEÇÃO DE LEMBRETES MULTIPLOS */
+        .lembretes-container { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 25px; border: 1px dashed var(--warning); }
+        .lembretes-header { color: var(--warning); font-size: 14px; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+        .lembrete-input-group { display: flex; gap: 5px; margin-bottom: 15px; }
+        .lembrete-input-group input { flex: 1; background: #222; border: 1px solid #444; color: white; padding: 10px; border-radius: 8px; font-size: 14px; }
+        .btn-add-lembrete { background: var(--warning); color: black; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; }
+        
+        .lembrete-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #333; font-size: 15px; color: #eee; }
+        .lembrete-item:last-child { border-bottom: none; }
+        .btn-del-lembrete { color: var(--danger); background: none; border: none; font-size: 18px; padding-left: 10px; }
+
+        /* CLIENTES */
         .cliente-item { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; }
         .urgente { border: 2px solid var(--danger) !important; background: rgba(255, 77, 77, 0.05); }
         .info h4 { margin: 0; font-size: 18px; }
@@ -20,9 +32,11 @@
         .btn-plus { background: var(--success); color: white; }
         .btn-edit { background: #333; color: white; }
         .btn-del { background: rgba(255, 77, 77, 0.15); color: var(--danger); }
+
+        /* MODAL */
         #modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 200; justify-content: center; align-items: center; }
         .modal-content { background: #222; padding: 25px; border-radius: 20px; width: 85%; max-width: 400px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #333; border: 1px solid #444; border-radius: 8px; color: white; box-sizing: border-box; }
+        .modal-content input { width: 100%; padding: 12px; margin: 10px 0; background: #333; border: 1px solid #444; border-radius: 8px; color: white; box-sizing: border-box; }
         .btn-save { background: var(--accent); color: white; border: none; width: 100%; padding: 15px; border-radius: 10px; font-weight: bold; }
         .btn-cancel { background: transparent; color: #888; border: none; width: 100%; padding: 10px; }
     </style>
@@ -31,16 +45,20 @@
 
     <div class="header"><button class="btn-add" onclick="abrirModal()">+ Novo Cliente</button></div>
 
-    <div class="aviso-card">
-        <small style="color:#888">📌 LEMBRETE</small>
-        <input type="text" id="textoAviso" placeholder="Editar lembrete..." onchange="salvarAviso()">
+    <div class="lembretes-container">
+        <div class="lembretes-header">⚠️ LEMBRETES IMPORTANTES</div>
+        <div class="lembrete-input-group">
+            <input type="text" id="novoLembrete" placeholder="Digite um lembrete...">
+            <button class="btn-add-lembrete" onclick="adicionarLembrete()">+</button>
+        </div>
+        <div id="listaLembretes"></div>
     </div>
 
     <div id="lista"></div>
 
     <div id="modal">
         <div class="modal-content">
-            <h3 id="modalTitle" style="margin:0">Cliente</h3>
+            <h3 id="modalTitle" style="margin:0">Dados do Cliente</h3>
             <input type="hidden" id="editId">
             <input type="text" id="nomeCli" placeholder="Nome">
             <input type="date" id="dataCli">
@@ -51,8 +69,39 @@
     </div>
 
     <script>
-        let clientes = JSON.parse(localStorage.getItem('meusClientesProV6')) || [];
+        let clientes = JSON.parse(localStorage.getItem('meusClientesProV7')) || [];
+        let lembretes = JSON.parse(localStorage.getItem('meusLembretesV7')) || [];
 
+        // --- FUNÇÕES DE LEMBRETES ---
+        function adicionarLembrete() {
+            const txt = document.getElementById('novoLembrete').value;
+            if(!txt) return;
+            lembretes.push({ id: Date.now(), texto: txt });
+            document.getElementById('novoLembrete').value = "";
+            salvarLembretes();
+        }
+
+        function excluirLembrete(id) {
+            lembretes = lembretes.filter(l => l.id !== id);
+            salvarLembretes();
+        }
+
+        function salvarLembretes() {
+            localStorage.setItem('meusLembretesV7', JSON.stringify(lembretes));
+            renderLembretes();
+        }
+
+        function renderLembretes() {
+            const div = document.getElementById('listaLembretes');
+            div.innerHTML = lembretes.map(l => `
+                <div class="lembrete-item">
+                    <span>• ${l.texto}</span>
+                    <button class="btn-del-lembrete" onclick="excluirLembrete(${l.id})">×</button>
+                </div>
+            `).join('');
+        }
+
+        // --- FUNÇÕES DE CLIENTES ---
         function abrirModal(id = null) {
             document.getElementById('modal').style.display = 'flex';
             if(id) {
@@ -88,28 +137,16 @@
             fecharModal();
         }
 
-        // LÓGICA MANUAL: MANTÉM O DIA EXATO
         function renovarUmMes(id) {
             const index = clientes.findIndex(c => c.id === id);
-            let dataString = clientes[index].data; // Formato "YYYY-MM-DD"
-            let partes = dataString.split('-');
-            
+            let partes = clientes[index].data.split('-');
             let ano = parseInt(partes[0]);
             let mes = parseInt(partes[1]);
-            let diaOriginal = partes[2]; // Mantemos como texto para não perder o zero à esquerda
-
+            let dia = partes[2];
             mes++; 
-            if (mes > 12) {
-                mes = 1;
-                ano++;
-            }
-
-            // Formata o mês com 2 dígitos
+            if (mes > 12) { mes = 1; ano++; }
             let novoMes = mes < 10 ? '0' + mes : mes;
-            
-            // Monta a nova data mantendo o dia original intacto
-            clientes[index].data = `${ano}-${novoMes}-${diaOriginal}`;
-            
+            clientes[index].data = `${ano}-${novoMes}-${dia}`;
             atualizarStorage();
         }
 
@@ -121,15 +158,11 @@
         }
 
         function atualizarStorage() {
-            localStorage.setItem('meusClientesProV6', JSON.stringify(clientes));
-            render();
+            localStorage.setItem('meusClientesProV7', JSON.stringify(clientes));
+            renderClientes();
         }
 
-        function salvarAviso() {
-            localStorage.setItem('meuAvisoProV6', document.getElementById('textoAviso').value);
-        }
-
-        function render() {
+        function renderClientes() {
             const listaDiv = document.getElementById('lista');
             const hoje = new Date(); hoje.setHours(0,0,0,0);
 
@@ -145,7 +178,6 @@
                 const dV = new Date(c.data);
                 const diff = Math.ceil((dV - hoje) / 86400000);
                 const isUrgente = diff <= 3;
-
                 return `
                     <div class="cliente-item ${isUrgente ? 'urgente' : ''}">
                         <div class="info">
@@ -163,11 +195,12 @@
                     </div>
                 `;
             }).join('');
-            
-            const aviso = localStorage.getItem('meuAvisoProV6');
-            if(aviso) document.getElementById('textoAviso').value = aviso;
         }
-        window.onload = render;
+
+        window.onload = () => {
+            renderLembretes();
+            renderClientes();
+        };
     </script>
 </body>
 </html>
