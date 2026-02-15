@@ -3,97 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Meu Gestor</title>
+    <title>Gestor de Clientes</title>
     <style>
-        :root { --primary: #2563eb; --bg: #f8fafc; --text: #1e293b; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        :root { --primary: #2563eb; --bg: #f1f5f9; --text: #1e293b; --danger: #ef4444; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
         .container { max-width: 500px; margin: auto; }
         
-        /* Card de Aviso Editável */
-        .aviso-card { background: #fef9c3; border-left: 5px solid #f59e0b; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .aviso-card h3 { margin: 0 0 5px 0; font-size: 14px; color: #b45309; }
-        #textoAviso { font-weight: bold; font-size: 16px; border: none; background: transparent; width: 100%; outline: none; }
+        /* Aviso */
+        .aviso-card { background: #fef9c3; border-left: 5px solid #f59e0b; padding: 12px; border-radius: 8px; margin-bottom: 20px; }
+        #textoAviso { border: none; background: transparent; width: 100%; font-size: 16px; font-weight: bold; outline: none; }
 
-        /* Lista de Clientes */
-        .cliente-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .info h4 { margin: 0; font-size: 17px; }
-        .info p { margin: 3px 0 0; font-size: 13px; color: #64748b; }
-        .data-tag { background: #e2e8f0; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; }
+        /* Formulário */
+        .form-add { background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        input { width: 93%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        button.add-btn { background: var(--primary); color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; }
 
-        /* Login Simples */
-        #loginOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:100; }
-        input[type="password"] { padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; }
-        button { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; }
+        /* Lista */
+        .cliente-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .info h4 { margin: 0; font-size: 16px; }
+        .info p { margin: 2px 0; font-size: 12px; color: #64748b; }
+        .btn-del { color: var(--danger); font-size: 20px; border: none; background: none; padding: 10px; cursor: pointer; }
+        
+        #loginOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:1000; }
     </style>
 </head>
 <body>
 
     <div id="loginOverlay">
         <h2>Acesso Restrito</h2>
-        <input type="password" id="senhaInput" placeholder="Digite sua senha">
-        <button onclick="verificarSenha()">Entrar</button>
+        <input type="password" id="senhaInput" placeholder="Sua senha" style="width: 200px;">
+        <button onclick="verificarSenha()" class="add-btn" style="width: 220px;">Entrar</button>
     </div>
 
-    <div class="container" id="conteudo" style="display:none;">
-        <header>
-            <h1 style="font-size: 24px;">Olá, Bem-vindo!</h1>
-        </header>
-
+    <div class="container" id="appBody" style="display:none;">
         <div class="aviso-card">
-            <h3>⚠️ LEMBRETE IMPORTANTE (Toque para editar)</h3>
-            <input type="text" id="textoAviso" value="Clique aqui para escrever seu aviso..." onchange="salvarAviso()">
+            <small style="color:#b45309">⚠️ AVISO (Toque para editar)</small>
+            <input type="text" id="textoAviso" placeholder="Escreva um lembrete..." onchange="salvarAviso()">
         </div>
 
-        <h3>Meus Clientes</h3>
-        <div id="listaClientes">
-            </div>
+        <div class="form-add">
+            <h3>Adicionar Cliente</h3>
+            <input type="text" id="nomeCli" placeholder="Nome do Cliente">
+            <input type="date" id="dataCli">
+            <input type="text" id="painelCli" placeholder="Nome do Painel">
+            <button class="add-btn" onclick="adicionarCliente()">Salvar Cliente</button>
+        </div>
+
+        <h3>Clientes Organizados</h3>
+        <div id="lista"></div>
     </div>
 
     <script>
-        // 1. Dados dos Clientes (Organizados por Data)
-        const clientes = [
-            { nome: "João Silva", data: "2024-05-20", painel: "Painel Alpha" },
-            { nome: "Maria Oliveira", data: "2024-05-22", painel: "Painel Beta" },
-            { nome: "Carlos Souza", data: "2024-06-01", painel: "Painel Premium" }
-        ];
+        let clientes = JSON.parse(localStorage.getItem('meusClientes')) || [];
 
-        // 2. Função de Segurança (Senha)
         function verificarSenha() {
-            const senha = document.getElementById('senhaInput').value;
-            if(senha === "1234") { // <--- ALTERE SUA SENHA AQUI
+            if(document.getElementById('senhaInput').value === "1234") {
                 document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('conteudo').style.display = 'block';
-                renderizarClientes();
-            } else { alert("Senha incorreta!"); }
+                document.getElementById('appBody').style.display = 'block';
+                render();
+            } else { alert("Senha errada!"); }
         }
 
-        // 3. Renderizar Lista
-        function renderizarClientes() {
-            const lista = document.getElementById('listaClientes');
-            // Ordena por data automaticamente
-            clientes.sort((a, b) => new Date(a.data) - new Date(b.data));
-            
-            lista.innerHTML = clientes.map(c => `
-                <div class="cliente-item">
-                    <div class="info">
-                        <h4>${c.nome}</h4>
-                        <p>Painel: ${c.painel}</p>
-                    </div>
-                    <div class="data-tag">${c.data.split('-').reverse().join('/')}</div>
-                </div>
-            `).join('');
+        function adicionarCliente() {
+            const nome = document.getElementById('nomeCli').value;
+            const data = document.getElementById('dataCli').value;
+            const painel = document.getElementById('painelCli').value;
+
+            if(!nome || !data) return alert("Preencha nome e data!");
+
+            clientes.push({ id: Date.now(), nome, data, painel });
+            salvar();
+            document.getElementById('nomeCli').value = "";
+            document.getElementById('dataCli').value = "";
+            document.getElementById('painelCli').value = "";
+            render();
         }
 
-        // 4. Salvar Aviso no Navegador
+        function removerCliente(id) {
+            if(confirm("Deseja remover este cliente?")) {
+                clientes = clientes.filter(c => c.id !== id);
+                salvar();
+                render();
+            }
+        }
+
+        function salvar() {
+            localStorage.setItem('meusClientes', JSON.stringify(clientes));
+        }
+
         function salvarAviso() {
             localStorage.setItem('meuAviso', document.getElementById('textoAviso').value);
         }
 
-        window.onload = () => {
+        function render() {
+            const listaDiv = document.getElementById('lista');
+            // Ordenar por data
+            clientes.sort((a, b) => new Date(a.data) - new Date(b.data));
+            
+            listaDiv.innerHTML = clientes.map(c => `
+                <div class="cliente-item">
+                    <div class="info">
+                        <h4>${c.nome}</h4>
+                        <p>📅 ${c.data.split('-').reverse().join('/')}</p>
+                        <p>🖥️ Painel: ${c.painel}</p>
+                    </div>
+                    <button class="btn-del" onclick="removerCliente(${c.id})">×</button>
+                </div>
+            `).join('');
+            
             if(localStorage.getItem('meuAviso')) {
                 document.getElementById('textoAviso').value = localStorage.getItem('meuAviso');
             }
-        };
+        }
     </script>
 </body>
 </html>
