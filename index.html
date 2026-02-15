@@ -3,45 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Gestor Pro">
-    
-    <title>Gestor Elite V8</title>
+    <title>Gestor Cloud Pro</title>
     <style>
         :root { --bg: #000; --card: #1a1a1a; --text: #fff; --accent: #3b82f6; --danger: #ff4d4d; --warning: #f59e0b; --success: #10b981; }
-        
-        body { 
-            font-family: -apple-system, system-ui, sans-serif; 
-            background: var(--bg); 
-            color: var(--text); 
-            margin: 0; 
-            padding: 20px; 
-            padding-top: calc(80px + env(safe-area-inset-top)); /* Ajuste para o entalhe do iPhone */
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-        
-        .header { 
-            position: fixed; top: 0; left: 0; right: 0; 
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); 
-            padding: 15px; padding-top: env(safe-area-inset-top);
-            z-index: 100; border-bottom: 1px solid #333; 
-            display: flex; justify-content: center; 
-        }
-        
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-top: calc(80px + env(safe-area-inset-top)); }
+        .header { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); padding: 15px; padding-top: env(safe-area-inset-top); z-index: 100; border-bottom: 1px solid #333; display: flex; justify-content: center; }
         .btn-add { background: var(--accent); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-weight: bold; }
-
-        /* LEMBRETES */
         .lembretes-container { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 25px; border: 1px dashed var(--warning); }
         .lembretes-header { color: var(--warning); font-size: 14px; font-weight: bold; margin-bottom: 10px; }
         .lembrete-input-group { display: flex; gap: 5px; margin-bottom: 15px; }
         .lembrete-input-group input { flex: 1; background: #222; border: 1px solid #444; color: white; padding: 10px; border-radius: 8px; }
         .btn-add-lembrete { background: var(--warning); color: black; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; }
         .lembrete-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #333; }
-        .btn-del-lembrete { color: var(--danger); background: none; border: none; font-size: 18px; }
-
-        /* CLIENTES */
+        .btn-del-lembrete { color: var(--danger); background: none; border: none; font-size: 22px; }
         .cliente-item { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; }
         .urgente { border: 2px solid var(--danger) !important; background: rgba(255, 77, 77, 0.05); }
         .info h4 { margin: 0; font-size: 18px; }
@@ -49,10 +25,7 @@
         .acoes { display: flex; gap: 10px; border-top: 1px solid #333; padding-top: 12px; margin-top: 12px; }
         .btn-acao { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: bold; font-size: 13px; }
         .btn-plus { background: var(--success); color: white; }
-        .btn-edit { background: #333; color: white; }
         .btn-del { background: rgba(255, 77, 77, 0.15); color: var(--danger); }
-
-        /* MODAL */
         #modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 200; justify-content: center; align-items: center; }
         .modal-content { background: #222; padding: 25px; border-radius: 20px; width: 85%; max-width: 400px; }
         .modal-content input { width: 100%; padding: 12px; margin: 10px 0; background: #333; border: 1px solid #444; border-radius: 8px; color: white; box-sizing: border-box; }
@@ -65,7 +38,7 @@
     <div class="header"><button class="btn-add" onclick="abrirModal()">+ Novo Cliente</button></div>
 
     <div class="lembretes-container">
-        <div class="lembretes-header">⚠️ LEMBRETES</div>
+        <div class="lembretes-header">☁️ LEMBRETES NA NUVEM</div>
         <div class="lembrete-input-group">
             <input type="text" id="novoLembrete" placeholder="Novo lembrete...">
             <button class="btn-add-lembrete" onclick="adicionarLembrete()">+</button>
@@ -78,118 +51,89 @@
     <div id="modal">
         <div class="modal-content">
             <h3 id="modalTitle" style="margin:0">Cliente</h3>
-            <input type="hidden" id="editId">
             <input type="text" id="nomeCli" placeholder="Nome">
             <input type="date" id="dataCli">
             <input type="text" id="painelCli" placeholder="Painel">
-            <button class="btn-save" onclick="salvarCliente()">Salvar</button>
+            <button class="btn-save" onclick="salvarCliente()">Salvar na Nuvem</button>
             <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
         </div>
     </div>
 
-    <script>
-        let clientes = JSON.parse(localStorage.getItem('meusClientesProV8')) || [];
-        let lembretes = JSON.parse(localStorage.getItem('meusLembretesV8')) || [];
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        function adicionarLembrete() {
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMQbFBbbKFABCwwTxuESpXsz_Knz-V4FI",
+            authDomain: "meu-gestor-a7d13.firebaseapp.com",
+            projectId: "meu-gestor-a7d13",
+            storageBucket: "meu-gestor-a7d13.firebasestorage.app",
+            messagingSenderId: "1019995087685",
+            appId: "1:1019995087685:web:a063af65a4b7f234b4542c",
+            measurementId: "G-Y2SJTB8PE0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.adicionarLembrete = async () => {
             const txt = document.getElementById('novoLembrete').value;
             if(!txt) return;
-            lembretes.push({ id: Date.now(), texto: txt });
+            await addDoc(collection(db, "lembretes"), { texto: txt, criadoEm: Date.now() });
             document.getElementById('novoLembrete').value = "";
-            salvarLembretes();
-        }
+        };
 
-        function excluirLembrete(id) {
-            lembretes = lembretes.filter(l => l.id !== id);
-            salvarLembretes();
-        }
+        window.excluirLembrete = async (id) => {
+            await deleteDoc(doc(db, "lembretes", id));
+        };
 
-        function salvarLembretes() {
-            localStorage.setItem('meusLembretesV8', JSON.stringify(lembretes));
-            renderLembretes();
-        }
-
-        function renderLembretes() {
+        onSnapshot(query(collection(db, "lembretes"), orderBy("criadoEm", "desc")), (snapshot) => {
             const div = document.getElementById('listaLembretes');
-            div.innerHTML = lembretes.map(l => `
+            div.innerHTML = snapshot.docs.map(d => `
                 <div class="lembrete-item">
-                    <span>• ${l.texto}</span>
-                    <button class="btn-del-lembrete" onclick="excluirLembrete(${l.id})">×</button>
+                    <span>• ${d.data().texto}</span>
+                    <button class="btn-del-lembrete" onclick="excluirLembrete('${d.id}')">×</button>
                 </div>
             `).join('');
-        }
+        });
 
-        function abrirModal(id = null) {
-            document.getElementById('modal').style.display = 'flex';
-            if(id) {
-                const c = clientes.find(item => item.id === id);
-                document.getElementById('editId').value = c.id;
-                document.getElementById('nomeCli').value = c.nome;
-                document.getElementById('dataCli').value = c.data;
-                document.getElementById('painelCli').value = c.painel;
-            } else {
-                document.getElementById('editId').value = "";
-                document.getElementById('nomeCli').value = "";
-                document.getElementById('dataCli').value = "";
-                document.getElementById('painelCli').value = "";
-            }
-        }
+        window.abrirModal = () => { document.getElementById('modal').style.display = 'flex'; };
+        window.fecharModal = () => { document.getElementById('modal').style.display = 'none'; };
 
-        function fecharModal() { document.getElementById('modal').style.display = 'none'; }
-
-        function salvarCliente() {
-            const id = document.getElementById('editId').value;
+        window.salvarCliente = async () => {
             const nome = document.getElementById('nomeCli').value;
             const data = document.getElementById('dataCli').value;
             const painel = document.getElementById('painelCli').value;
-            if(!nome || !data) return alert("Preencha!");
+            if(!nome || !data) return alert("Preencha Nome e Data!");
 
-            if(id) {
-                const index = clientes.findIndex(c => c.id == id);
-                clientes[index] = { id: Number(id), nome, data, painel };
-            } else {
-                clientes.push({ id: Date.now(), nome, data, painel });
-            }
-            atualizarStorage();
+            await addDoc(collection(db, "clientes"), { nome, data, painel, criadoEm: Date.now() });
             fecharModal();
-        }
+            document.getElementById('nomeCli').value = "";
+            document.getElementById('dataCli').value = "";
+            document.getElementById('painelCli').value = "";
+        };
 
-        function renovarUmMes(id) {
-            const index = clientes.findIndex(c => c.id === id);
-            let partes = clientes[index].data.split('-');
+        window.renovarUmMes = async (id, dataAtual) => {
+            let partes = dataAtual.split('-');
             let ano = parseInt(partes[0]);
             let mes = parseInt(partes[1]);
             let dia = partes[2];
             mes++; if (mes > 12) { mes = 1; ano++; }
             let novoMes = mes < 10 ? '0' + mes : mes;
-            clientes[index].data = `${ano}-${novoMes}-${dia}`;
-            atualizarStorage();
-        }
+            const novaData = `${ano}-${novoMes}-${dia}`;
+            await updateDoc(doc(db, "clientes", id), { data: novaData });
+        };
 
-        function excluirCliente(id) {
-            if(confirm("Apagar?")) {
-                clientes = clientes.filter(c => c.id !== id);
-                atualizarStorage();
-            }
-        }
+        window.excluirCliente = async (id) => {
+            if(confirm("Apagar da nuvem?")) await deleteDoc(doc(db, "clientes", id));
+        };
 
-        function atualizarStorage() {
-            localStorage.setItem('meusClientesProV8', JSON.stringify(clientes));
-            renderClientes();
-        }
-
-        function renderClientes() {
+        onSnapshot(collection(db, "clientes"), (snapshot) => {
             const listaDiv = document.getElementById('lista');
             const hoje = new Date(); hoje.setHours(0,0,0,0);
+            let clientes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            clientes.sort((a, b) => new Date(a.data) - new Date(b.data));
 
-            clientes.sort((a, b) => {
-                const dA = new Date(a.data); const dB = new Date(b.data);
-                const urgA = ((dA - hoje) / 86400000) <= 3 ? 1 : 0;
-                const urgB = ((dB - hoje) / 86400000) <= 3 ? 1 : 0;
-                if (urgA !== urgB) return urgB - urgA;
-                return dA - dB;
-            });
-            
             listaDiv.innerHTML = clientes.map(c => {
                 const dV = new Date(c.data);
                 const diff = Math.ceil((dV - hoje) / 86400000);
@@ -204,16 +148,13 @@
                             </p>
                         </div>
                         <div class="acoes">
-                            <button class="btn-acao btn-plus" onclick="renovarUmMes(${c.id})">+1 Mês</button>
-                            <button class="btn-acao btn-edit" onclick="abrirModal(${c.id})">Editar</button>
-                            <button class="btn-acao btn-del" onclick="excluirCliente(${c.id})">Excluir</button>
+                            <button class="btn-acao btn-plus" onclick="renovarUmMes('${c.id}', '${c.data}')">+1 Mês</button>
+                            <button class="btn-acao btn-del" onclick="excluirCliente('${c.id}')">Excluir</button>
                         </div>
                     </div>
                 `;
             }).join('');
-        }
-
-        window.onload = () => { renderLembretes(); renderClientes(); };
+        });
     </script>
 </body>
 </html>
