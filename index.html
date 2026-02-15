@@ -2,25 +2,44 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Gestor Elite V7</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Gestor Pro">
+    
+    <title>Gestor Elite V8</title>
     <style>
         :root { --bg: #000; --card: #1a1a1a; --text: #fff; --accent: #3b82f6; --danger: #ff4d4d; --warning: #f59e0b; --success: #10b981; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-top: 80px; }
         
-        .header { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); padding: 15px; z-index: 100; border-bottom: 1px solid #333; display: flex; justify-content: center; }
+        body { 
+            font-family: -apple-system, system-ui, sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 20px; 
+            padding-top: calc(80px + env(safe-area-inset-top)); /* Ajuste para o entalhe do iPhone */
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        .header { 
+            position: fixed; top: 0; left: 0; right: 0; 
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); 
+            padding: 15px; padding-top: env(safe-area-inset-top);
+            z-index: 100; border-bottom: 1px solid #333; 
+            display: flex; justify-content: center; 
+        }
+        
         .btn-add { background: var(--accent); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-weight: bold; }
 
-        /* SEÇÃO DE LEMBRETES MULTIPLOS */
+        /* LEMBRETES */
         .lembretes-container { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 25px; border: 1px dashed var(--warning); }
-        .lembretes-header { color: var(--warning); font-size: 14px; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+        .lembretes-header { color: var(--warning); font-size: 14px; font-weight: bold; margin-bottom: 10px; }
         .lembrete-input-group { display: flex; gap: 5px; margin-bottom: 15px; }
-        .lembrete-input-group input { flex: 1; background: #222; border: 1px solid #444; color: white; padding: 10px; border-radius: 8px; font-size: 14px; }
+        .lembrete-input-group input { flex: 1; background: #222; border: 1px solid #444; color: white; padding: 10px; border-radius: 8px; }
         .btn-add-lembrete { background: var(--warning); color: black; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; }
-        
-        .lembrete-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #333; font-size: 15px; color: #eee; }
-        .lembrete-item:last-child { border-bottom: none; }
-        .btn-del-lembrete { color: var(--danger); background: none; border: none; font-size: 18px; padding-left: 10px; }
+        .lembrete-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #333; }
+        .btn-del-lembrete { color: var(--danger); background: none; border: none; font-size: 18px; }
 
         /* CLIENTES */
         .cliente-item { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; }
@@ -46,9 +65,9 @@
     <div class="header"><button class="btn-add" onclick="abrirModal()">+ Novo Cliente</button></div>
 
     <div class="lembretes-container">
-        <div class="lembretes-header">⚠️ LEMBRETES IMPORTANTES</div>
+        <div class="lembretes-header">⚠️ LEMBRETES</div>
         <div class="lembrete-input-group">
-            <input type="text" id="novoLembrete" placeholder="Digite um lembrete...">
+            <input type="text" id="novoLembrete" placeholder="Novo lembrete...">
             <button class="btn-add-lembrete" onclick="adicionarLembrete()">+</button>
         </div>
         <div id="listaLembretes"></div>
@@ -58,7 +77,7 @@
 
     <div id="modal">
         <div class="modal-content">
-            <h3 id="modalTitle" style="margin:0">Dados do Cliente</h3>
+            <h3 id="modalTitle" style="margin:0">Cliente</h3>
             <input type="hidden" id="editId">
             <input type="text" id="nomeCli" placeholder="Nome">
             <input type="date" id="dataCli">
@@ -69,10 +88,9 @@
     </div>
 
     <script>
-        let clientes = JSON.parse(localStorage.getItem('meusClientesProV7')) || [];
-        let lembretes = JSON.parse(localStorage.getItem('meusLembretesV7')) || [];
+        let clientes = JSON.parse(localStorage.getItem('meusClientesProV8')) || [];
+        let lembretes = JSON.parse(localStorage.getItem('meusLembretesV8')) || [];
 
-        // --- FUNÇÕES DE LEMBRETES ---
         function adicionarLembrete() {
             const txt = document.getElementById('novoLembrete').value;
             if(!txt) return;
@@ -87,7 +105,7 @@
         }
 
         function salvarLembretes() {
-            localStorage.setItem('meusLembretesV7', JSON.stringify(lembretes));
+            localStorage.setItem('meusLembretesV8', JSON.stringify(lembretes));
             renderLembretes();
         }
 
@@ -101,7 +119,6 @@
             `).join('');
         }
 
-        // --- FUNÇÕES DE CLIENTES ---
         function abrirModal(id = null) {
             document.getElementById('modal').style.display = 'flex';
             if(id) {
@@ -125,7 +142,7 @@
             const nome = document.getElementById('nomeCli').value;
             const data = document.getElementById('dataCli').value;
             const painel = document.getElementById('painelCli').value;
-            if(!nome || !data) return alert("Preencha Nome e Data!");
+            if(!nome || !data) return alert("Preencha!");
 
             if(id) {
                 const index = clientes.findIndex(c => c.id == id);
@@ -143,22 +160,21 @@
             let ano = parseInt(partes[0]);
             let mes = parseInt(partes[1]);
             let dia = partes[2];
-            mes++; 
-            if (mes > 12) { mes = 1; ano++; }
+            mes++; if (mes > 12) { mes = 1; ano++; }
             let novoMes = mes < 10 ? '0' + mes : mes;
             clientes[index].data = `${ano}-${novoMes}-${dia}`;
             atualizarStorage();
         }
 
         function excluirCliente(id) {
-            if(confirm("Apagar cliente?")) {
+            if(confirm("Apagar?")) {
                 clientes = clientes.filter(c => c.id !== id);
                 atualizarStorage();
             }
         }
 
         function atualizarStorage() {
-            localStorage.setItem('meusClientesProV7', JSON.stringify(clientes));
+            localStorage.setItem('meusClientesProV8', JSON.stringify(clientes));
             renderClientes();
         }
 
@@ -197,10 +213,7 @@
             }).join('');
         }
 
-        window.onload = () => {
-            renderLembretes();
-            renderClientes();
-        };
+        window.onload = () => { renderLembretes(); renderClientes(); };
     </script>
 </body>
 </html>
