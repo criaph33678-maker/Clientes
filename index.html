@@ -23,7 +23,6 @@
             padding-top: 80px; 
         }
 
-        /* Header Fixo */
         .header-action {
             position: fixed;
             top: 0; left: 0; right: 0;
@@ -45,7 +44,6 @@
             box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
         }
 
-        /* Lembrete */
         .aviso-card { 
             background: var(--card-bg); 
             border-left: 4px solid var(--warning); 
@@ -59,7 +57,6 @@
             font-size: 16px; font-weight: bold; outline: none; 
         }
 
-        /* Cartão do Cliente */
         .cliente-item { 
             background: var(--card-bg); 
             padding: 15px; 
@@ -72,22 +69,15 @@
             background: rgba(255, 77, 77, 0.05);
         }
 
-        .cliente-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-
         .info h4 { margin: 0; font-size: 18px; color: #fff; }
         .info p { margin: 4px 0; font-size: 13px; color: #aaa; }
 
-        /* Ações Individuais */
         .acoes-cliente {
             display: flex;
             gap: 10px;
             border-top: 1px solid #333;
             padding-top: 12px;
+            margin-top: 12px;
         }
 
         .btn-acao {
@@ -97,17 +87,12 @@
             border: none;
             font-weight: bold;
             font-size: 13px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
         }
 
         .btn-plus { background: var(--success); color: white; }
         .btn-edit { background: #333; color: white; }
         .btn-del { background: rgba(255, 77, 77, 0.15); color: var(--danger); }
 
-        /* Modal */
         #modal {
             display: none;
             position: fixed;
@@ -159,7 +144,7 @@
     </div>
 
     <script>
-        let clientes = JSON.parse(localStorage.getItem('meusClientesProV3')) || [];
+        let clientes = JSON.parse(localStorage.getItem('meusClientesProV4')) || [];
 
         function abrirModal(id = null) {
             document.getElementById('modal').style.display = 'flex';
@@ -200,31 +185,41 @@
             fecharModal();
         }
 
-        function renovar30Dias(id) {
+        // NOVA LÓGICA: MUDA O MÊS, MANTÉM O DIA
+        function renovarUmMes(id) {
             const index = clientes.findIndex(c => c.id === id);
-            let dataAtual = new Date(clientes[index].data);
-            dataAtual.setDate(dataAtual.getDate() + 30);
-            
-            // Formatar de volta para YYYY-MM-DD
-            clientes[index].data = dataAtual.toISOString().split('T')[0];
+            let dataPartes = clientes[index].data.split('-'); // [Ano, Mes, Dia]
+            let ano = parseInt(dataPartes[0]);
+            let mes = parseInt(dataPartes[1]);
+            let dia = dataPartes[2];
+
+            mes++; // Avança o mês
+            if (mes > 12) {
+                mes = 1;
+                ano++;
+            }
+
+            // Formata com zero à esquerda se necessário
+            let mesFormatado = mes < 10 ? '0' + mes : mes;
+            clientes[index].data = `${ano}-${mesFormatado}-${dia}`;
             
             atualizarStorage();
         }
 
         function excluirCliente(id) {
-            if(confirm("Tem certeza que deseja apagar este cliente?")) {
+            if(confirm("Deseja apagar este cliente?")) {
                 clientes = clientes.filter(c => c.id !== id);
                 atualizarStorage();
             }
         }
 
         function atualizarStorage() {
-            localStorage.setItem('meusClientesProV3', JSON.stringify(clientes));
+            localStorage.setItem('meusClientesProV4', JSON.stringify(clientes));
             render();
         }
 
         function salvarAviso() {
-            localStorage.setItem('meuAvisoProV3', document.getElementById('textoAviso').value);
+            localStorage.setItem('meuAvisoProV4', document.getElementById('textoAviso').value);
         }
 
         function render() {
@@ -250,17 +245,15 @@
 
                 return `
                     <div class="cliente-item ${isUrgente ? 'urgente' : ''}">
-                        <div class="cliente-header">
-                            <div class="info">
-                                <h4>${c.nome} ${isUrgente ? '⚠️' : ''}</h4>
-                                <p>🖥️ Painel: ${c.painel}</p>
-                                <p style="color: ${isUrgente ? 'var(--danger)' : '#aaa'}">
-                                    ${isUrgente ? 'VENCE EM ' + diffDias + ' DIAS' : 'Vence em: ' + c.data.split('-').reverse().join('/')}
-                                </p>
-                            </div>
+                        <div class="info">
+                            <h4>${c.nome} ${isUrgente ? '⚠️' : ''}</h4>
+                            <p>🖥️ Painel: ${c.painel}</p>
+                            <p style="color: ${isUrgente ? 'var(--danger)' : '#aaa'}">
+                                ${isUrgente ? 'VENCE EM ' + diffDias + ' DIAS' : 'Vence em: ' + c.data.split('-').reverse().join('/')}
+                            </p>
                         </div>
                         <div class="acoes-cliente">
-                            <button class="btn-acao btn-plus" onclick="renovar30Dias(${c.id})">+30 Dias</button>
+                            <button class="btn-acao btn-plus" onclick="renovarUmMes(${c.id})">+1 Mês</button>
                             <button class="btn-acao btn-edit" onclick="abrirModal(${c.id})">Editar</button>
                             <button class="btn-acao btn-del" onclick="excluirCliente(${c.id})">Excluir</button>
                         </div>
@@ -268,7 +261,7 @@
                 `;
             }).join('');
             
-            const avisoSalvo = localStorage.getItem('meuAvisoProV3');
+            const avisoSalvo = localStorage.getItem('meuAvisoProV4');
             if(avisoSalvo) document.getElementById('textoAviso').value = avisoSalvo;
         }
 
