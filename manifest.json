@@ -1,0 +1,15 @@
+{
+  "name": "Meu Gestor Pro",
+  "short_name": "Gestor",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/5999/5999184.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
