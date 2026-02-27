@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
     <link rel="manifest" href="manifest.json">
-    <title>Gestor Business V12.6</title>
+    <title>Gestor Business V12.7</title>
     <style>
         :root { --bg: #000; --card: #1a1a1a; --text: #fff; --accent: #3b82f6; --danger: #ff0000; --warning: #ffcc00; --success: #00ff00; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; padding-top: calc(140px + env(safe-area-inset-top)); }
@@ -18,14 +19,12 @@
         .busca-container { display: flex; gap: 8px; align-items: center; background: #222; padding: 8px 15px; border-radius: 20px; border: 1px solid #444; }
         .busca-container input { background: none; border: none; color: white; flex: 1; outline: none; font-size: 15px; }
 
-        /* MURAL DE AVISOS AMPLIADO */
+        /* MURAL DE AVISOS */
         .mural-avisos { margin: 20px 0; display: flex; flex-direction: column; gap: 12px; }
         .secao-titulo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-left: 3px solid var(--accent); padding-left: 10px; }
         .secao-titulo h5 { margin: 0; color: var(--text); text-transform: uppercase; font-size: 14px; font-weight: 900; }
         .btn-add-aviso { background: var(--accent); border: none; color: white; border-radius: 5px; padding: 5px 12px; font-size: 11px; font-weight: 800; cursor: pointer; }
-        
-        .card-aviso { background: #111; border: 1px solid #333; border-left: 6px solid var(--accent); padding: 18px; border-radius: 12px; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); line-height: 1.4; }
-        .card-aviso:active { transform: scale(0.98); background: #1a1a1a; }
+        .card-aviso { background: #111; border: 1px solid #333; border-left: 6px solid var(--accent); padding: 18px; border-radius: 12px; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; line-height: 1.4; }
 
         /* CLIENTES */
         .cliente-item { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #333; }
@@ -42,8 +41,6 @@
 
         #toast { visibility: hidden; min-width: 250px; background-color: var(--success); color: #fff; text-align: center; border-radius: 10px; padding: 16px; position: fixed; z-index: 300; left: 50%; transform: translateX(-50%); bottom: 30px; font-weight: bold; }
         #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
-        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
 
         #modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 200; justify-content: center; align-items: center; }
         .modal-content { background: #222; padding: 20px; border-radius: 20px; width: 85%; max-width: 400px; }
@@ -102,10 +99,16 @@
         const db = getFirestore(app);
         let todosClientes = [];
 
-        // --- LÓGICA DO MURAL DE AVISOS ---
+        // REGISTRO DO SERVICE WORKER (PARA INSTALAÇÃO NO ANDROID)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+            .then(() => console.log("Service Worker Ativo"))
+            .catch(err => console.log("Erro Service Worker", err));
+        }
+
+        // --- LÓGICA DO MURAL ---
         onSnapshot(query(collection(db, "avisos"), orderBy("criadoEm", "desc")), (snap) => {
-            const lista = document.getElementById('listaAvisos');
-            lista.innerHTML = snap.docs.map(d => `
+            document.getElementById('listaAvisos').innerHTML = snap.docs.map(d => `
                 <div class="card-aviso" onclick="acoesAviso('${d.id}', '${d.data().texto}')">
                     📢 ${d.data().texto}
                 </div>
@@ -114,28 +117,16 @@
 
         window.adicionarAviso = async () => {
             const texto = prompt("Digite o novo lembrete:");
-            if (texto) {
-                await addDoc(collection(db, "avisos"), { texto, criadoEm: Date.now() });
-                mostrarFeedback("📌 Lembrete fixado!");
-            }
+            if (texto) await addDoc(collection(db, "avisos"), { texto, criadoEm: Date.now() });
         };
 
         window.acoesAviso = async (id, textoAtual) => {
-            const opcao = confirm("Clique em OK para EDITAR ou em CANCELAR para APAGAR este lembrete.");
-            
+            const opcao = confirm("OK para EDITAR / CANCELAR para APAGAR.");
             if (opcao) {
-                // Editar
-                const novoTexto = prompt("Edite seu lembrete:", textoAtual);
-                if (novoTexto && novoTexto !== textoAtual) {
-                    await updateDoc(doc(db, "avisos", id), { texto: novoTexto });
-                    mostrarFeedback("✅ Lembrete atualizado!");
-                }
+                const novo = prompt("Editar:", textoAtual);
+                if (novo) await updateDoc(doc(db, "avisos", id), { texto: novo });
             } else {
-                // Apagar
-                if (confirm("Tem certeza que deseja EXCLUIR este lembrete?")) {
-                    await deleteDoc(doc(db, "avisos", id));
-                    mostrarFeedback("🗑️ Lembrete removido!", "#ff0000");
-                }
+                if (confirm("Excluir?")) await deleteDoc(doc(db, "avisos", id));
             }
         };
 
@@ -144,21 +135,19 @@
             const t = document.getElementById("toast");
             t.innerText = msg; t.style.backgroundColor = cor;
             t.className = "show";
-            setTimeout(() => { t.className = t.className.replace("show", ""); }, 3000);
+            setTimeout(() => { t.className = ""; }, 3000);
         }
 
         window.abrirModal = (id = null) => {
             document.getElementById('modal').style.display = 'flex';
             if(id) {
                 const c = todosClientes.find(cli => cli.id === id);
-                document.getElementById('modalTitle').innerText = "Editar Cliente";
                 document.getElementById('editId').value = id;
                 document.getElementById('nomeCli').value = c.nome;
                 document.getElementById('wppCli').value = c.whatsapp || "";
                 document.getElementById('dataCli').value = c.data;
                 document.getElementById('painelCli').value = c.painel || "";
             } else {
-                document.getElementById('modalTitle').innerText = "Novo Cliente";
                 document.getElementById('editId').value = "";
                 document.querySelectorAll('#modal input').forEach(i => i.value = "");
             }
@@ -174,14 +163,10 @@
                 data: document.getElementById('dataCli').value,
                 painel: document.getElementById('painelCli').value || "Geral"
             };
-            if(id) {
-                await updateDoc(doc(db, "clientes", id), dados);
-                mostrarFeedback("✅ Cliente editado!");
-            } else {
-                await addDoc(collection(db, "clientes"), { ...dados, criadoEm: Date.now() });
-                mostrarFeedback("✅ Cliente cadastrado!");
-            }
+            if(id) await updateDoc(doc(db, "clientes", id), dados);
+            else await addDoc(collection(db, "clientes"), { ...dados, criadoEm: Date.now() });
             fecharModal();
+            mostrarFeedback("Sucesso!");
         };
 
         window.renovarUmMes = async (id, dataAtual) => {
@@ -190,14 +175,11 @@
             let d = new Date(p[0], p[1]-1, p[2]);
             d.setMonth(d.getMonth() + 1);
             await updateDoc(doc(db, "clientes", id), { data: d.toISOString().split('T')[0] });
-            mostrarFeedback("🚀 Renovado com sucesso!");
+            mostrarFeedback("Renovado!");
         };
 
         window.excluirCliente = async (id) => {
-            if(confirm("Excluir permanentemente?")) {
-                await deleteDoc(doc(db, "clientes", id));
-                mostrarFeedback("🗑️ Cliente excluído!", "#ff0000");
-            }
+            if(confirm("Excluir?")) await deleteDoc(doc(db, "clientes", id));
         };
 
         window.filtrarClientes = () => {
@@ -206,8 +188,7 @@
         };
 
         function renderizar(lista) {
-            const hoje = new Date();
-            hoje.setHours(0,0,0,0);
+            const hoje = new Date(); hoje.setHours(0,0,0,0);
             document.getElementById('lista').innerHTML = lista.map(c => {
                 const dataVenc = new Date(c.data + 'T23:59:59');
                 const diff = Math.ceil((dataVenc - hoje) / 86400000);
@@ -228,8 +209,8 @@
                         <button class="btn-acao btn-edit" onclick="abrirModal('${c.id}')">✏️ Editar</button>
                         <button class="btn-acao btn-del" onclick="excluirCliente('${c.id}')">🗑️ Excluir</button>
                     </div>
-                </div>
-            `}).join('');
+                </div>`;
+            }).join('');
         }
 
         onSnapshot(query(collection(db, "clientes"), orderBy("data", "asc")), (snap) => {
