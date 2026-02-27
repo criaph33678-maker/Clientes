@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
-    <title>Gestor Business V11</title>
+    <title>Gestor Business V11.1</title>
     <style>
         :root { --bg: #000; --card: #1a1a1a; --text: #fff; --accent: #3b82f6; --danger: #ff4d4d; --warning: #f59e0b; --success: #10b981; --wpp: #25d366; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; padding-top: calc(115px + env(safe-area-inset-top)); }
@@ -18,14 +18,20 @@
         .busca-container { display: flex; gap: 8px; align-items: center; background: #222; padding: 8px 15px; border-radius: 20px; border: 1px solid #444; }
         .busca-container input { background: none; border: none; color: white; flex: 1; outline: none; font-size: 14px; }
 
-        .cliente-item { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #333; }
+        .cliente-item { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #333; transition: 0.3s; }
+        .cliente-item.urgente { border: 2px solid var(--danger) !important; box-shadow: 0 0 15px rgba(255, 77, 77, 0.2); }
+        
+        .info h4 { margin: 0; font-size: 17px; }
+        .info p { margin: 3px 0; font-size: 13px; color: #aaa; }
+        .alerta-venc { font-weight: bold; font-size: 12px; display: inline-block; margin-top: 5px; padding: 2px 8px; border-radius: 5px; }
+
         .acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; border-top: 1px solid #333; padding-top: 12px; }
         .btn-acao { padding: 10px; border-radius: 10px; border: none; font-weight: bold; font-size: 12px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
         .btn-plus { background: var(--success); }
         .btn-edit { background: #444; }
         .btn-del { background: rgba(255, 77, 77, 0.1); color: var(--danger); }
 
-        #toast { visibility: hidden; min-width: 250px; background-color: var(--success); color: #fff; text-align: center; border-radius: 10px; padding: 16px; position: fixed; z-index: 300; left: 50%; transform: translateX(-50%); bottom: 30px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        #toast { visibility: hidden; min-width: 250px; background-color: var(--success); color: #fff; text-align: center; border-radius: 10px; padding: 16px; position: fixed; z-index: 300; left: 50%; transform: translateX(-50%); bottom: 30px; font-weight: bold; }
         #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
         @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
         @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
@@ -38,7 +44,7 @@
 <body>
 
     <div class="header-fixo">
-        <div id="contadores" class="stats">Carregando contadores...</div>
+        <div id="contadores" class="stats">Calculando...</div>
         <div class="busca-container">
             <span>🔍</span>
             <input type="text" id="inputBusca" placeholder="Pesquisar nome..." oninput="filtrarClientes()">
@@ -147,11 +153,25 @@
         };
 
         function renderizar(lista) {
-            document.getElementById('lista').innerHTML = lista.map(c => `
-                <div class="cliente-item">
+            const hoje = new Date();
+            hoje.setHours(0,0,0,0);
+            
+            document.getElementById('lista').innerHTML = lista.map(c => {
+                // Cálculo de dias para o alerta
+                const dataVenc = new Date(c.data + 'T23:59:59');
+                const diff = Math.ceil((dataVenc - hoje) / 86400000);
+                const isUrgent = diff <= 3 && diff >= 0;
+                const isExpired = diff < 0;
+
+                return `
+                <div class="cliente-item ${isUrgent || isExpired ? 'urgente' : ''}">
                     <div class="info">
                         <h4>${c.nome}</h4>
-                        <p>📟 Painel: ${c.painel} | 📅 Venc: ${c.data.split('-').reverse().join('/')}</p>
+                        <p> Painel: ${c.painel}</p>
+                        <p> Venc: ${c.data.split('-').reverse().join('/')}</p>
+                        <span class="alerta-venc" style="color:${isExpired ? 'var(--danger)' : (isUrgent ? 'var(--warning)' : 'var(--success)')}">
+                            ${isExpired ? '❌ VENCIDO' : (isUrgent ? '⚠️ VENCE EM ' + diff + ' DIAS' : '✅ EM DIA')}
+                        </span>
                     </div>
                     <div class="acoes">
                         <button class="btn-acao btn-plus" onclick="renovarUmMes('${c.id}', '${c.data}')">➕ +1 Mês</button>
@@ -159,7 +179,7 @@
                         <button class="btn-acao btn-del" onclick="excluirCliente('${c.id}')" style="grid-column: span 2">🗑️ Excluir</button>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         onSnapshot(query(collection(db, "clientes"), orderBy("data", "asc")), (snap) => {
