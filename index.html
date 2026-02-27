@@ -6,21 +6,29 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
-    <title>Gestor Business V12.4</title>
+    <title>Gestor Business V12.5</title>
     <style>
         :root { --bg: #000; --card: #1a1a1a; --text: #fff; --accent: #3b82f6; --danger: #ff0000; --warning: #ffcc00; --success: #00ff00; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; padding-top: calc(165px + env(safe-area-inset-top)); }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; padding-top: calc(140px + env(safe-area-inset-top)); }
         
+        /* HEADER FIXO */
         .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 10px; padding-top: env(safe-area-inset-top); z-index: 100; border-bottom: 1px solid #333; }
         .stats { font-size: 11px; color: #aaa; display: flex; gap: 8px; margin-bottom: 8px; overflow-x: auto; white-space: nowrap; font-weight: 600; }
         .stats b { color: var(--accent); }
         
-        .busca-container { display: flex; gap: 8px; align-items: center; background: #222; padding: 8px 15px; border-radius: 20px; border: 1px solid #444; margin-bottom: 10px; }
+        .busca-container { display: flex; gap: 8px; align-items: center; background: #222; padding: 8px 15px; border-radius: 20px; border: 1px solid #444; }
         .busca-container input { background: none; border: none; color: white; flex: 1; outline: none; font-size: 15px; }
 
-        /* CAMPO DE AVISO RECUPERADO */
-        .campo-aviso { background: rgba(59, 130, 246, 0.15); border: 1px dashed var(--accent); border-radius: 12px; padding: 10px; text-align: center; color: var(--accent); font-size: 13px; font-weight: 700; margin-top: 5px; cursor: pointer; min-height: 20px; }
+        /* MURAL DE AVISOS (ESTILO LISTA) */
+        .mural-avisos { margin: 15px 0; display: flex; flex-direction: column; gap: 8px; }
+        .secao-titulo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .secao-titulo h5 { margin: 0; color: #888; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
+        .btn-add-aviso { background: none; border: 1px solid var(--accent); color: var(--accent); border-radius: 5px; padding: 2px 8px; font-size: 10px; font-weight: 800; cursor: pointer; }
+        
+        .card-aviso { background: rgba(59, 130, 246, 0.1); border-left: 4px solid var(--accent); padding: 12px; border-radius: 8px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; position: relative; }
+        .card-aviso:active { background: rgba(59, 130, 246, 0.2); }
 
+        /* LISTA DE CLIENTES */
         .cliente-item { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #333; }
         .cliente-item.urgente { border: 2px solid var(--danger) !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); }
         .info h4 { margin: 0; font-size: 20px; font-weight: 900; text-transform: uppercase; }
@@ -52,7 +60,14 @@
             <input type="text" id="inputBusca" placeholder="Pesquisar cliente..." oninput="filtrarClientes()">
             <button onclick="abrirModal()" style="background:var(--accent); border:none; color:white; border-radius:50%; width:32px; height:32px; font-weight:900;">+</button>
         </div>
-        <div id="textoAviso" class="campo-aviso" onclick="editarAviso()">Carregando lembretes...</div>
+    </div>
+
+    <div class="mural-avisos">
+        <div class="secao-titulo">
+            <h5>📌 Mural de Lembretes</h5>
+            <button class="btn-add-aviso" onclick="adicionarAviso()">+ NOVO</button>
+        </div>
+        <div id="listaAvisos"></div>
     </div>
 
     <div id="lista"></div>
@@ -88,24 +103,32 @@
         const db = getFirestore(app);
         let todosClientes = [];
 
-        // LÓGICA DO AVISO CONECTADA AO FIREBASE
-        onSnapshot(doc(db, "config", "avisoGeral"), (snap) => {
-            if (snap.exists()) {
-                document.getElementById('textoAviso').innerText = "📢 " + snap.data().texto;
-            } else {
-                document.getElementById('textoAviso').innerText = "📢 Toque para adicionar um lembrete...";
-            }
+        // --- LÓGICA DO MURAL DE AVISOS ---
+        onSnapshot(query(collection(db, "avisos"), orderBy("criadoEm", "desc")), (snap) => {
+            const lista = document.getElementById('listaAvisos');
+            lista.innerHTML = snap.docs.map(d => `
+                <div class="card-aviso" onclick="excluirAviso('${d.id}')">
+                    📢 ${d.data().texto}
+                </div>
+            `).join('');
         });
 
-        window.editarAviso = async () => {
-            const atual = document.getElementById('textoAviso').innerText.replace("📢 ", "");
-            const novo = prompt("Digite o novo lembrete:", atual);
-            if (novo !== null) {
-                await setDoc(doc(db, "config", "avisoGeral"), { texto: novo });
-                mostrarFeedback("📌 Lembrete atualizado!");
+        window.adicionarAviso = async () => {
+            const texto = prompt("Digite o novo aviso ou lembrete:");
+            if (texto) {
+                await addDoc(collection(db, "avisos"), { texto, criadoEm: Date.now() });
+                mostrarFeedback("📌 Lembrete fixado!");
             }
         };
 
+        window.excluirAviso = async (id) => {
+            if (confirm("Deseja apagar este lembrete?")) {
+                await deleteDoc(doc(db, "avisos", id));
+                mostrarFeedback("🗑️ Lembrete removido!", "#ff0000");
+            }
+        };
+
+        // --- LÓGICA DE CLIENTES ---
         function mostrarFeedback(msg, cor = "#00ff00") {
             const t = document.getElementById("toast");
             t.innerText = msg; t.style.backgroundColor = cor;
