@@ -6,39 +6,43 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
-    <title>Gestor Business V11.1</title>
+    <title>Gestor Business V12</title>
     <style>
-        :root { --bg: #000; --card: #1a1a1a; --text: #fff; --accent: #3b82f6; --danger: #ff4d4d; --warning: #f59e0b; --success: #10b981; --wpp: #25d366; }
+        :root { --bg: #000; --card: #1a1a1a; --text: #fff; --accent: #3b82f6; --danger: #ff0000; --warning: #f59e0b; --success: #00ff00; --wpp: #25d366; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; padding-top: calc(115px + env(safe-area-inset-top)); }
         
+        /* HEADER COM CONTADORES E BUSCA */
         .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 10px; padding-top: env(safe-area-inset-top); z-index: 100; border-bottom: 1px solid #333; }
-        .stats { font-size: 10px; color: #888; display: flex; gap: 8px; margin-bottom: 8px; justify-content: flex-start; overflow-x: auto; white-space: nowrap; padding-bottom: 5px; }
+        .stats { font-size: 11px; color: #aaa; display: flex; gap: 8px; margin-bottom: 8px; justify-content: flex-start; overflow-x: auto; white-space: nowrap; padding-bottom: 5px; font-weight: 600; }
         .stats b { color: var(--accent); }
         
         .busca-container { display: flex; gap: 8px; align-items: center; background: #222; padding: 8px 15px; border-radius: 20px; border: 1px solid #444; }
-        .busca-container input { background: none; border: none; color: white; flex: 1; outline: none; font-size: 14px; }
+        .busca-container input { background: none; border: none; color: white; flex: 1; outline: none; font-size: 15px; }
 
+        /* LISTA DE CLIENTES E DESTAQUE DE LETRAS */
         .cliente-item { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #333; transition: 0.3s; }
-        .cliente-item.urgente { border: 2px solid var(--danger) !important; box-shadow: 0 0 15px rgba(255, 77, 77, 0.2); }
-        
-        .info h4 { margin: 0; font-size: 17px; }
-        .info p { margin: 3px 0; font-size: 13px; color: #aaa; }
-        .alerta-venc { font-weight: bold; font-size: 12px; display: inline-block; margin-top: 5px; padding: 2px 8px; border-radius: 5px; }
+        .info h4 { margin: 0 0 5px 0; font-size: 20px; font-weight: 800; text-transform: uppercase; color: var(--text); }
+        .info p { margin: 4px 0; font-size: 14px; color: #bbb; font-weight: 500; }
+        .info b { color: var(--text); }
 
+        /* BOTÕES COM CORES INTENSAS */
         .acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; border-top: 1px solid #333; padding-top: 12px; }
-        .btn-acao { padding: 10px; border-radius: 10px; border: none; font-weight: bold; font-size: 12px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
-        .btn-plus { background: var(--success); }
+        .btn-acao { padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 13px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-plus { background: var(--success); box-shadow: 0 0 10px rgba(0, 255, 0, 0.2); }
+        .btn-plus:active { background: #00cc00; }
         .btn-edit { background: #444; }
-        .btn-del { background: rgba(255, 77, 77, 0.1); color: var(--danger); }
+        .btn-del { background: var(--danger); grid-column: span 2; box-shadow: 0 0 10px rgba(255, 0, 0, 0.2); }
+        .btn-del:active { background: #cc0000; }
 
-        #toast { visibility: hidden; min-width: 250px; background-color: var(--success); color: #fff; text-align: center; border-radius: 10px; padding: 16px; position: fixed; z-index: 300; left: 50%; transform: translateX(-50%); bottom: 30px; font-weight: bold; }
+        /* TOAST E MODAL */
+        #toast { visibility: hidden; min-width: 250px; background-color: var(--success); color: #fff; text-align: center; border-radius: 10px; padding: 16px; position: fixed; z-index: 300; left: 50%; transform: translateX(-50%); bottom: 30px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
         @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
         @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
 
         #modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 200; justify-content: center; align-items: center; }
         .modal-content { background: #222; padding: 20px; border-radius: 20px; width: 85%; max-width: 400px; }
-        .modal-content input { width: 100%; padding: 12px; margin: 8px 0; background: #333; border: 1px solid #444; border-radius: 10px; color: white; box-sizing: border-box; }
+        .modal-content input { width: 100%; padding: 14px; margin: 8px 0; background: #333; border: 1px solid #444; border-radius: 10px; color: white; box-sizing: border-box; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -46,25 +50,25 @@
     <div class="header-fixo">
         <div id="contadores" class="stats">Calculando...</div>
         <div class="busca-container">
-            <span>🔍</span>
-            <input type="text" id="inputBusca" placeholder="Pesquisar nome..." oninput="filtrarClientes()">
-            <button onclick="abrirModal()" style="background:var(--accent); border:none; color:white; border-radius:50%; width:30px; height:30px; font-weight:bold">+</button>
+            <span style="font-size: 16px;">🔍</span>
+            <input type="text" id="inputBusca" placeholder="Pesquisar nome do cliente..." oninput="filtrarClientes()">
+            <button onclick="abrirModal()" style="background:var(--accent); border:none; color:white; border-radius:50%; width:32px; height:32px; font-weight:900; font-size:18px">+</button>
         </div>
     </div>
 
     <div id="lista"></div>
-    <div id="toast">Sucesso!</div>
+    <div id="toast">✅ Operação realizada!</div>
 
     <div id="modal">
         <div class="modal-content">
-            <h3 id="modalTitle" style="margin:0 0 10px 0">Novo Cliente</h3>
+            <h3 id="modalTitle" style="margin:0 0 10px 0; font-weight:900">Novo Cliente</h3>
             <input type="hidden" id="editId">
-            <input type="text" id="nomeCli" placeholder="Nome">
-            <input type="text" id="wppCli" placeholder="WhatsApp">
+            <input type="text" id="nomeCli" placeholder="Nome do Cliente">
+            <input type="text" id="wppCli" placeholder="WhatsApp (DDD+Número)">
             <input type="date" id="dataCli">
-            <input type="text" id="painelCli" placeholder="Painel">
-            <button class="btn-plus" style="width:100%; padding:15px; margin-top:10px" onclick="salvarCliente()">Confirmar Alteração</button>
-            <button onclick="fecharModal()" style="background:none; border:none; color:#888; width:100%; margin-top:10px">Cancelar</button>
+            <input type="text" id="painelCli" placeholder="Nome do Painel">
+            <button class="btn-plus" style="width:100%; padding:15px; margin-top:10px" onclick="salvarCliente()">Confirmar e Salvar</button>
+            <button onclick="fecharModal()" style="background:none; border:none; color:#aaa; width:100%; margin-top:10px; font-weight:600">Cancelar</button>
         </div>
     </div>
 
@@ -85,25 +89,26 @@
         const db = getFirestore(app);
         let todosClientes = [];
 
-        function mostrarFeedback(msg, cor = "#10b981") {
-            const t = document.getElementById("toast");
-            t.innerText = msg; t.style.backgroundColor = cor;
-            t.className = "show";
-            setTimeout(() => { t.className = t.className.replace("show", ""); }, 3000);
+        function mostrarFeedback(mensagem, cor = "#00ff00") {
+            const toast = document.getElementById("toast");
+            toast.innerText = mensagem;
+            toast.style.backgroundColor = cor;
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
         }
 
         window.abrirModal = (id = null) => {
             document.getElementById('modal').style.display = 'flex';
             if(id) {
                 const c = todosClientes.find(cli => cli.id === id);
-                document.getElementById('modalTitle').innerText = "Editar Cliente";
+                document.getElementById('modalTitle').innerText = "Editar Dados";
                 document.getElementById('editId').value = id;
                 document.getElementById('nomeCli').value = c.nome;
                 document.getElementById('wppCli').value = c.whatsapp || "";
                 document.getElementById('dataCli').value = c.data;
                 document.getElementById('painelCli').value = c.painel || "";
             } else {
-                document.getElementById('modalTitle').innerText = "Novo Cliente";
+                document.getElementById('modalTitle').innerText = "Novo Cadastro";
                 document.getElementById('editId').value = "";
                 document.querySelectorAll('#modal input').forEach(i => i.value = "");
             }
@@ -119,31 +124,32 @@
                 data: document.getElementById('dataCli').value,
                 painel: document.getElementById('painelCli').value || "Geral"
             };
+            if(!dados.nome || !dados.data) return alert("Nome e Data são obrigatórios!");
             if(id) {
-                if(confirm("Confirmar alteração dos dados?")) {
+                if(confirm("Deseja salvar as alterações deste cliente?")) {
                     await updateDoc(doc(db, "clientes", id), dados);
-                    mostrarFeedback("✅ Cliente editado com sucesso!");
+                    mostrarFeedback("✅ Alterações salvas com sucesso!");
                 }
             } else {
                 await addDoc(collection(db, "clientes"), { ...dados, criadoEm: Date.now() });
-                mostrarFeedback("✅ Cliente cadastrado!");
+                mostrarFeedback("✅ Novo cliente cadastrado!");
             }
             fecharModal();
         };
 
         window.renovarUmMes = async (id, dataAtual) => {
-            if(!confirm("Confirmar renovação de +1 mês?")) return;
+            if(!confirm("Confirmar renovação de +1 mês para este cliente?")) return;
             let p = dataAtual.split('-');
             let d = new Date(p[0], p[1]-1, p[2]);
             d.setMonth(d.getMonth() + 1);
             await updateDoc(doc(db, "clientes", id), { data: d.toISOString().split('T')[0] });
-            mostrarFeedback("🚀 Cliente renovado com sucesso!");
+            mostrarFeedback("🚀 Renovação realizada com sucesso!");
         };
 
         window.excluirCliente = async (id) => {
-            if(confirm("⚠️ Excluir este cliente?")) {
+            if(confirm("⚠️ ATENÇÃO: Deseja EXCLUIR este cliente permanentemente?")) {
                 await deleteDoc(doc(db, "clientes", id));
-                mostrarFeedback("🗑️ Cliente excluído!", "#ff4d4d");
+                mostrarFeedback("🗑️ Cliente excluído do sistema!", "#ff0000");
             }
         };
 
@@ -153,33 +159,20 @@
         };
 
         function renderizar(lista) {
-            const hoje = new Date();
-            hoje.setHours(0,0,0,0);
-            
-            document.getElementById('lista').innerHTML = lista.map(c => {
-                // Cálculo de dias para o alerta
-                const dataVenc = new Date(c.data + 'T23:59:59');
-                const diff = Math.ceil((dataVenc - hoje) / 86400000);
-                const isUrgent = diff <= 3 && diff >= 0;
-                const isExpired = diff < 0;
-
-                return `
-                <div class="cliente-item ${isUrgent || isExpired ? 'urgente' : ''}">
+            document.getElementById('lista').innerHTML = lista.map(c => `
+                <div class="cliente-item">
                     <div class="info">
                         <h4>${c.nome}</h4>
-                        <p> Painel: ${c.painel}</p>
-                        <p> Venc: ${c.data.split('-').reverse().join('/')}</p>
-                        <span class="alerta-venc" style="color:${isExpired ? 'var(--danger)' : (isUrgent ? 'var(--warning)' : 'var(--success)')}">
-                            ${isExpired ? '❌ VENCIDO' : (isUrgent ? '⚠️ VENCE EM ' + diff + ' DIAS' : '✅ EM DIA')}
-                        </span>
+                        <p>🖥️ Painel: <b>${c.painel}</b></p>
+                        <p>📅 Vencimento: <b>${c.data.split('-').reverse().join('/')}</b></p>
                     </div>
                     <div class="acoes">
                         <button class="btn-acao btn-plus" onclick="renovarUmMes('${c.id}', '${c.data}')">➕ +1 Mês</button>
                         <button class="btn-acao btn-edit" onclick="abrirModal('${c.id}')">✏️ Editar</button>
-                        <button class="btn-acao btn-del" onclick="excluirCliente('${c.id}')" style="grid-column: span 2">🗑️ Excluir</button>
+                        <button class="btn-acao btn-del" onclick="excluirCliente('${c.id}')">🗑️ Excluir Cliente</button>
                     </div>
                 </div>
-            `}).join('');
+            `).join('');
         }
 
         onSnapshot(query(collection(db, "clientes"), orderBy("data", "asc")), (snap) => {
