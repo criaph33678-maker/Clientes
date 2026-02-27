@@ -6,31 +6,27 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
-    <title>Gestor Business V12.1</title>
+    <title>Gestor Business V12.4</title>
     <style>
         :root { --bg: #000; --card: #1a1a1a; --text: #fff; --accent: #3b82f6; --danger: #ff0000; --warning: #ffcc00; --success: #00ff00; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; padding-top: calc(115px + env(safe-area-inset-top)); }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; padding-top: calc(165px + env(safe-area-inset-top)); }
         
-        /* HEADER */
         .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 10px; padding-top: env(safe-area-inset-top); z-index: 100; border-bottom: 1px solid #333; }
         .stats { font-size: 11px; color: #aaa; display: flex; gap: 8px; margin-bottom: 8px; overflow-x: auto; white-space: nowrap; font-weight: 600; }
         .stats b { color: var(--accent); }
         
-        .busca-container { display: flex; gap: 8px; align-items: center; background: #222; padding: 8px 15px; border-radius: 20px; border: 1px solid #444; }
+        .busca-container { display: flex; gap: 8px; align-items: center; background: #222; padding: 8px 15px; border-radius: 20px; border: 1px solid #444; margin-bottom: 10px; }
         .busca-container input { background: none; border: none; color: white; flex: 1; outline: none; font-size: 15px; }
 
-        /* LISTA E ALERTAS */
-        .cliente-item { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #333; transition: 0.4s; }
-        
-        /* ESTA É A REGRA QUE FAZ O AVISO APARECER */
+        /* CAMPO DE AVISO RECUPERADO */
+        .campo-aviso { background: rgba(59, 130, 246, 0.15); border: 1px dashed var(--accent); border-radius: 12px; padding: 10px; text-align: center; color: var(--accent); font-size: 13px; font-weight: 700; margin-top: 5px; cursor: pointer; min-height: 20px; }
+
+        .cliente-item { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #333; }
         .cliente-item.urgente { border: 2px solid var(--danger) !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); }
-        
         .info h4 { margin: 0; font-size: 20px; font-weight: 900; text-transform: uppercase; }
         .info p { margin: 4px 0; font-size: 14px; color: #bbb; }
-        
         .alerta-texto { font-weight: 900; font-size: 13px; display: block; margin-top: 5px; text-transform: uppercase; }
 
-        /* BOTÕES */
         .acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; border-top: 1px solid #333; padding-top: 12px; }
         .btn-acao { padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 13px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; text-transform: uppercase; }
         .btn-plus { background: var(--success); }
@@ -56,6 +52,7 @@
             <input type="text" id="inputBusca" placeholder="Pesquisar cliente..." oninput="filtrarClientes()">
             <button onclick="abrirModal()" style="background:var(--accent); border:none; color:white; border-radius:50%; width:32px; height:32px; font-weight:900;">+</button>
         </div>
+        <div id="textoAviso" class="campo-aviso" onclick="editarAviso()">Carregando lembretes...</div>
     </div>
 
     <div id="lista"></div>
@@ -76,7 +73,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDMQbFBbbKFABCwwTxuESpXsz_Knz-V4FI",
@@ -90,6 +87,24 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         let todosClientes = [];
+
+        // LÓGICA DO AVISO CONECTADA AO FIREBASE
+        onSnapshot(doc(db, "config", "avisoGeral"), (snap) => {
+            if (snap.exists()) {
+                document.getElementById('textoAviso').innerText = "📢 " + snap.data().texto;
+            } else {
+                document.getElementById('textoAviso').innerText = "📢 Toque para adicionar um lembrete...";
+            }
+        });
+
+        window.editarAviso = async () => {
+            const atual = document.getElementById('textoAviso').innerText.replace("📢 ", "");
+            const novo = prompt("Digite o novo lembrete:", atual);
+            if (novo !== null) {
+                await setDoc(doc(db, "config", "avisoGeral"), { texto: novo });
+                mostrarFeedback("📌 Lembrete atualizado!");
+            }
+        };
 
         function mostrarFeedback(msg, cor = "#00ff00") {
             const t = document.getElementById("toast");
@@ -126,7 +141,7 @@
                 painel: document.getElementById('painelCli').value || "Geral"
             };
             if(id) {
-                if(confirm("Confirmar alteração dos dados?")) {
+                if(confirm("Confirmar alteração?")) {
                     await updateDoc(doc(db, "clientes", id), dados);
                     mostrarFeedback("✅ Cliente editado!");
                 }
@@ -138,16 +153,16 @@
         };
 
         window.renovarUmMes = async (id, dataAtual) => {
-            if(!confirm("Confirmar renovação de +1 mês?")) return;
+            if(!confirm("Renovar +1 mês?")) return;
             let p = dataAtual.split('-');
             let d = new Date(p[0], p[1]-1, p[2]);
             d.setMonth(d.getMonth() + 1);
             await updateDoc(doc(db, "clientes", id), { data: d.toISOString().split('T')[0] });
-            mostrarFeedback("🚀 Cliente renovado com sucesso!");
+            mostrarFeedback("🚀 Renovado com sucesso!");
         };
 
         window.excluirCliente = async (id) => {
-            if(confirm("⚠️ Excluir permanentemente?")) {
+            if(confirm("Excluir permanentemente?")) {
                 await deleteDoc(doc(db, "clientes", id));
                 mostrarFeedback("🗑️ Cliente excluído!", "#ff0000");
             }
@@ -161,22 +176,17 @@
         function renderizar(lista) {
             const hoje = new Date();
             hoje.setHours(0,0,0,0);
-            
             document.getElementById('lista').innerHTML = lista.map(c => {
                 const dataVenc = new Date(c.data + 'T23:59:59');
                 const diff = Math.ceil((dataVenc - hoje) / 86400000);
-                
-                // LÓGICA DE URGÊNCIA (3 dias ou menos)
                 const isUrgent = diff <= 3 && diff >= 0;
                 const isExpired = diff < 0;
-
                 return `
                 <div class="cliente-item ${isUrgent || isExpired ? 'urgente' : ''}">
                     <div class="info">
                         <h4>${c.nome}</h4>
                         <p>🖥️ Painel: <b>${c.painel}</b></p>
                         <p>📅 Vencimento: <b>${c.data.split('-').reverse().join('/')}</b></p>
-                        
                         <span class="alerta-texto" style="color:${isExpired ? 'var(--danger)' : (isUrgent ? 'var(--warning)' : 'var(--success)')}">
                             ${isExpired ? '❌ VENCIDO' : (isUrgent ? '⚠️ VENCE EM ' + diff + ' DIAS' : '✅ EM DIA')}
                         </span>
@@ -184,7 +194,7 @@
                     <div class="acoes">
                         <button class="btn-acao btn-plus" onclick="renovarUmMes('${c.id}', '${c.data}')">➕ +1 Mês</button>
                         <button class="btn-acao btn-edit" onclick="abrirModal('${c.id}')">✏️ Editar</button>
-                        <button class="btn-acao btn-del" onclick="excluirCliente('${c.id}')">🗑️ Excluir Cliente</button>
+                        <button class="btn-acao btn-del" onclick="excluirCliente('${c.id}')">🗑️ Excluir</button>
                     </div>
                 </div>
             `}).join('');
