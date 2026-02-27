@@ -6,29 +6,28 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
-    <title>Gestor Business V12.5</title>
+    <title>Gestor Business V12.6</title>
     <style>
         :root { --bg: #000; --card: #1a1a1a; --text: #fff; --accent: #3b82f6; --danger: #ff0000; --warning: #ffcc00; --success: #00ff00; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; padding-top: calc(140px + env(safe-area-inset-top)); }
         
-        /* HEADER FIXO */
+        /* HEADER */
         .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 10px; padding-top: env(safe-area-inset-top); z-index: 100; border-bottom: 1px solid #333; }
         .stats { font-size: 11px; color: #aaa; display: flex; gap: 8px; margin-bottom: 8px; overflow-x: auto; white-space: nowrap; font-weight: 600; }
         .stats b { color: var(--accent); }
-        
         .busca-container { display: flex; gap: 8px; align-items: center; background: #222; padding: 8px 15px; border-radius: 20px; border: 1px solid #444; }
         .busca-container input { background: none; border: none; color: white; flex: 1; outline: none; font-size: 15px; }
 
-        /* MURAL DE AVISOS (ESTILO LISTA) */
-        .mural-avisos { margin: 15px 0; display: flex; flex-direction: column; gap: 8px; }
-        .secao-titulo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        .secao-titulo h5 { margin: 0; color: #888; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
-        .btn-add-aviso { background: none; border: 1px solid var(--accent); color: var(--accent); border-radius: 5px; padding: 2px 8px; font-size: 10px; font-weight: 800; cursor: pointer; }
+        /* MURAL DE AVISOS AMPLIADO */
+        .mural-avisos { margin: 20px 0; display: flex; flex-direction: column; gap: 12px; }
+        .secao-titulo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-left: 3px solid var(--accent); padding-left: 10px; }
+        .secao-titulo h5 { margin: 0; color: var(--text); text-transform: uppercase; font-size: 14px; font-weight: 900; }
+        .btn-add-aviso { background: var(--accent); border: none; color: white; border-radius: 5px; padding: 5px 12px; font-size: 11px; font-weight: 800; cursor: pointer; }
         
-        .card-aviso { background: rgba(59, 130, 246, 0.1); border-left: 4px solid var(--accent); padding: 12px; border-radius: 8px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; position: relative; }
-        .card-aviso:active { background: rgba(59, 130, 246, 0.2); }
+        .card-aviso { background: #111; border: 1px solid #333; border-left: 6px solid var(--accent); padding: 18px; border-radius: 12px; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); line-height: 1.4; }
+        .card-aviso:active { transform: scale(0.98); background: #1a1a1a; }
 
-        /* LISTA DE CLIENTES */
+        /* CLIENTES */
         .cliente-item { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #333; }
         .cliente-item.urgente { border: 2px solid var(--danger) !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); }
         .info h4 { margin: 0; font-size: 20px; font-weight: 900; text-transform: uppercase; }
@@ -65,7 +64,7 @@
     <div class="mural-avisos">
         <div class="secao-titulo">
             <h5>📌 Mural de Lembretes</h5>
-            <button class="btn-add-aviso" onclick="adicionarAviso()">+ NOVO</button>
+            <button class="btn-add-aviso" onclick="adicionarAviso()">+ NOVO AVISO</button>
         </div>
         <div id="listaAvisos"></div>
     </div>
@@ -81,14 +80,14 @@
             <input type="text" id="wppCli" placeholder="WhatsApp">
             <input type="date" id="dataCli">
             <input type="text" id="painelCli" placeholder="Painel">
-            <button class="btn-plus" style="width:100%; padding:15px; margin-top:10px" onclick="salvarCliente()">Confirmar Alteração</button>
+            <button class="btn-plus" style="width:100%; padding:15px; margin-top:10px" onclick="salvarCliente()">Confirmar</button>
             <button onclick="fecharModal()" style="background:none; border:none; color:#aaa; width:100%; margin-top:10px">Cancelar</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDMQbFBbbKFABCwwTxuESpXsz_Knz-V4FI",
@@ -107,24 +106,36 @@
         onSnapshot(query(collection(db, "avisos"), orderBy("criadoEm", "desc")), (snap) => {
             const lista = document.getElementById('listaAvisos');
             lista.innerHTML = snap.docs.map(d => `
-                <div class="card-aviso" onclick="excluirAviso('${d.id}')">
+                <div class="card-aviso" onclick="acoesAviso('${d.id}', '${d.data().texto}')">
                     📢 ${d.data().texto}
                 </div>
             `).join('');
         });
 
         window.adicionarAviso = async () => {
-            const texto = prompt("Digite o novo aviso ou lembrete:");
+            const texto = prompt("Digite o novo lembrete:");
             if (texto) {
                 await addDoc(collection(db, "avisos"), { texto, criadoEm: Date.now() });
                 mostrarFeedback("📌 Lembrete fixado!");
             }
         };
 
-        window.excluirAviso = async (id) => {
-            if (confirm("Deseja apagar este lembrete?")) {
-                await deleteDoc(doc(db, "avisos", id));
-                mostrarFeedback("🗑️ Lembrete removido!", "#ff0000");
+        window.acoesAviso = async (id, textoAtual) => {
+            const opcao = confirm("Clique em OK para EDITAR ou em CANCELAR para APAGAR este lembrete.");
+            
+            if (opcao) {
+                // Editar
+                const novoTexto = prompt("Edite seu lembrete:", textoAtual);
+                if (novoTexto && novoTexto !== textoAtual) {
+                    await updateDoc(doc(db, "avisos", id), { texto: novoTexto });
+                    mostrarFeedback("✅ Lembrete atualizado!");
+                }
+            } else {
+                // Apagar
+                if (confirm("Tem certeza que deseja EXCLUIR este lembrete?")) {
+                    await deleteDoc(doc(db, "avisos", id));
+                    mostrarFeedback("🗑️ Lembrete removido!", "#ff0000");
+                }
             }
         };
 
@@ -164,10 +175,8 @@
                 painel: document.getElementById('painelCli').value || "Geral"
             };
             if(id) {
-                if(confirm("Confirmar alteração?")) {
-                    await updateDoc(doc(db, "clientes", id), dados);
-                    mostrarFeedback("✅ Cliente editado!");
-                }
+                await updateDoc(doc(db, "clientes", id), dados);
+                mostrarFeedback("✅ Cliente editado!");
             } else {
                 await addDoc(collection(db, "clientes"), { ...dados, criadoEm: Date.now() });
                 mostrarFeedback("✅ Cliente cadastrado!");
