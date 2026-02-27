@@ -5,57 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Gestor Cloud Pro</title>
+    <link rel="manifest" href="manifest.json">
+    <title>Gestor Business V11</title>
     <style>
-        :root { --bg: #000; --card: #1a1a1a; --text: #fff; --accent: #3b82f6; --danger: #ff4d4d; --warning: #f59e0b; --success: #10b981; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-top: calc(80px + env(safe-area-inset-top)); }
-        .header { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); padding: 15px; padding-top: env(safe-area-inset-top); z-index: 100; border-bottom: 1px solid #333; display: flex; justify-content: center; }
-        .btn-add { background: var(--accent); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-weight: bold; }
-        .lembretes-container { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 25px; border: 1px dashed var(--warning); }
-        .lembretes-header { color: var(--warning); font-size: 14px; font-weight: bold; margin-bottom: 10px; }
-        .lembrete-input-group { display: flex; gap: 5px; margin-bottom: 15px; }
-        .lembrete-input-group input { flex: 1; background: #222; border: 1px solid #444; color: white; padding: 10px; border-radius: 8px; }
-        .btn-add-lembrete { background: var(--warning); color: black; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; }
-        .lembrete-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #333; }
-        .btn-del-lembrete { color: var(--danger); background: none; border: none; font-size: 22px; }
-        .cliente-item { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; }
-        .urgente { border: 2px solid var(--danger) !important; background: rgba(255, 77, 77, 0.05); }
-        .info h4 { margin: 0; font-size: 18px; }
-        .info p { margin: 4px 0; font-size: 13px; color: #aaa; }
-        .acoes { display: flex; gap: 10px; border-top: 1px solid #333; padding-top: 12px; margin-top: 12px; }
-        .btn-acao { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: bold; font-size: 13px; }
-        .btn-plus { background: var(--success); color: white; }
-        .btn-del { background: rgba(255, 77, 77, 0.15); color: var(--danger); }
+        :root { --bg: #000; --card: #1a1a1a; --text: #fff; --accent: #3b82f6; --danger: #ff4d4d; --warning: #f59e0b; --success: #10b981; --wpp: #25d366; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; padding-top: calc(115px + env(safe-area-inset-top)); }
+        
+        .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 10px; padding-top: env(safe-area-inset-top); z-index: 100; border-bottom: 1px solid #333; }
+        .stats { font-size: 10px; color: #888; display: flex; gap: 8px; margin-bottom: 8px; justify-content: flex-start; overflow-x: auto; white-space: nowrap; padding-bottom: 5px; }
+        .stats b { color: var(--accent); }
+        
+        .busca-container { display: flex; gap: 8px; align-items: center; background: #222; padding: 8px 15px; border-radius: 20px; border: 1px solid #444; }
+        .busca-container input { background: none; border: none; color: white; flex: 1; outline: none; font-size: 14px; }
+
+        .cliente-item { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #333; }
+        .acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; border-top: 1px solid #333; padding-top: 12px; }
+        .btn-acao { padding: 10px; border-radius: 10px; border: none; font-weight: bold; font-size: 12px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .btn-plus { background: var(--success); }
+        .btn-edit { background: #444; }
+        .btn-del { background: rgba(255, 77, 77, 0.1); color: var(--danger); }
+
+        #toast { visibility: hidden; min-width: 250px; background-color: var(--success); color: #fff; text-align: center; border-radius: 10px; padding: 16px; position: fixed; z-index: 300; left: 50%; transform: translateX(-50%); bottom: 30px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+
         #modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 200; justify-content: center; align-items: center; }
-        .modal-content { background: #222; padding: 25px; border-radius: 20px; width: 85%; max-width: 400px; }
-        .modal-content input { width: 100%; padding: 12px; margin: 10px 0; background: #333; border: 1px solid #444; border-radius: 8px; color: white; box-sizing: border-box; }
-        .btn-save { background: var(--accent); color: white; border: none; width: 100%; padding: 15px; border-radius: 10px; font-weight: bold; }
-        .btn-cancel { background: transparent; color: #888; border: none; width: 100%; padding: 10px; }
+        .modal-content { background: #222; padding: 20px; border-radius: 20px; width: 85%; max-width: 400px; }
+        .modal-content input { width: 100%; padding: 12px; margin: 8px 0; background: #333; border: 1px solid #444; border-radius: 10px; color: white; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-    <div class="header"><button class="btn-add" onclick="abrirModal()">+ Novo Cliente</button></div>
-
-    <div class="lembretes-container">
-        <div class="lembretes-header">☁️ LEMBRETES NA NUVEM</div>
-        <div class="lembrete-input-group">
-            <input type="text" id="novoLembrete" placeholder="Novo lembrete...">
-            <button class="btn-add-lembrete" onclick="adicionarLembrete()">+</button>
+    <div class="header-fixo">
+        <div id="contadores" class="stats">Carregando contadores...</div>
+        <div class="busca-container">
+            <span>🔍</span>
+            <input type="text" id="inputBusca" placeholder="Pesquisar nome..." oninput="filtrarClientes()">
+            <button onclick="abrirModal()" style="background:var(--accent); border:none; color:white; border-radius:50%; width:30px; height:30px; font-weight:bold">+</button>
         </div>
-        <div id="listaLembretes"></div>
     </div>
 
     <div id="lista"></div>
+    <div id="toast">Sucesso!</div>
 
     <div id="modal">
         <div class="modal-content">
-            <h3 id="modalTitle" style="margin:0">Cliente</h3>
+            <h3 id="modalTitle" style="margin:0 0 10px 0">Novo Cliente</h3>
+            <input type="hidden" id="editId">
             <input type="text" id="nomeCli" placeholder="Nome">
+            <input type="text" id="wppCli" placeholder="WhatsApp">
             <input type="date" id="dataCli">
             <input type="text" id="painelCli" placeholder="Painel">
-            <button class="btn-save" onclick="salvarCliente()">Salvar na Nuvem</button>
-            <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+            <button class="btn-plus" style="width:100%; padding:15px; margin-top:10px" onclick="salvarCliente()">Confirmar Alteração</button>
+            <button onclick="fecharModal()" style="background:none; border:none; color:#888; width:100%; margin-top:10px">Cancelar</button>
         </div>
     </div>
 
@@ -69,91 +72,102 @@
             projectId: "meu-gestor-a7d13",
             storageBucket: "meu-gestor-a7d13.firebasestorage.app",
             messagingSenderId: "1019995087685",
-            appId: "1:1019995087685:web:a063af65a4b7f234b4542c",
-            measurementId: "G-Y2SJTB8PE0"
+            appId: "1:1019995087685:web:a063af65a4b7f234b4542c"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        let todosClientes = [];
 
-        window.adicionarLembrete = async () => {
-            const txt = document.getElementById('novoLembrete').value;
-            if(!txt) return;
-            await addDoc(collection(db, "lembretes"), { texto: txt, criadoEm: Date.now() });
-            document.getElementById('novoLembrete').value = "";
+        function mostrarFeedback(msg, cor = "#10b981") {
+            const t = document.getElementById("toast");
+            t.innerText = msg; t.style.backgroundColor = cor;
+            t.className = "show";
+            setTimeout(() => { t.className = t.className.replace("show", ""); }, 3000);
+        }
+
+        window.abrirModal = (id = null) => {
+            document.getElementById('modal').style.display = 'flex';
+            if(id) {
+                const c = todosClientes.find(cli => cli.id === id);
+                document.getElementById('modalTitle').innerText = "Editar Cliente";
+                document.getElementById('editId').value = id;
+                document.getElementById('nomeCli').value = c.nome;
+                document.getElementById('wppCli').value = c.whatsapp || "";
+                document.getElementById('dataCli').value = c.data;
+                document.getElementById('painelCli').value = c.painel || "";
+            } else {
+                document.getElementById('modalTitle').innerText = "Novo Cliente";
+                document.getElementById('editId').value = "";
+                document.querySelectorAll('#modal input').forEach(i => i.value = "");
+            }
         };
 
-        window.excluirLembrete = async (id) => {
-            await deleteDoc(doc(db, "lembretes", id));
-        };
-
-        onSnapshot(query(collection(db, "lembretes"), orderBy("criadoEm", "desc")), (snapshot) => {
-            const div = document.getElementById('listaLembretes');
-            div.innerHTML = snapshot.docs.map(d => `
-                <div class="lembrete-item">
-                    <span>• ${d.data().texto}</span>
-                    <button class="btn-del-lembrete" onclick="excluirLembrete('${d.id}')">×</button>
-                </div>
-            `).join('');
-        });
-
-        window.abrirModal = () => { document.getElementById('modal').style.display = 'flex'; };
         window.fecharModal = () => { document.getElementById('modal').style.display = 'none'; };
 
         window.salvarCliente = async () => {
-            const nome = document.getElementById('nomeCli').value;
-            const data = document.getElementById('dataCli').value;
-            const painel = document.getElementById('painelCli').value;
-            if(!nome || !data) return alert("Preencha Nome e Data!");
-
-            await addDoc(collection(db, "clientes"), { nome, data, painel, criadoEm: Date.now() });
+            const id = document.getElementById('editId').value;
+            const dados = {
+                nome: document.getElementById('nomeCli').value,
+                whatsapp: document.getElementById('wppCli').value.replace(/\D/g,''),
+                data: document.getElementById('dataCli').value,
+                painel: document.getElementById('painelCli').value || "Geral"
+            };
+            if(id) {
+                if(confirm("Confirmar alteração dos dados?")) {
+                    await updateDoc(doc(db, "clientes", id), dados);
+                    mostrarFeedback("✅ Cliente editado com sucesso!");
+                }
+            } else {
+                await addDoc(collection(db, "clientes"), { ...dados, criadoEm: Date.now() });
+                mostrarFeedback("✅ Cliente cadastrado!");
+            }
             fecharModal();
-            document.getElementById('nomeCli').value = "";
-            document.getElementById('dataCli').value = "";
-            document.getElementById('painelCli').value = "";
         };
 
         window.renovarUmMes = async (id, dataAtual) => {
-            let partes = dataAtual.split('-');
-            let ano = parseInt(partes[0]);
-            let mes = parseInt(partes[1]);
-            let dia = partes[2];
-            mes++; if (mes > 12) { mes = 1; ano++; }
-            let novoMes = mes < 10 ? '0' + mes : mes;
-            const novaData = `${ano}-${novoMes}-${dia}`;
-            await updateDoc(doc(db, "clientes", id), { data: novaData });
+            if(!confirm("Confirmar renovação de +1 mês?")) return;
+            let p = dataAtual.split('-');
+            let d = new Date(p[0], p[1]-1, p[2]);
+            d.setMonth(d.getMonth() + 1);
+            await updateDoc(doc(db, "clientes", id), { data: d.toISOString().split('T')[0] });
+            mostrarFeedback("🚀 Cliente renovado com sucesso!");
         };
 
         window.excluirCliente = async (id) => {
-            if(confirm("Apagar da nuvem?")) await deleteDoc(doc(db, "clientes", id));
+            if(confirm("⚠️ Excluir este cliente?")) {
+                await deleteDoc(doc(db, "clientes", id));
+                mostrarFeedback("🗑️ Cliente excluído!", "#ff4d4d");
+            }
         };
 
-        onSnapshot(collection(db, "clientes"), (snapshot) => {
-            const listaDiv = document.getElementById('lista');
-            const hoje = new Date(); hoje.setHours(0,0,0,0);
-            let clientes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-            clientes.sort((a, b) => new Date(a.data) - new Date(b.data));
+        window.filtrarClientes = () => {
+            const termo = document.getElementById('inputBusca').value.toLowerCase();
+            renderizar(todosClientes.filter(c => c.nome.toLowerCase().includes(termo)));
+        };
 
-            listaDiv.innerHTML = clientes.map(c => {
-                const dV = new Date(c.data);
-                const diff = Math.ceil((dV - hoje) / 86400000);
-                const isUrgente = diff <= 3;
-                return `
-                    <div class="cliente-item ${isUrgente ? 'urgente' : ''}">
-                        <div class="info">
-                            <h4>${c.nome} ${isUrgente ? '⚠️' : ''}</h4>
-                            <p>🖥️ Painel: ${c.painel}</p>
-                            <p style="color: ${isUrgente ? 'var(--danger)' : '#aaa'}">
-                                ${isUrgente ? 'VENCE EM ' + diff + ' DIAS' : 'Vence em: ' + c.data.split('-').reverse().join('/')}
-                            </p>
-                        </div>
-                        <div class="acoes">
-                            <button class="btn-acao btn-plus" onclick="renovarUmMes('${c.id}', '${c.data}')">+1 Mês</button>
-                            <button class="btn-acao btn-del" onclick="excluirCliente('${c.id}')">Excluir</button>
-                        </div>
+        function renderizar(lista) {
+            document.getElementById('lista').innerHTML = lista.map(c => `
+                <div class="cliente-item">
+                    <div class="info">
+                        <h4>${c.nome}</h4>
+                        <p>📟 Painel: ${c.painel} | 📅 Venc: ${c.data.split('-').reverse().join('/')}</p>
                     </div>
-                `;
-            }).join('');
+                    <div class="acoes">
+                        <button class="btn-acao btn-plus" onclick="renovarUmMes('${c.id}', '${c.data}')">➕ +1 Mês</button>
+                        <button class="btn-acao btn-edit" onclick="abrirModal('${c.id}')">✏️ Editar</button>
+                        <button class="btn-acao btn-del" onclick="excluirCliente('${c.id}')" style="grid-column: span 2">🗑️ Excluir</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        onSnapshot(query(collection(db, "clientes"), orderBy("data", "asc")), (snap) => {
+            todosClientes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            const paineis = {};
+            todosClientes.forEach(c => { paineis[c.painel] = (paineis[c.painel] || 0) + 1; });
+            document.getElementById('contadores').innerHTML = Object.keys(paineis).map(p => `${p}: <b>${paineis[p]}</b>`).join(' | ') + ` | TOTAL: <b>${todosClientes.length}</b>`;
+            filtrarClientes();
         });
     </script>
 </body>
