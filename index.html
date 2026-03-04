@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
-    <title>Gestor Business V13.3</title>
+    <title>Gestor Business V13.4</title>
     <style>
         :root { --bg: #000; --card: #1a1a1a; --text: #fff; --accent: #3b82f6; --danger: #ff0000; --warning: #ffcc00; --success: #00ff00; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; min-height: 100vh; }
@@ -14,11 +14,11 @@
         /* TELA DE LOGIN */
         #tela-login { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; box-sizing: border-box; }
         .login-card { background: #111; padding: 30px; border-radius: 25px; border: 1px solid #333; width: 100%; max-width: 350px; text-align: center; }
-        .login-card input { width: 100%; padding: 15px; margin: 10px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 12px; box-sizing: border-box; }
+        .login-card input { width: 100%; padding: 15px; margin: 10px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
         .btn-entrar { width: 100%; padding: 15px; background: var(--accent); border: none; color: #fff; font-weight: 900; border-radius: 12px; cursor: pointer; margin-top: 10px; }
 
-        /* INTERFACE DO APLICATIVO (APÓS LOGIN) */
-        #app-interface { display: none; padding: 15px; padding-top: calc(140px + env(safe-area-inset-top)); }
+        /* INTERFACE DO APLICATIVO */
+        #app-interface { display: none; padding: 15px; padding-top: calc(140px + env(safe-area-inset-top)); padding-bottom: 100px; }
         
         /* HEADER FIXO CLÁSSICO */
         .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 10px; padding-top: env(safe-area-inset-top); z-index: 100; border-bottom: 1px solid #333; }
@@ -27,13 +27,13 @@
         .busca-container { display: flex; gap: 8px; align-items: center; background: #222; padding: 8px 15px; border-radius: 20px; border: 1px solid #444; }
         .busca-container input { background: none; border: none; color: white; flex: 1; outline: none; font-size: 15px; }
 
-        /* MURAL DE AVISOS CLÁSSICO */
+        /* MURAL DE AVISOS */
         .mural-avisos { margin: 20px 0; display: flex; flex-direction: column; gap: 12px; }
         .secao-titulo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-left: 3px solid var(--accent); padding-left: 10px; }
         .secao-titulo h5 { margin: 0; color: #fff; text-transform: uppercase; font-size: 14px; font-weight: 900; }
         .card-aviso { background: #111; border: 1px solid #333; border-left: 6px solid var(--accent); padding: 18px; border-radius: 12px; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; line-height: 1.4; }
 
-        /* LISTA DE CLIENTES CLÁSSICA */
+        /* LISTA DE CLIENTES */
         .cliente-item { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #333; }
         .cliente-item.urgente { border: 2px solid var(--danger) !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); }
         .info h4 { margin: 0; font-size: 20px; font-weight: 900; text-transform: uppercase; }
@@ -45,7 +45,10 @@
         .btn-edit { background: #444; }
         .btn-del { background: var(--danger); grid-column: span 2; }
 
-        #btn-logout { background: none; border: 1px solid #444; color: #888; padding: 5px 10px; border-radius: 8px; font-size: 10px; cursor: pointer; position: absolute; right: 15px; top: 15px; }
+        /* NOVO BOTÃO SAIR (VERMELHO E VISÍVEL) */
+        .container-sair { padding: 20px; text-align: center; }
+        .btn-sair-grande { background: var(--danger); color: white; border: none; padding: 15px 40px; border-radius: 15px; font-weight: 900; font-size: 16px; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3); text-transform: uppercase; }
+
         #loading { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--accent); font-weight: 900; z-index: 2000; }
     </style>
 </head>
@@ -56,10 +59,10 @@
     <div id="tela-login">
         <div class="login-card">
             <h2 style="margin:0 0 10px 0">Gestor Business</h2>
-            <p style="font-size:12px; color:#666; margin-bottom:20px">Acesse com sua conta</p>
+            <p style="font-size:12px; color:#666; margin-bottom:20px">Acesse sua conta</p>
             <input type="text" id="userInput" placeholder="Usuário">
             <input type="password" id="passInput" placeholder="Senha">
-            <label style="font-size: 12px; color:#888; display:flex; align-items:center; gap:5px; margin-top:10px">
+            <label style="font-size: 12px; color:#888; display:flex; align-items:center; gap:5px; margin-top:10px; cursor:pointer">
                 <input type="checkbox" id="checkLembrar" style="width:16px" checked> Manter conectado
             </label>
             <button class="btn-entrar" onclick="fazerLogin()">ENTRAR NO APP</button>
@@ -67,7 +70,6 @@
     </div>
 
     <div id="app-interface">
-        <button id="btn-logout" onclick="logout()">SAIR</button>
         
         <div class="header-fixo" id="headerAdmin" style="display:none">
             <div id="contadores" class="stats">Carregando...</div>
@@ -86,6 +88,10 @@
         </div>
 
         <div id="listaCorpo"></div>
+
+        <div class="container-sair">
+            <button class="btn-sair-grande" onclick="confirmarSair()">SAIR DO APLICATIVO</button>
+        </div>
     </div>
 
     <script type="module">
@@ -106,7 +112,7 @@
         let todosClientes = [];
         let usuarioLogado = null;
 
-        // --- VERIFICAÇÃO AUTOMÁTICA DE SESSÃO ---
+        // VERIFICAÇÃO DE SESSÃO
         const loginSalvo = localStorage.getItem('gestor_u');
         const passSalvo = localStorage.getItem('gestor_p');
         if(loginSalvo && passSalvo) {
@@ -149,7 +155,6 @@
             carregarMural();
         }
 
-        // --- VISÃO ADMIN (VISUAL CLÁSSICO LISTA) ---
         function carregarDadosAdmin() {
             onSnapshot(query(collection(db, "clientes"), orderBy("data", "asc")), (snap) => {
                 todosClientes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -178,14 +183,13 @@
                     </div>
                     <div class="acoes">
                         <button class="btn-acao btn-plus" onclick="renovar('${c.id}', '${c.data}')">➕ +1 Mês</button>
-                        <button class="btn-acao btn-edit" onclick="alert('Use o painel /admin para editar detalhadamente')">✏️ Editar</button>
+                        <button class="btn-acao btn-edit" onclick="alert('Use o painel /admin para editar')">✏️ Editar</button>
                         <button class="btn-acao btn-del" onclick="deletar('${c.id}')">🗑️ Excluir</button>
                     </div>
                 </div>`;
             }).join('');
         }
 
-        // --- VISÃO CLIENTE ---
         function carregarDadosCliente(user) {
             const hoje = new Date(); hoje.setHours(0,0,0,0);
             const venc = new Date(user.vencimento + 'T23:59:59');
@@ -197,13 +201,12 @@
                     <p style="color:#aaa; margin:15px 0">Seu acesso vence em:</p>
                     <div style="font-size:32px; font-weight:900;">${user.vencimento.split('-').reverse().join('/')}</div>
                     <p style="font-weight:800; color:${diff < 0 ? 'var(--danger)' : 'var(--success)'}">
-                        ${diff < 0 ? '❌ EXSPIRADO' : '✅ ATIVO'}
+                        ${diff < 0 ? '❌ EXPIRADO' : '✅ ACESSO ATIVO'}
                     </p>
                 </div>
             `;
         }
 
-        // --- MURAL ---
         function carregarMural() {
             onSnapshot(query(collection(db, "avisos"), orderBy("criadoEm", "desc")), (snap) => {
                 document.getElementById('listaAvisos').innerHTML = snap.docs.map(d => `
@@ -214,7 +217,13 @@
             });
         }
 
-        // Funções de Ação Admin
+        window.confirmarSair = () => {
+            if(confirm("Deseja realmente sair e deslogar do aplicativo?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        };
+
         window.renovar = async (id, data) => {
             if(!confirm("+1 Mês?")) return;
             let d = new Date(data.split('-')[0], data.split('-')[1]-1, data.split('-')[2]);
@@ -225,8 +234,6 @@
         window.deletar = async (id) => {
             if(confirm("Excluir?")) await deleteDoc(doc(db, "clientes", id));
         };
-
-        window.logout = () => { localStorage.clear(); location.reload(); };
 
         window.adicionarAviso = async () => {
             const t = prompt("Novo aviso:");
@@ -250,4 +257,6 @@
 
     </script>
 </body>
+</html>
+
 </html>
