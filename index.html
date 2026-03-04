@@ -6,9 +6,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
-    <title>Gestor Business V13.4</title>
+    <title>Gestor Business V13.5</title>
     <style>
-        :root { --bg: #000; --card: #1a1a1a; --text: #fff; --accent: #3b82f6; --danger: #ff0000; --warning: #ffcc00; --success: #00ff00; }
+        :root { --bg: #000; --card: #1a1a1a; --text: #fff; --accent: #3b82f6; --danger: #ff3b30; --warning: #ffcc00; --success: #00ff00; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; min-height: 100vh; }
 
         /* TELA DE LOGIN */
@@ -18,36 +18,28 @@
         .btn-entrar { width: 100%; padding: 15px; background: var(--accent); border: none; color: #fff; font-weight: 900; border-radius: 12px; cursor: pointer; margin-top: 10px; }
 
         /* INTERFACE DO APLICATIVO */
-        #app-interface { display: none; padding: 15px; padding-top: calc(140px + env(safe-area-inset-top)); padding-bottom: 100px; }
+        #app-interface { display: none; padding: 15px; padding-top: calc(150px + env(safe-area-inset-top)); padding-bottom: 50px; }
         
+        /* BOTÃO SAIR PEQUENO NO TOPO */
+        .btn-sair-topo { position: fixed; top: calc(10px + env(safe-area-inset-top)); right: 15px; background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 11px; z-index: 200; cursor: pointer; text-transform: uppercase; box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3); }
+
         /* HEADER FIXO CLÁSSICO */
-        .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 10px; padding-top: env(safe-area-inset-top); z-index: 100; border-bottom: 1px solid #333; }
-        .stats { font-size: 11px; color: #aaa; display: flex; gap: 8px; margin-bottom: 8px; overflow-x: auto; white-space: nowrap; font-weight: 600; }
+        .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 10px; padding-top: env(safe-area-inset-top); z-index: 100; border-bottom: 1px solid #333; height: 120px; display: flex; flex-direction: column; justify-content: flex-end; }
+        .stats { font-size: 11px; color: #aaa; display: flex; gap: 8px; margin-bottom: 8px; overflow-x: auto; white-space: nowrap; font-weight: 600; padding-right: 60px; }
         .stats b { color: var(--accent); }
-        .busca-container { display: flex; gap: 8px; align-items: center; background: #222; padding: 8px 15px; border-radius: 20px; border: 1px solid #444; }
+        .busca-container { display: flex; gap: 8px; align-items: center; background: #222; padding: 8px 15px; border-radius: 20px; border: 1px solid #444; margin-bottom: 5px; }
         .busca-container input { background: none; border: none; color: white; flex: 1; outline: none; font-size: 15px; }
 
-        /* MURAL DE AVISOS */
+        /* MURAL E CLIENTES */
         .mural-avisos { margin: 20px 0; display: flex; flex-direction: column; gap: 12px; }
         .secao-titulo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-left: 3px solid var(--accent); padding-left: 10px; }
         .secao-titulo h5 { margin: 0; color: #fff; text-transform: uppercase; font-size: 14px; font-weight: 900; }
         .card-aviso { background: #111; border: 1px solid #333; border-left: 6px solid var(--accent); padding: 18px; border-radius: 12px; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; line-height: 1.4; }
-
-        /* LISTA DE CLIENTES */
         .cliente-item { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #333; }
         .cliente-item.urgente { border: 2px solid var(--danger) !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); }
         .info h4 { margin: 0; font-size: 20px; font-weight: 900; text-transform: uppercase; }
-        .alerta-texto { font-weight: 900; font-size: 13px; display: block; margin-top: 5px; text-transform: uppercase; }
-
         .acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; border-top: 1px solid #333; padding-top: 12px; }
-        .btn-acao { padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 13px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; text-transform: uppercase; }
-        .btn-plus { background: var(--success); }
-        .btn-edit { background: #444; }
-        .btn-del { background: var(--danger); grid-column: span 2; }
-
-        /* NOVO BOTÃO SAIR (VERMELHO E VISÍVEL) */
-        .container-sair { padding: 20px; text-align: center; }
-        .btn-sair-grande { background: var(--danger); color: white; border: none; padding: 15px 40px; border-radius: 15px; font-weight: 900; font-size: 16px; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3); text-transform: uppercase; }
+        .btn-acao { padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 11px; color: white; cursor: pointer; text-transform: uppercase; }
 
         #loading { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--accent); font-weight: 900; z-index: 2000; }
     </style>
@@ -65,11 +57,12 @@
             <label style="font-size: 12px; color:#888; display:flex; align-items:center; gap:5px; margin-top:10px; cursor:pointer">
                 <input type="checkbox" id="checkLembrar" style="width:16px" checked> Manter conectado
             </label>
-            <button class="btn-entrar" onclick="fazerLogin()">ENTRAR NO APP</button>
+            <button class="btn-entrar" onclick="fazerLogin()">ENTRAR</button>
         </div>
     </div>
 
     <div id="app-interface">
+        <button class="btn-sair-topo" onclick="confirmarSair()">Sair</button>
         
         <div class="header-fixo" id="headerAdmin" style="display:none">
             <div id="contadores" class="stats">Carregando...</div>
@@ -88,10 +81,6 @@
         </div>
 
         <div id="listaCorpo"></div>
-
-        <div class="container-sair">
-            <button class="btn-sair-grande" onclick="confirmarSair()">SAIR DO APLICATIVO</button>
-        </div>
     </div>
 
     <script type="module">
@@ -112,12 +101,9 @@
         let todosClientes = [];
         let usuarioLogado = null;
 
-        // VERIFICAÇÃO DE SESSÃO
         const loginSalvo = localStorage.getItem('gestor_u');
         const passSalvo = localStorage.getItem('gestor_p');
-        if(loginSalvo && passSalvo) {
-            autenticar(loginSalvo, passSalvo, true);
-        }
+        if(loginSalvo && passSalvo) { autenticar(loginSalvo, passSalvo, true); }
 
         window.fazerLogin = () => {
             const u = document.getElementById('userInput').value.toLowerCase().trim();
@@ -129,7 +115,6 @@
             document.getElementById('loading').style.display = 'block';
             const q = query(collection(db, "usuarios"), where("login", "==", user), where("senha", "==", pass));
             const snap = await getDocs(q);
-
             if(!snap.empty) {
                 usuarioLogado = snap.docs[0].data();
                 if(manter) { localStorage.setItem('gestor_u', user); localStorage.setItem('gestor_p', pass); }
@@ -144,9 +129,8 @@
             document.getElementById('tela-login').style.display = 'none';
             document.getElementById('loading').style.display = 'none';
             document.getElementById('app-interface').style.display = 'block';
-
             if(usuarioLogado.login === 'admin') {
-                document.getElementById('headerAdmin').style.display = 'block';
+                document.getElementById('headerAdmin').style.display = 'flex';
                 document.getElementById('btnNovoAviso').style.display = 'block';
                 carregarDadosAdmin();
             } else {
@@ -177,14 +161,13 @@
                     <div class="info">
                         <h4>${c.nome}</h4>
                         <p style="font-size:13px; color:#aaa; margin:5px 0">🖥️ Painel: ${c.painel} | 📅 Venc: ${c.data.split('-').reverse().join('/')}</p>
-                        <span class="alerta-texto" style="color:${isExpired ? 'var(--danger)' : (isUrgent ? 'var(--warning)' : 'var(--success)')}">
+                        <span style="font-weight:900; font-size:12px; color:${isExpired ? 'var(--danger)' : (isUrgent ? 'var(--warning)' : 'var(--success)')}">
                             ${isExpired ? '❌ VENCIDO' : (isUrgent ? '⚠️ VENCE EM ' + diff + ' DIAS' : '✅ EM DIA')}
                         </span>
                     </div>
                     <div class="acoes">
-                        <button class="btn-acao btn-plus" onclick="renovar('${c.id}', '${c.data}')">➕ +1 Mês</button>
-                        <button class="btn-acao btn-edit" onclick="alert('Use o painel /admin para editar')">✏️ Editar</button>
-                        <button class="btn-acao btn-del" onclick="deletar('${c.id}')">🗑️ Excluir</button>
+                        <button class="btn-acao" style="background:var(--success)" onclick="renovar('${c.id}', '${c.data}')">➕ +1 Mês</button>
+                        <button class="btn-acao" style="background:var(--danger); grid-column: span 2" onclick="deletar('${c.id}')">🗑️ Excluir</button>
                     </div>
                 </div>`;
             }).join('');
@@ -194,17 +177,16 @@
             const hoje = new Date(); hoje.setHours(0,0,0,0);
             const venc = new Date(user.vencimento + 'T23:59:59');
             const diff = Math.ceil((venc - hoje) / 86400000);
-            document.getElementById('app-interface').style.paddingTop = '20px';
+            document.getElementById('app-interface').style.paddingTop = '60px';
             document.getElementById('listaCorpo').innerHTML = `
                 <div class="cliente-item" style="border-left: 6px solid var(--accent); padding:30px">
                     <h2 style="margin:0">Olá, ${user.nome}</h2>
-                    <p style="color:#aaa; margin:15px 0">Seu acesso vence em:</p>
+                    <p style="color:#aaa; margin:15px 0">Vencimento:</p>
                     <div style="font-size:32px; font-weight:900;">${user.vencimento.split('-').reverse().join('/')}</div>
                     <p style="font-weight:800; color:${diff < 0 ? 'var(--danger)' : 'var(--success)'}">
-                        ${diff < 0 ? '❌ EXPIRADO' : '✅ ACESSO ATIVO'}
+                        ${diff < 0 ? '❌ ACESSO EXPIRADO' : '✅ ACESSO ATIVO'}
                     </p>
-                </div>
-            `;
+                </div>`;
         }
 
         function carregarMural() {
@@ -212,16 +194,12 @@
                 document.getElementById('listaAvisos').innerHTML = snap.docs.map(d => `
                     <div class="card-aviso" onclick="${usuarioLogado.login === 'admin' ? `acoesMural('${d.id}', '${d.data().texto}')` : ''}">
                         📢 ${d.data().texto}
-                    </div>
-                `).join('');
+                    </div>`).join('');
             });
         }
 
         window.confirmarSair = () => {
-            if(confirm("Deseja realmente sair e deslogar do aplicativo?")) {
-                localStorage.clear();
-                location.reload();
-            }
+            if(confirm("Deseja realmente deslogar?")) { localStorage.clear(); location.reload(); }
         };
 
         window.renovar = async (id, data) => {
@@ -245,18 +223,13 @@
             if(op) {
                 const n = prompt("Editar:", txt);
                 if(n) await updateDoc(doc(db, "avisos", id), { texto: n });
-            } else {
-                if(confirm("Apagar?")) await deleteDoc(doc(db, "avisos", id));
-            }
+            } else { if(confirm("Apagar?")) await deleteDoc(doc(db, "avisos", id)); }
         };
 
         window.filtrarClientes = () => {
             const t = document.getElementById('inputBusca').value.toLowerCase();
             renderizarLista(todosClientes.filter(c => c.nome.toLowerCase().includes(t)));
         };
-
     </script>
 </body>
-</html>
-
 </html>
