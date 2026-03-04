@@ -6,50 +6,53 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
-    <title>Gestor Business V13.8</title>
+    <title>Gestor Business V13.9</title>
     <style>
         :root { --bg: #000; --card: #1a1a1a; --text: #fff; --accent: #3b82f6; --danger: #ff3b30; --warning: #ffcc00; --success: #00ff00; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; min-height: 100vh; }
 
-        /* LOGIN */
-        #tela-login { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; }
+        /* TELA DE LOGIN */
+        #tela-login { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; box-sizing: border-box; }
         .login-card { background: #111; padding: 30px; border-radius: 25px; border: 1px solid #333; width: 100%; max-width: 350px; text-align: center; }
-        .login-card input { width: 100%; padding: 15px; margin: 10px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 12px; width: 100%; box-sizing: border-box; }
-        .btn-entrar { width: 100%; padding: 15px; background: var(--accent); border: none; color: #fff; font-weight: 900; border-radius: 12px; cursor: pointer; }
+        .login-card input { width: 100%; padding: 15px; margin: 10px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
+        .btn-entrar { width: 100%; padding: 15px; background: var(--accent); border: none; color: #fff; font-weight: 900; border-radius: 12px; cursor: pointer; margin-top: 10px; }
 
-        /* INTERFACE */
-        #app-interface { display: none; padding: 15px; padding-top: calc(150px + env(safe-area-inset-top)); }
+        /* INTERFACE DO APP */
+        #app-interface { display: none; padding: 15px; padding-top: calc(150px + env(safe-area-inset-top)); padding-bottom: 50px; }
         
-        /* BOTÃO SAIR */
-        .btn-sair-topo { position: fixed; top: calc(10px + env(safe-area-inset-top)); right: 15px; background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 11px; z-index: 200; }
+        /* BOTÃO SAIR NO TOPO */
+        .btn-sair-topo { position: fixed; top: calc(10px + env(safe-area-inset-top)); right: 15px; background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 11px; z-index: 200; cursor: pointer; text-transform: uppercase; }
 
-        /* HEADER FIXO CLÁSSICO */
-        .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 10px; padding-top: env(safe-area-inset-top); z-index: 100; border-bottom: 1px solid #333; height: 125px; display: flex; flex-direction: column; justify-content: flex-end; }
+        /* HEADER FIXO 13.6 */
+        .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 10px; padding-top: env(safe-area-inset-top); z-index: 100; border-bottom: 1px solid #333; height: 120px; display: flex; flex-direction: column; justify-content: flex-end; }
         .stats { font-size: 11px; color: #aaa; display: flex; gap: 8px; margin-bottom: 8px; overflow-x: auto; white-space: nowrap; font-weight: 600; padding-right: 60px; }
         .stats b { color: var(--accent); }
         .busca-container { display: flex; gap: 8px; align-items: center; background: #222; padding: 8px 15px; border-radius: 20px; border: 1px solid #444; margin-bottom: 5px; }
         .busca-container input { background: none; border: none; color: white; flex: 1; outline: none; font-size: 15px; }
 
         /* MURAL CLÁSSICO */
-        .mural-avisos { margin: 20px 0; }
-        .secao-titulo { display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--accent); padding-left: 10px; margin-bottom: 10px; }
-        .secao-titulo h5 { margin: 0; text-transform: uppercase; font-size: 14px; font-weight: 900; }
-        .card-aviso { background: #111; border: 1px solid #333; border-left: 6px solid var(--accent); padding: 18px; border-radius: 12px; margin-bottom: 12px; font-weight: 700; cursor: pointer; }
+        .mural-avisos { margin: 20px 0; display: flex; flex-direction: column; gap: 12px; }
+        .secao-titulo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-left: 3px solid var(--accent); padding-left: 10px; }
+        .secao-titulo h5 { margin: 0; color: #fff; text-transform: uppercase; font-size: 14px; font-weight: 900; }
+        .card-aviso { background: #111; border: 1px solid #333; border-left: 6px solid var(--accent); padding: 18px; border-radius: 12px; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; line-height: 1.4; }
 
         /* LISTA DE CLIENTES CLÁSSICA */
         .cliente-item { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #333; }
         .info h4 { margin: 0; font-size: 20px; font-weight: 900; text-transform: uppercase; }
         .acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; border-top: 1px solid #333; padding-top: 12px; }
-        .btn-acao { padding: 12px; border-radius: 10px; border: none; color: white; font-weight: 800; font-size: 11px; text-transform: uppercase; }
+        .btn-acao { padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 11px; color: white; cursor: pointer; text-transform: uppercase; }
 
-        #btn-add-geral { background: var(--success); color: black; border: none; padding: 12px; border-radius: 12px; font-weight: 900; width: 100%; margin-bottom: 20px; }
+        #btn-add-cliente { background: var(--success); color: black; border: none; padding: 12px; border-radius: 12px; font-weight: 900; width: 100%; margin-bottom: 20px; cursor: pointer; }
+        #loading { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--accent); font-weight: 900; z-index: 2000; }
     </style>
 </head>
 <body>
 
+    <div id="loading">CARREGANDO...</div>
+
     <div id="tela-login">
         <div class="login-card">
-            <h2>Gestor Business</h2>
+            <h2 style="margin:0 0 10px 0">Gestor Business</h2>
             <input type="text" id="userInput" placeholder="Usuário">
             <input type="password" id="passInput" placeholder="Senha">
             <button class="btn-entrar" onclick="fazerLogin()">ENTRAR</button>
@@ -60,29 +63,30 @@
         <button class="btn-sair-topo" onclick="confirmarSair()">Sair</button>
         
         <div class="header-fixo">
-            <div id="contadores" class="stats">Carregando dados...</div>
+            <div id="contadores" class="stats">Carregando...</div>
             <div class="busca-container">
+                <span>🔍</span>
                 <input type="text" id="inputBusca" placeholder="Pesquisar..." oninput="filtrarClientes()">
             </div>
         </div>
 
-        <button id="btn-add-geral" onclick="novoCliente()">+ CADASTRAR NOVO CLIENTE</button>
+        <button id="btn-add-cliente" onclick="novoCliente()">+ CADASTRAR NOVO CLIENTE</button>
 
         <div class="mural-avisos">
             <div class="secao-titulo">
-                <h5 id="txtMural">📌 Mural</h5>
-                <button onclick="novoLembrete()" style="background:var(--accent); color:white; border:none; border-radius:5px; padding:4px 8px; font-size:10px;">+ NOVO</button>
+                <h5 id="tituloMural">📌 Mural</h5>
+                <button onclick="adicionarAviso()" style="background:var(--accent); color:white; border:none; border-radius:5px; padding:4px 8px; font-size:10px;">+ NOVO</button>
             </div>
             <div id="listaAvisos"></div>
         </div>
 
-        <div class="secao-titulo"><h5>👥 Lista de Clientes</h5></div>
+        <div class="secao-titulo"><h5>👥 Clientes</h5></div>
         <div id="listaCorpo"></div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDMQbFBbbKFABCwwTxuESpXsz_Knz-V4FI",
@@ -103,37 +107,45 @@
             const p = document.getElementById('passInput').value;
             const q = query(collection(db, "usuarios"), where("login", "==", u), where("senha", "==", p));
             const snap = await getDocs(q);
-            if(!snap.empty) { usuarioLogado = snap.docs[0].data(); iniciarApp(); } else { alert("Login incorreto!"); }
+            if(!snap.empty) { usuarioLogado = snap.docs[0].data(); iniciarApp(); } else { alert("Login Incorreto!"); }
         };
 
         function iniciarApp() {
             document.getElementById('tela-login').style.display = 'none';
             document.getElementById('app-interface').style.display = 'block';
-            document.getElementById('txtMural').innerText = (usuarioLogado.login === 'admin') ? "📌 Notas do Sistema" : "📝 Minhas Notas";
+            document.getElementById('tituloMural').innerText = (usuarioLogado.login === 'admin') ? "📌 Lembretes Admin" : "📝 Minhas Notas";
             carregarDados();
             carregarMural();
         }
 
         function carregarDados() {
-            // REGRA DE OURO: Admin vê TUDO. Cliente vê apenas o que ele criou.
+            // ADMIN VÊ TUDO | CLIENTE VÊ SÓ O QUE ELE CRIOU (OU SEU PRÓPRIO CARD)
             const q = (usuarioLogado.login === 'admin') 
                 ? query(collection(db, "clientes"), orderBy("data", "asc"))
                 : query(collection(db, "clientes"), where("dono", "==", usuarioLogado.login), orderBy("data", "asc"));
 
             onSnapshot(q, (snap) => {
                 todosDados = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                const total = todosDados.length;
-                document.getElementById('contadores').innerHTML = `Total de Clientes: <b>${total}</b>`;
+                document.getElementById('contadores').innerHTML = `Total: <b>${todosDados.length}</b>`;
                 renderizarLista(todosDados);
             });
         }
+
+        window.novoCliente = async () => {
+            const n = prompt("Nome:");
+            const p = prompt("Painel:");
+            const d = prompt("Vencimento (AAAA-MM-DD):", new Date().toISOString().split('T')[0]);
+            if(n && p && d) {
+                await addDoc(collection(db, "clientes"), { nome: n, painel: p, data: d, dono: usuarioLogado.login });
+            }
+        };
 
         function renderizarLista(lista) {
             document.getElementById('listaCorpo').innerHTML = lista.map(c => `
                 <div class="cliente-item">
                     <div class="info">
                         <h4>${c.nome}</h4>
-                        <p style="color:#aaa; font-size:13px;">${c.painel} | Venc: ${c.data.split('-').reverse().join('/')}</p>
+                        <p style="font-size:13px; color:#aaa;">${c.painel} | Venc: ${c.data.split('-').reverse().join('/')}</p>
                     </div>
                     <div class="acoes">
                         <button class="btn-acao" style="background:var(--accent)" onclick="renovar('${c.id}', '${c.data}')">Renovar</button>
@@ -143,7 +155,7 @@
         }
 
         function carregarMural() {
-            const qMural = (usuarioLogado.login === 'admin')
+            const qMural = (usuarioLogado.login === 'admin') 
                 ? query(collection(db, "avisos"), orderBy("criadoEm", "desc"))
                 : query(collection(db, "lembretes_privados"), where("usuarioId", "==", usuarioLogado.login), orderBy("criadoEm", "desc"));
 
@@ -155,16 +167,7 @@
             });
         }
 
-        window.novoCliente = async () => {
-            const nome = prompt("Nome:");
-            const painel = prompt("Painel:");
-            const data = prompt("Data (AAAA-MM-DD):", new Date().toISOString().split('T')[0]);
-            if(nome && painel && data) {
-                await addDoc(collection(db, "clientes"), { nome, painel, data, dono: usuarioLogado.login });
-            }
-        };
-
-        window.novoLembrete = async () => {
+        window.adicionarAviso = async () => {
             const t = prompt("Nota:");
             if(!t) return;
             const pasta = (usuarioLogado.login === 'admin') ? "avisos" : "lembretes_privados";
@@ -180,7 +183,7 @@
         };
 
         window.excluir = async (id, pasta) => { if(confirm("Excluir?")) await deleteDoc(doc(db, pasta, id)); };
-        window.confirmarSair = () => { location.reload(); };
+        window.confirmarSair = () => { if(confirm("Deslogar?")) { location.reload(); } };
         window.filtrarClientes = () => {
             const t = document.getElementById('inputBusca').value.toLowerCase();
             renderizarLista(todosDados.filter(c => c.nome.toLowerCase().includes(t)));
