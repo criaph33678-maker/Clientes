@@ -5,41 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Gestor Business V13.14</title>
+    <title>Gestor Business V13.15</title>
     <style>
         :root { --bg: #000; --card: #111; --text: #fff; --accent: #3b82f6; --danger: #ff3b30; --success: #4ade80; --warning: #facc15; }
         
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0; }
 
-        /* HEADER COM CONTAGEM E BOTÃO ADICIONAR NO TOPO (SOLICITADO) */
+        /* HEADER E BOTÃO ADICIONAR NO TOPO */
         .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: #000; padding: 10px 15px; padding-top: env(safe-area-inset-top); z-index: 1000; border-bottom: 1px solid #1a1a1a; }
-        .stats-topo { font-size: 11px; color: #888; font-weight: bold; margin-bottom: 8px; text-align: left; }
-        .stats-topo b { color: #3b82f6; }
+        .stats-topo { font-size: 11px; color: #888; font-weight: bold; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+        .stats-topo b { color: var(--accent); }
         
-        .busca-wrapper { display: flex; gap: 10px; align-items: center; }
-        .busca-container { background: #1a1a1a; flex: 1; display: flex; align-items: center; padding: 8px 15px; border-radius: 20px; border: 1px solid #333; }
+        /* BOTÃO ADICIONAR CLIENTE NO TOPO (SOLICITADO) */
+        .btn-novo-cliente-topo { background: var(--accent); color: white; border: none; width: 100%; padding: 12px; border-radius: 12px; font-weight: 900; font-size: 14px; margin-bottom: 12px; cursor: pointer; text-transform: uppercase; }
+
+        .busca-container { background: #1a1a1a; display: flex; align-items: center; padding: 10px 15px; border-radius: 15px; border: 1px solid #333; }
         .busca-container input { background: none; border: none; color: #fff; flex: 1; outline: none; font-size: 14px; }
         
-        /* BOTÃO ADICIONAR NO TOPO */
-        .btn-add-topo { background: #3b82f6; border: none; width: 35px; height: 35px; border-radius: 50%; color: white; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        /* CONTEÚDO */
+        .secao-mural { margin-top: calc(145px + env(safe-area-inset-top)); padding: 15px; }
+        .card-aviso { background: #1a1a1a; padding: 12px; border-radius: 15px; margin-bottom: 8px; font-size: 13px; font-weight: bold; border-left: 4px solid var(--accent); }
 
-        /* MURAL REDUZIDO */
-        .secao-mural { margin-top: calc(100px + env(safe-area-inset-top)); padding: 15px; }
-        .mural-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-left: 3px solid #3b82f6; padding-left: 10px; }
-        .card-aviso { background: #1a1a1a; padding: 12px; border-radius: 15px; margin-bottom: 8px; font-size: 13px; font-weight: bold; border-bottom: 2px solid #0056b3; }
-
-        /* CARDS PEQUENOS E COMPACTOS (SOLICITADO) */
+        /* CARDS PEQUENOS */
         .lista-clientes { padding: 0 15px 100px 15px; }
-        .card-cliente { background: #111; border: 1px solid #333; border-radius: 22px; padding: 15px; margin-bottom: 12px; position: relative; }
-        .card-cliente.vence-logo { border: 2px solid var(--danger); box-shadow: 0 0 12px rgba(255, 59, 48, 0.3); }
-        
-        .card-cliente h3 { margin: 0 0 5px 0; text-transform: uppercase; font-size: 18px; font-weight: 900; }
-        .info-linha { display: flex; align-items: center; gap: 6px; color: #ccc; font-size: 12px; margin-bottom: 3px; }
-        .aviso-vencimento { color: var(--warning); font-weight: bold; font-size: 11px; margin-top: 5px; text-transform: uppercase; }
+        .card-cliente { background: #111; border: 1px solid #333; border-radius: 20px; padding: 15px; margin-bottom: 12px; position: relative; }
+        .card-cliente.vence-logo { border: 2px solid var(--danger); box-shadow: 0 0 10px rgba(255, 59, 48, 0.2); }
+        .card-cliente h3 { margin: 0 0 5px 0; font-size: 18px; font-weight: 800; text-transform: uppercase; }
+        .info-p { font-size: 12px; color: #aaa; margin: 2px 0; }
+        .vence-em { color: var(--warning); font-weight: bold; font-size: 11px; margin-top: 5px; }
 
-        /* BOTÕES PEQUENOS LADO A LADO */
+        /* BOTÕES */
         .grid-botoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
-        .btn-card { padding: 10px; border-radius: 12px; border: none; font-weight: 900; font-size: 11px; cursor: pointer; text-transform: uppercase; }
+        .btn-card { padding: 10px; border-radius: 10px; border: none; font-weight: 800; font-size: 11px; text-transform: uppercase; cursor: pointer; }
         .btn-renovar { background: var(--success); color: #000; }
         .btn-editar { background: #333; color: #fff; }
         .btn-excluir { background: var(--danger); color: #fff; grid-column: span 2; margin-top: 4px; padding: 8px; }
@@ -53,29 +50,23 @@
 
     <div id="tela-login" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;">
         <div style="background:#111; padding:30px; border-radius:25px; width:85%; max-width:280px; text-align:center; border:1px solid #333;">
-            <h2 style="margin-bottom:25px;">GESTOR</h2>
+            <h2 style="margin-bottom:25px;">GESTOR BUSINESS</h2>
             <input type="text" id="u" placeholder="Usuário" style="width:100%; padding:12px; margin-bottom:10px; border-radius:12px; border:1px solid #333; background:#000; color:#fff; box-sizing:border-box; outline:none;">
             <input type="password" id="p" placeholder="Senha" style="width:100%; padding:12px; margin-bottom:20px; border-radius:12px; border:1px solid #333; background:#000; color:#fff; box-sizing:border-box; outline:none;">
-            <button onclick="logar()" style="width:100%; padding:12px; background:#3b82f6; border:none; color:#fff; border-radius:12px; font-weight:900;">ACESSAR</button>
+            <button onclick="logar()" style="width:100%; padding:12px; background:var(--accent); border:none; color:#fff; border-radius:12px; font-weight:900;">ACESSAR</button>
         </div>
     </div>
 
     <div id="app" style="display:none;">
         <header class="header-fixo">
             <div id="contagem" class="stats-topo"></div>
-            <div class="busca-wrapper">
-                <div class="busca-container">
-                    <input type="text" id="busca" placeholder="Buscar..." oninput="filtrar()">
-                </div>
-                <button class="btn-add-topo" onclick="novoCliente()">+</button>
+            <button class="btn-novo-cliente-topo" onclick="novoCliente()">+ Adicionar Cliente</button>
+            <div class="busca-container">
+                <input type="text" id="busca" placeholder="Buscar cliente na lista..." oninput="filtrar()">
             </div>
         </header>
 
         <section class="secao-mural">
-            <div class="mural-header">
-                <h2 style="font-size:13px; margin:0;">📌 NOTAS</h2>
-                <button onclick="novoAviso()" style="background:none; border:none; color:#3b82f6; font-weight:bold; font-size:10px;">+ ADICIONAR</button>
-            </div>
             <div id="lista-mural"></div>
         </section>
 
@@ -105,7 +96,7 @@
             const pass = document.getElementById('p').value;
             const q = query(collection(db, "usuarios"), where("login", "==", login), where("senha", "==", pass));
             const snap = await getDocs(q);
-            if(!snap.empty) { logado = snap.docs[0].data(); iniciarApp(); } else { alert("Erro!"); }
+            if(!snap.empty) { logado = snap.docs[0].data(); iniciarApp(); } else { alert("Acesso negado!"); }
         };
 
         function iniciarApp() {
@@ -122,9 +113,20 @@
 
             onSnapshot(q, (snap) => {
                 dadosRaw = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                const uniplay = dadosRaw.filter(x => x.painel.toLowerCase().includes('unplay')).length;
-                const unitv = dadosRaw.filter(x => x.painel.toLowerCase().includes('unitv')).length;
-                document.getElementById('contagem').innerHTML = `Unplay: <b>${uniplay}</b> | Unitv: <b>${unitv}</b> | Total: <b>${dadosRaw.length}</b>`;
+                
+                // CONTAGEM DINÂMICA DE TODOS OS PAINÉIS EXISTENTES
+                const contagemPaineis = {};
+                dadosRaw.forEach(c => {
+                    const p = c.painel || "Outros";
+                    contagemPaineis[p] = (contagemPaineis[p] || 0) + 1;
+                });
+
+                let htmlStats = "";
+                for (const p in contagemPaineis) {
+                    htmlStats += `${p}: <b>${contagemPaineis[p]}</b> | `;
+                }
+                document.getElementById('contagem').innerHTML = htmlStats + `Total: <b>${dadosRaw.length}</b>`;
+                
                 render(dadosRaw);
             });
         }
@@ -139,9 +141,9 @@
                 return `
                 <div class="card-cliente ${classeVence}">
                     <h3>${c.nome}</h3>
-                    <div class="info-linha">🖥️ Painel: <b>${c.painel}</b></div>
-                    <div class="info-linha">📅 Expira: <b>${c.data.split('-').reverse().join('/')}</b></div>
-                    ${diff <= 3 && diff >= 0 ? `<div class="aviso-vencimento">⚠️ VENCE EM ${diff} DIAS</div>` : ''}
+                    <p class="info-p">Painel: <b>${c.painel}</b></p>
+                    <p class="info-p">Vence: <b>${c.data.split('-').reverse().join('/')}</b></p>
+                    ${diff <= 3 && diff >= 0 ? `<div class="vence-em">⚠️ VENCE EM ${diff} DIAS</div>` : ''}
                     <div class="grid-botoes">
                         <button class="btn-card btn-renovar" onclick="renovar('${c.id}', '${c.data}')">+1 MÊS</button>
                         <button class="btn-card btn-editar" onclick="editar('${c.id}')">EDITAR</button>
@@ -165,8 +167,8 @@
         }
 
         window.novoCliente = async () => {
-            const n = prompt("Nome:");
-            const p = prompt("Painel:");
+            const n = prompt("Nome do Cliente:");
+            const p = prompt("Nome do Painel (Livre):");
             const d = prompt("Vencimento (AAAA-MM-DD):");
             if(n && p && d) await addDoc(collection(db, "clientes"), { nome: n, painel: p, data: d, dono: logado.login });
         };
