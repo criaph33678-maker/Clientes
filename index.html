@@ -3,29 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
-    <title>Gestor Pro V13.2</title>
+    <title>Gestor Business V13.3</title>
     <style>
-        :root { --bg: #000; --card: #161616; --text: #fff; --accent: #3b82f6; --success: #00ff00; --danger: #ff0000; --warning: #ffcc00; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; min-height: 100vh; }
-        
-        /* LOGIN */
-        #tela-login { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; }
-        .login-card { background: var(--card); padding: 30px; border-radius: 25px; border: 1px solid #333; width: 100%; max-width: 350px; text-align: center; }
-        input { width: 100%; padding: 15px; margin: 10px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 12px; box-sizing: border-box; }
-        .btn-entrar { width: 100%; padding: 15px; background: var(--accent); border: none; color: #fff; font-weight: 900; border-radius: 12px; cursor: pointer; }
+        :root { --bg: #000; --card: #1a1a1a; --text: #fff; --accent: #3b82f6; --danger: #ff0000; --warning: #ffcc00; --success: #00ff00; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; min-height: 100vh; }
 
-        /* INTERFACE PRINCIPAL (ADMIN OU CLIENTE) */
-        #interface { display: none; padding: 15px; padding-top: env(safe-area-inset-top); }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        
-        /* ESTILO DOS CARDS DE CLIENTE (VISÃO ADMIN) */
-        .card { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #333; }
-        .urgente { border: 2px solid var(--danger); }
-        .acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        .btn-acao { padding: 10px; border-radius: 8px; border: none; color: #fff; font-weight: 700; font-size: 12px; }
+        /* TELA DE LOGIN */
+        #tela-login { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; box-sizing: border-box; }
+        .login-card { background: #111; padding: 30px; border-radius: 25px; border: 1px solid #333; width: 100%; max-width: 350px; text-align: center; }
+        .login-card input { width: 100%; padding: 15px; margin: 10px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 12px; box-sizing: border-box; }
+        .btn-entrar { width: 100%; padding: 15px; background: var(--accent); border: none; color: #fff; font-weight: 900; border-radius: 12px; cursor: pointer; margin-top: 10px; }
 
-        #loading { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; color: var(--accent); font-weight: 800; }
+        /* INTERFACE DO APLICATIVO (APÓS LOGIN) */
+        #app-interface { display: none; padding: 15px; padding-top: calc(140px + env(safe-area-inset-top)); }
+        
+        /* HEADER FIXO CLÁSSICO */
+        .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 10px; padding-top: env(safe-area-inset-top); z-index: 100; border-bottom: 1px solid #333; }
+        .stats { font-size: 11px; color: #aaa; display: flex; gap: 8px; margin-bottom: 8px; overflow-x: auto; white-space: nowrap; font-weight: 600; }
+        .stats b { color: var(--accent); }
+        .busca-container { display: flex; gap: 8px; align-items: center; background: #222; padding: 8px 15px; border-radius: 20px; border: 1px solid #444; }
+        .busca-container input { background: none; border: none; color: white; flex: 1; outline: none; font-size: 15px; }
+
+        /* MURAL DE AVISOS CLÁSSICO */
+        .mural-avisos { margin: 20px 0; display: flex; flex-direction: column; gap: 12px; }
+        .secao-titulo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-left: 3px solid var(--accent); padding-left: 10px; }
+        .secao-titulo h5 { margin: 0; color: #fff; text-transform: uppercase; font-size: 14px; font-weight: 900; }
+        .card-aviso { background: #111; border: 1px solid #333; border-left: 6px solid var(--accent); padding: 18px; border-radius: 12px; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; line-height: 1.4; }
+
+        /* LISTA DE CLIENTES CLÁSSICA */
+        .cliente-item { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #333; }
+        .cliente-item.urgente { border: 2px solid var(--danger) !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); }
+        .info h4 { margin: 0; font-size: 20px; font-weight: 900; text-transform: uppercase; }
+        .alerta-texto { font-weight: 900; font-size: 13px; display: block; margin-top: 5px; text-transform: uppercase; }
+
+        .acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; border-top: 1px solid #333; padding-top: 12px; }
+        .btn-acao { padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 13px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; text-transform: uppercase; }
+        .btn-plus { background: var(--success); }
+        .btn-edit { background: #444; }
+        .btn-del { background: var(--danger); grid-column: span 2; }
+
+        #btn-logout { background: none; border: 1px solid #444; color: #888; padding: 5px 10px; border-radius: 8px; font-size: 10px; cursor: pointer; position: absolute; right: 15px; top: 15px; }
+        #loading { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--accent); font-weight: 900; z-index: 2000; }
     </style>
 </head>
 <body>
@@ -34,28 +55,42 @@
 
     <div id="tela-login">
         <div class="login-card">
-            <h2 style="margin:0 0 20px 0">Gestor Pro</h2>
-            <input type="text" id="user" placeholder="Usuário">
-            <input type="password" id="pass" placeholder="Senha">
-            <label style="font-size: 12px; color: #888; display: flex; align-items: center; gap: 5px; margin-bottom: 15px;">
-                <input type="checkbox" id="lembrar" style="width:15px" checked> Manter conectado
+            <h2 style="margin:0 0 10px 0">Gestor Business</h2>
+            <p style="font-size:12px; color:#666; margin-bottom:20px">Acesse com sua conta</p>
+            <input type="text" id="userInput" placeholder="Usuário">
+            <input type="password" id="passInput" placeholder="Senha">
+            <label style="font-size: 12px; color:#888; display:flex; align-items:center; gap:5px; margin-top:10px">
+                <input type="checkbox" id="checkLembrar" style="width:16px" checked> Manter conectado
             </label>
-            <button class="btn-entrar" onclick="tentarLogin()">ACESSAR SISTEMA</button>
+            <button class="btn-entrar" onclick="fazerLogin()">ENTRAR NO APP</button>
         </div>
     </div>
 
-    <div id="interface">
-        <div class="header">
-            <h3 id="saudacao">Olá!</h3>
-            <button onclick="logout()" style="background:none; border:none; color:var(--danger); font-weight:700;">SAIR</button>
-        </div>
+    <div id="app-interface">
+        <button id="btn-logout" onclick="logout()">SAIR</button>
         
-        <div id="conteudo-dinamico"></div>
+        <div class="header-fixo" id="headerAdmin" style="display:none">
+            <div id="contadores" class="stats">Carregando...</div>
+            <div class="busca-container">
+                <span>🔍</span>
+                <input type="text" id="inputBusca" placeholder="Pesquisar cliente..." oninput="filtrarClientes()">
+            </div>
+        </div>
+
+        <div class="mural-avisos">
+            <div class="secao-titulo">
+                <h5>📌 Mural de Lembretes</h5>
+                <button id="btnNovoAviso" onclick="adicionarAviso()" style="background:var(--accent); color:white; border:none; border-radius:5px; padding:4px 8px; font-size:10px; display:none">+ NOVO</button>
+            </div>
+            <div id="listaAvisos"></div>
+        </div>
+
+        <div id="listaCorpo"></div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, query, where, getDocs, onSnapshot, orderBy, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDMQbFBbbKFABCwwTxuESpXsz_Knz-V4FI",
@@ -68,80 +103,151 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        let todosClientes = [];
+        let usuarioLogado = null;
 
-        // --- VERIFICAÇÃO DE SESSÃO ---
-        const sUser = localStorage.getItem('gestor_u');
-        const sPass = localStorage.getItem('gestor_p');
-        if(sUser && sPass) validar(sUser, sPass, true);
+        // --- VERIFICAÇÃO AUTOMÁTICA DE SESSÃO ---
+        const loginSalvo = localStorage.getItem('gestor_u');
+        const passSalvo = localStorage.getItem('gestor_p');
+        if(loginSalvo && passSalvo) {
+            autenticar(loginSalvo, passSalvo, true);
+        }
 
-        window.tentarLogin = () => {
-            const u = document.getElementById('user').value.toLowerCase().trim();
-            const p = document.getElementById('pass').value;
-            validar(u, p, document.getElementById('lembrar').checked);
+        window.fazerLogin = () => {
+            const u = document.getElementById('userInput').value.toLowerCase().trim();
+            const p = document.getElementById('passInput').value;
+            autenticar(u, p, document.getElementById('checkLembrar').checked);
         };
 
-        async function validar(u, p, manter) {
+        async function autenticar(user, pass, manter) {
             document.getElementById('loading').style.display = 'block';
-            
-            // 1. Verificamos se é VOCÊ (Admin Master)
-            // Crie esse usuário no seu painel /admin/ com login 'admin' para testar
-            const q = query(collection(db, "usuarios"), where("login", "==", u), where("senha", "==", p));
+            const q = query(collection(db, "usuarios"), where("login", "==", user), where("senha", "==", pass));
             const snap = await getDocs(q);
 
-            if (!snap.empty) {
-                const dados = snap.docs[0].data();
-                if(manter) { localStorage.setItem('gestor_u', u); localStorage.setItem('gestor_p', p); }
-                
-                // Se o login for 'admin', ele abre a visão de administrador
-                if(u === 'admin') carregarAdmin(dados); 
-                else carregarCliente(dados);
+            if(!snap.empty) {
+                usuarioLogado = snap.docs[0].data();
+                if(manter) { localStorage.setItem('gestor_u', user); localStorage.setItem('gestor_p', pass); }
+                iniciarApp();
             } else {
-                alert("Acesso negado!");
+                alert("Usuário ou Senha incorretos!");
                 document.getElementById('loading').style.display = 'none';
             }
         }
 
-        // --- VISÃO DO SEU USO (ADMIN) ---
-        function carregarAdmin(info) {
+        function iniciarApp() {
             document.getElementById('tela-login').style.display = 'none';
             document.getElementById('loading').style.display = 'none';
-            document.getElementById('interface').style.display = 'block';
-            document.getElementById('saudacao').innerText = "Painel Master";
+            document.getElementById('app-interface').style.display = 'block';
 
-            // Aqui ele puxa a sua lista antiga de 'clientes'
+            if(usuarioLogado.login === 'admin') {
+                document.getElementById('headerAdmin').style.display = 'block';
+                document.getElementById('btnNovoAviso').style.display = 'block';
+                carregarDadosAdmin();
+            } else {
+                carregarDadosCliente(usuarioLogado);
+            }
+            carregarMural();
+        }
+
+        // --- VISÃO ADMIN (VISUAL CLÁSSICO LISTA) ---
+        function carregarDadosAdmin() {
             onSnapshot(query(collection(db, "clientes"), orderBy("data", "asc")), (snap) => {
-                const lista = snap.docs.map(d => {
-                    const c = d.data();
-                    return `
-                    <div class="card">
-                        <b>${c.nome}</b><br>
-                        <small>Vence: ${c.data}</small>
-                        <div class="acoes">
-                            <button class="btn-acao" style="background:#444">EDITAR</button>
-                            <button class="btn-acao" style="background:var(--danger)">EXCLUIR</button>
-                        </div>
-                    </div>`;
-                }).join('');
-                document.getElementById('conteudo-dinamico').innerHTML = `<h4>Todos os Clientes:</h4>` + lista;
+                todosClientes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                const paineis = {};
+                todosClientes.forEach(c => { paineis[c.painel] = (paineis[c.painel] || 0) + 1; });
+                document.getElementById('contadores').innerHTML = Object.keys(paineis).map(p => `${p}: <b>${paineis[p]}</b>`).join(' | ') + ` | TOTAL: <b>${todosClientes.length}</b>`;
+                renderizarLista(todosClientes);
             });
         }
 
-        // --- VISÃO DO CLIENTE ---
-        function carregarCliente(info) {
-            document.getElementById('tela-login').style.display = 'none';
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('interface').style.display = 'block';
-            document.getElementById('saudacao').innerText = "Olá, " + info.nome;
-            
-            document.getElementById('conteudo-dinamico').innerHTML = `
-                <div class="card" style="border-left: 5px solid var(--accent)">
-                    <p>Seu plano: <b>${info.plano}</b></p>
-                    <p>Vencimento: <b>${info.vencimento}</b></p>
+        function renderizarLista(lista) {
+            const hoje = new Date(); hoje.setHours(0,0,0,0);
+            document.getElementById('listaCorpo').innerHTML = lista.map(c => {
+                const dataVenc = new Date(c.data + 'T23:59:59');
+                const diff = Math.ceil((dataVenc - hoje) / 86400000);
+                const isUrgent = diff <= 3 && diff >= 0;
+                const isExpired = diff < 0;
+                return `
+                <div class="cliente-item ${isUrgent || isExpired ? 'urgente' : ''}">
+                    <div class="info">
+                        <h4>${c.nome}</h4>
+                        <p style="font-size:13px; color:#aaa; margin:5px 0">🖥️ Painel: ${c.painel} | 📅 Venc: ${c.data.split('-').reverse().join('/')}</p>
+                        <span class="alerta-texto" style="color:${isExpired ? 'var(--danger)' : (isUrgent ? 'var(--warning)' : 'var(--success)')}">
+                            ${isExpired ? '❌ VENCIDO' : (isUrgent ? '⚠️ VENCE EM ' + diff + ' DIAS' : '✅ EM DIA')}
+                        </span>
+                    </div>
+                    <div class="acoes">
+                        <button class="btn-acao btn-plus" onclick="renovar('${c.id}', '${c.data}')">➕ +1 Mês</button>
+                        <button class="btn-acao btn-edit" onclick="alert('Use o painel /admin para editar detalhadamente')">✏️ Editar</button>
+                        <button class="btn-acao btn-del" onclick="deletar('${c.id}')">🗑️ Excluir</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // --- VISÃO CLIENTE ---
+        function carregarDadosCliente(user) {
+            const hoje = new Date(); hoje.setHours(0,0,0,0);
+            const venc = new Date(user.vencimento + 'T23:59:59');
+            const diff = Math.ceil((venc - hoje) / 86400000);
+            document.getElementById('app-interface').style.paddingTop = '20px';
+            document.getElementById('listaCorpo').innerHTML = `
+                <div class="cliente-item" style="border-left: 6px solid var(--accent); padding:30px">
+                    <h2 style="margin:0">Olá, ${user.nome}</h2>
+                    <p style="color:#aaa; margin:15px 0">Seu acesso vence em:</p>
+                    <div style="font-size:32px; font-weight:900;">${user.vencimento.split('-').reverse().join('/')}</div>
+                    <p style="font-weight:800; color:${diff < 0 ? 'var(--danger)' : 'var(--success)'}">
+                        ${diff < 0 ? '❌ EXSPIRADO' : '✅ ATIVO'}
+                    </p>
                 </div>
             `;
         }
 
+        // --- MURAL ---
+        function carregarMural() {
+            onSnapshot(query(collection(db, "avisos"), orderBy("criadoEm", "desc")), (snap) => {
+                document.getElementById('listaAvisos').innerHTML = snap.docs.map(d => `
+                    <div class="card-aviso" onclick="${usuarioLogado.login === 'admin' ? `acoesMural('${d.id}', '${d.data().texto}')` : ''}">
+                        📢 ${d.data().texto}
+                    </div>
+                `).join('');
+            });
+        }
+
+        // Funções de Ação Admin
+        window.renovar = async (id, data) => {
+            if(!confirm("+1 Mês?")) return;
+            let d = new Date(data.split('-')[0], data.split('-')[1]-1, data.split('-')[2]);
+            d.setMonth(d.getMonth() + 1);
+            await updateDoc(doc(db, "clientes", id), { data: d.toISOString().split('T')[0] });
+        };
+
+        window.deletar = async (id) => {
+            if(confirm("Excluir?")) await deleteDoc(doc(db, "clientes", id));
+        };
+
         window.logout = () => { localStorage.clear(); location.reload(); };
+
+        window.adicionarAviso = async () => {
+            const t = prompt("Novo aviso:");
+            if(t) await addDoc(collection(db, "avisos"), { texto: t, criadoEm: Date.now() });
+        };
+
+        window.acoesMural = async (id, txt) => {
+            const op = confirm("OK: Editar / CANCELAR: Excluir");
+            if(op) {
+                const n = prompt("Editar:", txt);
+                if(n) await updateDoc(doc(db, "avisos", id), { texto: n });
+            } else {
+                if(confirm("Apagar?")) await deleteDoc(doc(db, "avisos", id));
+            }
+        };
+
+        window.filtrarClientes = () => {
+            const t = document.getElementById('inputBusca').value.toLowerCase();
+            renderizarLista(todosClientes.filter(c => c.nome.toLowerCase().includes(t)));
+        };
+
     </script>
 </body>
 </html>
