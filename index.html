@@ -5,47 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Gestor Business V13.19</title>
+    <title>Gestor Business V13.23</title>
     <style>
         :root { --bg: #000; --card: #111; --text: #fff; --accent: #3b82f6; --danger: #ff3b30; --success: #4ade80; --warning: #facc15; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0; }
 
         /* HEADER */
         .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: #000; padding: 10px 15px; padding-top: env(safe-area-inset-top); z-index: 1000; border-bottom: 1px solid #1a1a1a; }
-        .stats-topo { font-size: 11px; color: #888; font-weight: bold; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 8px; padding-right: 50px; }
+        .stats-topo { font-size: 11px; color: #888; font-weight: bold; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 8px; padding-right: 60px; }
+        .btn-sair { position: fixed; top: calc(10px + env(safe-area-inset-top)); right: 15px; background: rgba(51, 51, 51, 0.9); border: 1px solid #444; color: #fff; padding: 6px 12px; border-radius: 10px; font-size: 10px; z-index: 2100; font-weight: bold; }
+
         .btn-novo-cliente-topo { background: var(--accent); color: white; border: none; width: 100%; padding: 14px; border-radius: 15px; font-weight: 900; font-size: 14px; margin-bottom: 12px; cursor: pointer; text-transform: uppercase; }
         .busca-container { background: #1a1a1a; display: flex; align-items: center; padding: 10px 15px; border-radius: 15px; border: 1px solid #333; }
         .busca-container input { background: none; border: none; color: #fff; flex: 1; outline: none; font-size: 14px; }
         
-        /* BOTÃO SAIR REFORÇADO (PARA IOS/ANDROID) */
-        .btn-sair { position: fixed; top: calc(10px + env(safe-area-inset-top)); right: 15px; background: rgba(51, 51, 51, 0.8); border: 1px solid #444; color: #fff; padding: 5px 10px; border-radius: 8px; font-size: 10px; z-index: 2100; font-weight: bold; backdrop-filter: blur(5px); }
+        .secao-app { margin-top: calc(165px + env(safe-area-inset-top)); padding: 15px; }
+        .card-aviso { background: #1a1a1a; padding: 12px; border-radius: 15px; margin-bottom: 8px; font-size: 13px; font-weight: bold; border-left: 4px solid var(--accent); color: #fff; }
 
-        /* LOGIN */
-        .login-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-        .login-card { background: #111; padding: 30px; border-radius: 25px; width: 85%; max-width: 280px; text-align: center; border: 1px solid #333; }
-        .login-card input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #000; color: #fff; box-sizing: border-box; margin-bottom: 10px; outline: none; }
-        .remember-box { display: flex; align-items: center; gap: 8px; color: #888; font-size: 13px; margin-bottom: 20px; cursor: pointer; justify-content: flex-start; }
-
-        /* CONTEÚDO */
-        .secao-mural { margin-top: calc(160px + env(safe-area-inset-top)); padding: 15px; }
-        .lista-clientes { padding: 0 15px 120px 15px; }
         .card-cliente { background: #111; border: 1px solid #333; border-radius: 20px; padding: 15px; margin-bottom: 12px; }
         .card-cliente.vence-logo { border: 2px solid var(--danger) !important; box-shadow: 0 0 15px rgba(255, 59, 48, 0.4); }
         .card-cliente h3 { margin: 0 0 5px 0; font-size: 18px; font-weight: 800; text-transform: uppercase; }
-        .info-p { font-size: 12px; color: #aaa; margin: 2px 0; }
-        .vence-em { color: var(--warning); font-weight: bold; font-size: 11px; margin-top: 5px; }
-
+        
         .grid-botoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
         .btn-card { padding: 12px; border-radius: 12px; border: none; font-weight: 800; font-size: 11px; text-transform: uppercase; cursor: pointer; }
         .btn-renovar { background: var(--success); color: #000; }
         .btn-editar { background: #333; color: #fff; }
         .btn-excluir { background: var(--danger); color: #fff; grid-column: span 2; margin-top: 4px; padding: 8px; }
 
-        /* MODAL */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2500; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
         .modal-content { background: #111; width: 100%; max-width: 400px; padding: 25px; border-radius: 30px; border: 1px solid #333; text-align: center; }
         .modal-content input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #333; background: #000; color: #fff; box-sizing: border-box; font-size: 16px; }
-        .btn-acao-modal { background: var(--success); color: #000; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: 900; margin-top: 15px; }
+        
+        .login-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+        .login-card { background: #111; padding: 30px; border-radius: 25px; width: 85%; max-width: 280px; text-align: center; border: 1px solid #333; }
     </style>
 </head>
 <body>
@@ -54,22 +46,22 @@
 
     <div id="modal-cliente" class="modal">
         <div class="modal-content">
-            <h2 id="modal-titulo" style="margin-top:0">Novo Cliente</h2>
+            <h2 id="modal-titulo">Novo Cliente</h2>
             <input type="hidden" id="edit-id">
             <input type="text" id="cli-nome" placeholder="Nome do Cliente">
             <input type="text" id="cli-painel" placeholder="Nome do Painel">
             <input type="date" id="cli-vencimento">
-            <button class="btn-acao-modal" onclick="processarCliente()">SALVAR DADOS</button>
+            <button class="btn-card btn-renovar" style="width:100%; margin-top:10px; padding:15px;" onclick="processarCliente()">SALVAR</button>
             <button onclick="fecharModal()" style="background:none; border:none; color:#888; margin-top:15px; font-weight:bold;">CANCELAR</button>
         </div>
     </div>
 
     <div id="tela-login" class="login-container">
         <div class="login-card">
-            <h2 style="margin-bottom:25px;">GESTOR BUSINESS</h2>
-            <input type="text" id="u" placeholder="Usuário">
-            <input type="password" id="p" placeholder="Senha">
-            <label class="remember-box">
+            <h2>GESTOR BUSINESS</h2>
+            <input type="text" id="u" placeholder="Usuário" style="width:100%; padding:15px; border-radius:12px; background:#000; color:#fff; border:1px solid #333; margin-bottom:10px;">
+            <input type="password" id="p" placeholder="Senha" style="width:100%; padding:15px; border-radius:12px; background:#000; color:#fff; border:1px solid #333; margin-bottom:10px;">
+            <label style="display:flex; align-items:center; gap:8px; color:#888; font-size:12px; margin-bottom:15px;">
                 <input type="checkbox" id="remember"> Lembrar acesso
             </label>
             <button onclick="logar()" style="width:100%; padding:15px; background:var(--accent); border:none; color:#fff; border-radius:12px; font-weight:900;">ACESSAR</button>
@@ -79,13 +71,16 @@
     <div id="app" style="display:none;">
         <header class="header-fixo">
             <div id="contagem" class="stats-topo"></div>
-            <button class="btn-novo-cliente-topo" onclick="abrirModalAdd()">+ Adicionar Cliente</button>
+            <button class="btn-novo-cliente-topo" onclick="abrirModalAdd()">+ ADICIONAR CLIENTE</button>
             <div class="busca-container">
-                <input type="text" id="busca" placeholder="Buscar cliente..." oninput="filtrar()">
+                <input type="text" id="busca" placeholder="Buscar na minha lista..." oninput="filtrar()">
             </div>
         </header>
-        <section class="secao-mural"><div id="lista-mural"></div></section>
-        <section class="lista-clientes" id="lista-corpo"></section>
+
+        <main class="secao-app">
+            <div id="lista-mural"></div>
+            <div id="lista-corpo"></div>
+        </main>
     </div>
 
     <script type="module">
@@ -101,8 +96,8 @@
             appId: "1:1019995087685:web:a063af65a4b7f234b4542c"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const firebaseApp = initializeApp(firebaseConfig);
+        const db = getFirestore(firebaseApp);
         let dadosRaw = [];
         let logado = null;
 
@@ -132,7 +127,7 @@
                     localStorage.setItem('gestor_p', pass);
                 }
                 iniciarApp(); 
-            } else { alert("Erro de Login!"); }
+            } else { alert("Login Incorreto!"); }
         };
 
         function iniciarApp() {
@@ -140,14 +135,24 @@
             document.getElementById('app').style.display = 'block';
             document.getElementById('btn-sair-global').style.display = 'block';
             carregarDados();
+            carregarMural();
         }
 
         function carregarDados() {
-            // CORREÇÃO: Admin agora vê apenas os SEUS clientes, não todos.
-            const q = query(collection(db, "clientes"), where("dono", "==", logado.login), orderBy("data", "asc"));
+            // REGRA: Admin vê dele + os antigos sem dono. Cliente vê apenas os dele.
+            const q = (logado.login === 'admin')
+                ? query(collection(db, "clientes"), orderBy("data", "asc"))
+                : query(collection(db, "clientes"), where("dono", "==", logado.login));
 
             onSnapshot(q, (snap) => {
-                dadosRaw = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                let temp = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                // Filtro extra para garantir que o Admin não veja dados de outros usuários novos
+                if(logado.login === 'admin') {
+                    dadosRaw = temp.filter(c => !c.dono || c.dono === 'admin');
+                } else {
+                    dadosRaw = temp;
+                }
+                
                 const contPaineis = {};
                 dadosRaw.forEach(c => contPaineis[c.painel] = (contPaineis[c.painel] || 0) + 1);
                 let htmlS = "";
@@ -168,17 +173,25 @@
                 return `
                 <div class="card-cliente ${classeVence}">
                     <h3>${c.nome}</h3>
-                    <p class="info-p">Painel: <b>${c.painel}</b></p>
-                    <p class="info-p">Vence: <b>${dia}/${mes}/${ano}</b></p>
-                    ${diff > 0 && diff <= 3 ? `<div class="vence-em">⚠️ VENCE EM ${diff} DIAS</div>` : ''}
-                    ${diff <= 0 ? `<div class="vence-em" style="color:red">❌ VENCIDO / HOJE</div>` : ''}
+                    <p style="font-size:12px; color:#aaa; margin:2px 0;">Painel: <b>${c.painel}</b> | Vence: <b>${dia}/${mes}/${ano}</b></p>
                     <div class="grid-botoes">
                         <button class="btn-card btn-renovar" onclick="renovarConfirmar('${c.id}', '${c.data}')">+1 MÊS</button>
                         <button class="btn-card btn-editar" onclick="abrirModalEdit('${c.id}', '${c.nome}', '${c.painel}', '${c.data}')">EDITAR</button>
-                        <button class="btn-card btn-excluir" onclick="excluirConfirmar('${c.id}')">EXCLUIR</button>
+                        <button class="btn-card btn-excluir" onclick="excluirCli('${c.id}')">EXCLUIR</button>
                     </div>
                 </div>`;
             }).join('');
+        }
+
+        function carregarMural() {
+            // Mural funciona para ambos agora!
+            const q = query(collection(db, "lembretes_privados"), where("usuarioId", "==", logado.login));
+            onSnapshot(q, (snap) => {
+                document.getElementById('lista-mural').innerHTML = snap.docs.map(d => `
+                    <div class="card-aviso" onclick="excluirMural('${d.id}')">
+                        📢 ${d.data().texto}
+                    </div>`).join('');
+            });
         }
 
         window.abrirModalAdd = () => {
@@ -203,8 +216,7 @@
             const p = document.getElementById('cli-painel').value;
             const d = document.getElementById('cli-vencimento').value;
             if(!n || !p || !d) return alert("Preencha tudo!");
-
-            if(confirm(`Confirmar ação?`)) {
+            if(confirm("Confirmar salvamento?")) {
                 if(id) await updateDoc(doc(db, "clientes", id), { nome: n, painel: p, data: d });
                 else await addDoc(collection(db, "clientes"), { nome: n, painel: p, data: d, dono: logado.login });
                 fecharModal();
@@ -212,7 +224,7 @@
         };
 
         window.renovarConfirmar = async (id, dataAtual) => {
-            if(confirm("Renovar por 1 mês?")) {
+            if(confirm("Renovar por 1 mês mantendo o dia?")) {
                 const [ano, mes, dia] = dataAtual.split('-').map(Number);
                 let novaData = new Date(ano, mes, dia); 
                 if (novaData.getDate() != dia) novaData.setDate(0); 
@@ -220,15 +232,9 @@
             }
         };
 
-        window.excluirConfirmar = async (id) => { if(confirm("EXCLUIR definitivamente?")) await deleteDoc(doc(db, "clientes", id)); };
-        
-        window.confirmarSair = () => { 
-            if(confirm("Deseja sair do aplicativo?")) {
-                localStorage.removeItem('gestor_u');
-                localStorage.removeItem('gestor_p');
-                location.reload(); 
-            }
-        };
+        window.excluirCli = async (id) => { if(confirm("Deseja excluir?")) await deleteDoc(doc(db, "clientes", id)); };
+        window.excluirMural = async (id) => { if(confirm("Remover nota?")) await deleteDoc(doc(db, "lembretes_privados", id)); };
+        window.confirmarSair = () => { if(confirm("Deseja sair?")) { localStorage.clear(); location.reload(); } };
         window.filtrar = () => {
             const t = document.getElementById('busca').value.toLowerCase();
             render(dadosRaw.filter(x => x.nome.toLowerCase().includes(t)));
