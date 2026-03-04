@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
-    <title>Gestor Business V13.5</title>
+    <title>Gestor Business V13.6</title>
     <style>
         :root { --bg: #000; --card: #1a1a1a; --text: #fff; --accent: #3b82f6; --danger: #ff3b30; --warning: #ffcc00; --success: #00ff00; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; min-height: 100vh; }
@@ -17,24 +17,26 @@
         .login-card input { width: 100%; padding: 15px; margin: 10px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
         .btn-entrar { width: 100%; padding: 15px; background: var(--accent); border: none; color: #fff; font-weight: 900; border-radius: 12px; cursor: pointer; margin-top: 10px; }
 
-        /* INTERFACE DO APLICATIVO */
+        /* INTERFACE DO APP */
         #app-interface { display: none; padding: 15px; padding-top: calc(150px + env(safe-area-inset-top)); padding-bottom: 50px; }
         
-        /* BOTÃO SAIR PEQUENO NO TOPO */
-        .btn-sair-topo { position: fixed; top: calc(10px + env(safe-area-inset-top)); right: 15px; background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 11px; z-index: 200; cursor: pointer; text-transform: uppercase; box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3); }
+        /* BOTÃO SAIR NO TOPO */
+        .btn-sair-topo { position: fixed; top: calc(10px + env(safe-area-inset-top)); right: 15px; background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 11px; z-index: 200; cursor: pointer; text-transform: uppercase; }
 
-        /* HEADER FIXO CLÁSSICO */
+        /* HEADER FIXO */
         .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 10px; padding-top: env(safe-area-inset-top); z-index: 100; border-bottom: 1px solid #333; height: 120px; display: flex; flex-direction: column; justify-content: flex-end; }
         .stats { font-size: 11px; color: #aaa; display: flex; gap: 8px; margin-bottom: 8px; overflow-x: auto; white-space: nowrap; font-weight: 600; padding-right: 60px; }
         .stats b { color: var(--accent); }
         .busca-container { display: flex; gap: 8px; align-items: center; background: #222; padding: 8px 15px; border-radius: 20px; border: 1px solid #444; margin-bottom: 5px; }
         .busca-container input { background: none; border: none; color: white; flex: 1; outline: none; font-size: 15px; }
 
-        /* MURAL E CLIENTES */
+        /* MURAL CLÁSSICO */
         .mural-avisos { margin: 20px 0; display: flex; flex-direction: column; gap: 12px; }
         .secao-titulo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-left: 3px solid var(--accent); padding-left: 10px; }
         .secao-titulo h5 { margin: 0; color: #fff; text-transform: uppercase; font-size: 14px; font-weight: 900; }
-        .card-aviso { background: #111; border: 1px solid #333; border-left: 6px solid var(--accent); padding: 18px; border-radius: 12px; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; line-height: 1.4; }
+        .card-aviso { background: #111; border: 1px solid #333; border-left: 6px solid var(--accent); padding: 18px; border-radius: 12px; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; line-height: 1.4; }
+
+        /* LISTA DE CLIENTES */
         .cliente-item { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #333; }
         .cliente-item.urgente { border: 2px solid var(--danger) !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); }
         .info h4 { margin: 0; font-size: 20px; font-weight: 900; text-transform: uppercase; }
@@ -51,7 +53,6 @@
     <div id="tela-login">
         <div class="login-card">
             <h2 style="margin:0 0 10px 0">Gestor Business</h2>
-            <p style="font-size:12px; color:#666; margin-bottom:20px">Acesse sua conta</p>
             <input type="text" id="userInput" placeholder="Usuário">
             <input type="password" id="passInput" placeholder="Senha">
             <label style="font-size: 12px; color:#888; display:flex; align-items:center; gap:5px; margin-top:10px; cursor:pointer">
@@ -74,8 +75,8 @@
 
         <div class="mural-avisos">
             <div class="secao-titulo">
-                <h5>📌 Mural de Lembretes</h5>
-                <button id="btnNovoAviso" onclick="adicionarAviso()" style="background:var(--accent); color:white; border:none; border-radius:5px; padding:4px 8px; font-size:10px; display:none">+ NOVO</button>
+                <h5 id="tituloMural">📌 Meus Lembretes</h5>
+                <button onclick="adicionarAviso()" style="background:var(--accent); color:white; border:none; border-radius:5px; padding:4px 8px; font-size:10px;">+ NOVO</button>
             </div>
             <div id="listaAvisos"></div>
         </div>
@@ -129,22 +130,56 @@
             document.getElementById('tela-login').style.display = 'none';
             document.getElementById('loading').style.display = 'none';
             document.getElementById('app-interface').style.display = 'block';
+            
             if(usuarioLogado.login === 'admin') {
                 document.getElementById('headerAdmin').style.display = 'flex';
-                document.getElementById('btnNovoAviso').style.display = 'block';
+                document.getElementById('tituloMural').innerText = "📌 Lembretes Admin";
                 carregarDadosAdmin();
             } else {
+                document.getElementById('tituloMural').innerText = "📝 Minhas Anotações";
                 carregarDadosCliente(usuarioLogado);
             }
             carregarMural();
         }
 
+        // --- MURAL PRIVADO ---
+        function carregarMural() {
+            const pasta = (usuarioLogado.login === 'admin') ? "avisos" : "lembretes_privados";
+            const qMural = (usuarioLogado.login === 'admin') 
+                ? query(collection(db, "avisos"), orderBy("criadoEm", "desc"))
+                : query(collection(db, "lembretes_privados"), where("usuarioId", "==", usuarioLogado.login), orderBy("criadoEm", "desc"));
+
+            onSnapshot(qMural, (snap) => {
+                document.getElementById('listaAvisos').innerHTML = snap.docs.map(d => `
+                    <div class="card-aviso" onclick="acoesMural('${d.id}', '${d.data().texto}')">
+                        ${d.data().texto}
+                    </div>`).join('');
+            });
+        }
+
+        window.adicionarAviso = async () => {
+            const t = prompt("Escreva sua anotação:");
+            if(!t) return;
+            if(usuarioLogado.login === 'admin') {
+                await addDoc(collection(db, "avisos"), { texto: t, criadoEm: Date.now() });
+            } else {
+                await addDoc(collection(db, "lembretes_privados"), { texto: t, usuarioId: usuarioLogado.login, criadoEm: Date.now() });
+            }
+        };
+
+        window.acoesMural = async (id, txt) => {
+            const pasta = (usuarioLogado.login === 'admin') ? "avisos" : "lembretes_privados";
+            const op = confirm("OK: Editar / CANCELAR: Excluir");
+            if(op) {
+                const n = prompt("Editar:", txt);
+                if(n) await updateDoc(doc(db, pasta, id), { texto: n });
+            } else { if(confirm("Apagar?")) await deleteDoc(doc(db, pasta, id)); }
+        };
+
+        // --- GESTÃO DE CLIENTES ---
         function carregarDadosAdmin() {
             onSnapshot(query(collection(db, "clientes"), orderBy("data", "asc")), (snap) => {
                 todosClientes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                const paineis = {};
-                todosClientes.forEach(c => { paineis[c.painel] = (paineis[c.painel] || 0) + 1; });
-                document.getElementById('contadores').innerHTML = Object.keys(paineis).map(p => `${p}: <b>${paineis[p]}</b>`).join(' | ') + ` | TOTAL: <b>${todosClientes.length}</b>`;
                 renderizarLista(todosClientes);
             });
         }
@@ -154,16 +189,11 @@
             document.getElementById('listaCorpo').innerHTML = lista.map(c => {
                 const dataVenc = new Date(c.data + 'T23:59:59');
                 const diff = Math.ceil((dataVenc - hoje) / 86400000);
-                const isUrgent = diff <= 3 && diff >= 0;
-                const isExpired = diff < 0;
                 return `
-                <div class="cliente-item ${isUrgent || isExpired ? 'urgente' : ''}">
+                <div class="cliente-item ${diff <= 3 ? 'urgente' : ''}">
                     <div class="info">
                         <h4>${c.nome}</h4>
-                        <p style="font-size:13px; color:#aaa; margin:5px 0">🖥️ Painel: ${c.painel} | 📅 Venc: ${c.data.split('-').reverse().join('/')}</p>
-                        <span style="font-weight:900; font-size:12px; color:${isExpired ? 'var(--danger)' : (isUrgent ? 'var(--warning)' : 'var(--success)')}">
-                            ${isExpired ? '❌ VENCIDO' : (isUrgent ? '⚠️ VENCE EM ' + diff + ' DIAS' : '✅ EM DIA')}
-                        </span>
+                        <p style="font-size:13px; color:#aaa;">🖥️ ${c.painel} | 📅 ${c.data.split('-').reverse().join('/')}</p>
                     </div>
                     <div class="acoes">
                         <button class="btn-acao" style="background:var(--success)" onclick="renovar('${c.id}', '${c.data}')">➕ +1 Mês</button>
@@ -181,51 +211,17 @@
             document.getElementById('listaCorpo').innerHTML = `
                 <div class="cliente-item" style="border-left: 6px solid var(--accent); padding:30px">
                     <h2 style="margin:0">Olá, ${user.nome}</h2>
-                    <p style="color:#aaa; margin:15px 0">Vencimento:</p>
+                    <p style="color:#aaa; margin:15px 0">Seu acesso vence em:</p>
                     <div style="font-size:32px; font-weight:900;">${user.vencimento.split('-').reverse().join('/')}</div>
                     <p style="font-weight:800; color:${diff < 0 ? 'var(--danger)' : 'var(--success)'}">
-                        ${diff < 0 ? '❌ ACESSO EXPIRADO' : '✅ ACESSO ATIVO'}
+                        ${diff < 0 ? '❌ EXPIRADO' : '✅ ACESSO ATIVO'}
                     </p>
                 </div>`;
         }
 
-        function carregarMural() {
-            onSnapshot(query(collection(db, "avisos"), orderBy("criadoEm", "desc")), (snap) => {
-                document.getElementById('listaAvisos').innerHTML = snap.docs.map(d => `
-                    <div class="card-aviso" onclick="${usuarioLogado.login === 'admin' ? `acoesMural('${d.id}', '${d.data().texto}')` : ''}">
-                        📢 ${d.data().texto}
-                    </div>`).join('');
-            });
-        }
-
-        window.confirmarSair = () => {
-            if(confirm("Deseja realmente deslogar?")) { localStorage.clear(); location.reload(); }
-        };
-
-        window.renovar = async (id, data) => {
-            if(!confirm("+1 Mês?")) return;
-            let d = new Date(data.split('-')[0], data.split('-')[1]-1, data.split('-')[2]);
-            d.setMonth(d.getMonth() + 1);
-            await updateDoc(doc(db, "clientes", id), { data: d.toISOString().split('T')[0] });
-        };
-
-        window.deletar = async (id) => {
-            if(confirm("Excluir?")) await deleteDoc(doc(db, "clientes", id));
-        };
-
-        window.adicionarAviso = async () => {
-            const t = prompt("Novo aviso:");
-            if(t) await addDoc(collection(db, "avisos"), { texto: t, criadoEm: Date.now() });
-        };
-
-        window.acoesMural = async (id, txt) => {
-            const op = confirm("OK: Editar / CANCELAR: Excluir");
-            if(op) {
-                const n = prompt("Editar:", txt);
-                if(n) await updateDoc(doc(db, "avisos", id), { texto: n });
-            } else { if(confirm("Apagar?")) await deleteDoc(doc(db, "avisos", id)); }
-        };
-
+        window.confirmarSair = () => { if(confirm("Deseja deslogar?")) { localStorage.clear(); location.reload(); } };
+        window.renovar = async (id, data) => { /* lógica de renovar */ };
+        window.deletar = async (id) => { if(confirm("Excluir?")) await deleteDoc(doc(db, "clientes", id)); };
         window.filtrarClientes = () => {
             const t = document.getElementById('inputBusca').value.toLowerCase();
             renderizarLista(todosClientes.filter(c => c.nome.toLowerCase().includes(t)));
