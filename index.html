@@ -5,21 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Gestor Business V13.23</title>
+    <title>Gestor Business V13.26</title>
     <style>
         :root { --bg: #000; --card: #111; --text: #fff; --accent: #3b82f6; --danger: #ff3b30; --success: #4ade80; --warning: #facc15; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0; }
 
-        /* HEADER */
         .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: #000; padding: 10px 15px; padding-top: env(safe-area-inset-top); z-index: 1000; border-bottom: 1px solid #1a1a1a; }
-        .stats-topo { font-size: 11px; color: #888; font-weight: bold; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 8px; padding-right: 60px; }
+        .stats-topo { font-size: 11px; color: #888; font-weight: bold; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 8px; padding-right: 65px; }
         .btn-sair { position: fixed; top: calc(10px + env(safe-area-inset-top)); right: 15px; background: rgba(51, 51, 51, 0.9); border: 1px solid #444; color: #fff; padding: 6px 12px; border-radius: 10px; font-size: 10px; z-index: 2100; font-weight: bold; }
 
         .btn-novo-cliente-topo { background: var(--accent); color: white; border: none; width: 100%; padding: 14px; border-radius: 15px; font-weight: 900; font-size: 14px; margin-bottom: 12px; cursor: pointer; text-transform: uppercase; }
         .busca-container { background: #1a1a1a; display: flex; align-items: center; padding: 10px 15px; border-radius: 15px; border: 1px solid #333; }
         .busca-container input { background: none; border: none; color: #fff; flex: 1; outline: none; font-size: 14px; }
         
-        .secao-app { margin-top: calc(165px + env(safe-area-inset-top)); padding: 15px; }
+        .secao-principal { margin-top: calc(165px + env(safe-area-inset-top)); padding: 15px; }
         .card-aviso { background: #1a1a1a; padding: 12px; border-radius: 15px; margin-bottom: 8px; font-size: 13px; font-weight: bold; border-left: 4px solid var(--accent); color: #fff; }
 
         .card-cliente { background: #111; border: 1px solid #333; border-radius: 20px; padding: 15px; margin-bottom: 12px; }
@@ -46,21 +45,21 @@
 
     <div id="modal-cliente" class="modal">
         <div class="modal-content">
-            <h2 id="modal-titulo">Novo Cliente</h2>
+            <h2 id="modal-titulo">Cliente</h2>
             <input type="hidden" id="edit-id">
-            <input type="text" id="cli-nome" placeholder="Nome do Cliente">
-            <input type="text" id="cli-painel" placeholder="Nome do Painel">
+            <input type="text" id="cli-nome" placeholder="Nome">
+            <input type="text" id="cli-painel" placeholder="Painel">
             <input type="date" id="cli-vencimento">
             <button class="btn-card btn-renovar" style="width:100%; margin-top:10px; padding:15px;" onclick="processarCliente()">SALVAR</button>
-            <button onclick="fecharModal()" style="background:none; border:none; color:#888; margin-top:15px; font-weight:bold;">CANCELAR</button>
+            <button onclick="fecharModal('modal-cliente')" style="background:none; border:none; color:#888; margin-top:15px; font-weight:bold;">CANCELAR</button>
         </div>
     </div>
 
     <div id="tela-login" class="login-container">
         <div class="login-card">
             <h2>GESTOR BUSINESS</h2>
-            <input type="text" id="u" placeholder="Usuário" style="width:100%; padding:15px; border-radius:12px; background:#000; color:#fff; border:1px solid #333; margin-bottom:10px;">
-            <input type="password" id="p" placeholder="Senha" style="width:100%; padding:15px; border-radius:12px; background:#000; color:#fff; border:1px solid #333; margin-bottom:10px;">
+            <input type="text" id="u" placeholder="Usuário" style="width:100%; padding:15px; border-radius:12px; background:#000; border:1px solid #333; color:#fff; margin-bottom:10px;">
+            <input type="password" id="p" placeholder="Senha" style="width:100%; padding:15px; border-radius:12px; background:#000; border:1px solid #333; color:#fff; margin-bottom:10px;">
             <label style="display:flex; align-items:center; gap:8px; color:#888; font-size:12px; margin-bottom:15px;">
                 <input type="checkbox" id="remember"> Lembrar acesso
             </label>
@@ -73,11 +72,11 @@
             <div id="contagem" class="stats-topo"></div>
             <button class="btn-novo-cliente-topo" onclick="abrirModalAdd()">+ ADICIONAR CLIENTE</button>
             <div class="busca-container">
-                <input type="text" id="busca" placeholder="Buscar na minha lista..." oninput="filtrar()">
+                <input type="text" id="busca" placeholder="Pesquisar..." oninput="filtrar()">
             </div>
         </header>
 
-        <main class="secao-app">
+        <main class="secao-principal">
             <div id="lista-mural"></div>
             <div id="lista-corpo"></div>
         </main>
@@ -96,69 +95,38 @@
             appId: "1:1019995087685:web:a063af65a4b7f234b4542c"
         };
 
-        const firebaseApp = initializeApp(firebaseConfig);
-        const db = getFirestore(firebaseApp);
+        const fApp = initializeApp(firebaseConfig);
+        const db = getFirestore(fApp);
         let dadosRaw = [];
         let logado = null;
 
-        window.onload = () => {
-            const savedU = localStorage.getItem('gestor_u');
-            const savedP = localStorage.getItem('gestor_p');
-            if(savedU && savedP) {
-                document.getElementById('u').value = savedU;
-                document.getElementById('p').value = savedP;
-                document.getElementById('remember').checked = true;
-                logar();
-            }
-        };
-
         window.logar = async () => {
-            const login = document.getElementById('u').value.toLowerCase().trim();
-            const pass = document.getElementById('p').value;
-            if(!login || !pass) return;
-
-            const q = query(collection(db, "usuarios"), where("login", "==", login), where("senha", "==", pass));
+            const u = document.getElementById('u').value.toLowerCase().trim(), p = document.getElementById('p').value;
+            if(!u || !p) return;
+            const q = query(collection(db, "usuarios"), where("login", "==", u), where("senha", "==", p));
             const snap = await getDocs(q);
-            
-            if(!snap.empty) { 
+            if(!snap.empty) {
                 logado = snap.docs[0].data();
-                if(document.getElementById('remember').checked) {
-                    localStorage.setItem('gestor_u', login);
-                    localStorage.setItem('gestor_p', pass);
-                }
-                iniciarApp(); 
-            } else { alert("Login Incorreto!"); }
+                if(document.getElementById('remember').checked) { localStorage.setItem('gestor_u', u); localStorage.setItem('gestor_p', p); }
+                document.getElementById('tela-login').style.display='none'; document.getElementById('app').style.display='block'; document.getElementById('btn-sair-global').style.display='block';
+                carregarTudo();
+            } else { alert("Acesso negado!"); }
         };
 
-        function iniciarApp() {
-            document.getElementById('tela-login').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-            document.getElementById('btn-sair-global').style.display = 'block';
-            carregarDados();
-            carregarMural();
-        }
-
-        function carregarDados() {
-            // REGRA: Admin vê dele + os antigos sem dono. Cliente vê apenas os dele.
-            const q = (logado.login === 'admin')
-                ? query(collection(db, "clientes"), orderBy("data", "asc"))
-                : query(collection(db, "clientes"), where("dono", "==", logado.login));
-
-            onSnapshot(q, (snap) => {
+        function carregarTudo() {
+            // ADMIN vê dele + antigos. CLIENTE vê apenas dele.
+            const qC = (logado.login === 'admin') ? query(collection(db, "clientes"), orderBy("data", "asc")) : query(collection(db, "clientes"), where("dono", "==", logado.login), orderBy("data", "asc"));
+            onSnapshot(qC, (snap) => {
                 let temp = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                // Filtro extra para garantir que o Admin não veja dados de outros usuários novos
-                if(logado.login === 'admin') {
-                    dadosRaw = temp.filter(c => !c.dono || c.dono === 'admin');
-                } else {
-                    dadosRaw = temp;
-                }
-                
-                const contPaineis = {};
-                dadosRaw.forEach(c => contPaineis[c.painel] = (contPaineis[c.painel] || 0) + 1);
-                let htmlS = "";
-                for (const p in contPaineis) htmlS += `${p}: <b>${contPaineis[p]}</b> | `;
-                document.getElementById('contagem').innerHTML = htmlS + `Total: <b>${dadosRaw.length}</b>`;
+                dadosRaw = (logado.login === 'admin') ? temp.filter(c => !c.dono || c.dono === 'admin') : temp;
                 render(dadosRaw);
+            });
+
+            // MURAL: Ambos vêm suas próprias notas agora
+            const qM = query(collection(db, "lembretes_privados"), where("usuarioId", "==", logado.login));
+            onSnapshot(qM, (snap) => {
+                document.getElementById('lista-mural').innerHTML = snap.docs.map(d => `
+                    <div class="card-aviso" onclick="excluirNota('${d.id}')">📢 ${d.data().texto}</div>`).join('');
             });
         }
 
@@ -166,79 +134,36 @@
             const hoje = new Date(); hoje.setHours(0,0,0,0);
             document.getElementById('lista-corpo').innerHTML = lista.map(c => {
                 const [ano, mes, dia] = c.data.split('-');
-                const v = new Date(ano, mes - 1, dia, 23, 59, 59);
+                const v = new Date(ano, mes-1, dia);
                 const diff = Math.ceil((v - hoje) / 86400000);
-                const classeVence = (diff <= 3) ? 'vence-logo' : '';
-
                 return `
-                <div class="card-cliente ${classeVence}">
+                <div class="card-cliente ${diff <= 3 ? 'vence-logo' : ''}">
                     <h3>${c.nome}</h3>
-                    <p style="font-size:12px; color:#aaa; margin:2px 0;">Painel: <b>${c.painel}</b> | Vence: <b>${dia}/${mes}/${ano}</b></p>
+                    <p style="font-size:12px; color:#aaa;">Painel: <b>${c.painel}</b> | Vence: <b>${dia}/${mes}/${ano}</b></p>
                     <div class="grid-botoes">
-                        <button class="btn-card btn-renovar" onclick="renovarConfirmar('${c.id}', '${c.data}')">+1 MÊS</button>
-                        <button class="btn-card btn-editar" onclick="abrirModalEdit('${c.id}', '${c.nome}', '${c.painel}', '${c.data}')">EDITAR</button>
+                        <button class="btn-card btn-renovar" onclick="renovar('${c.id}','${c.data}')">+1 MÊS</button>
+                        <button class="btn-card btn-editar" onclick="abrirModalEdit('${c.id}','${c.nome}','${c.painel}','c.data')">EDITAR</button>
                         <button class="btn-card btn-excluir" onclick="excluirCli('${c.id}')">EXCLUIR</button>
                     </div>
                 </div>`;
             }).join('');
         }
 
-        function carregarMural() {
-            // Mural funciona para ambos agora!
-            const q = query(collection(db, "lembretes_privados"), where("usuarioId", "==", logado.login));
-            onSnapshot(q, (snap) => {
-                document.getElementById('lista-mural').innerHTML = snap.docs.map(d => `
-                    <div class="card-aviso" onclick="excluirMural('${d.id}')">
-                        📢 ${d.data().texto}
-                    </div>`).join('');
-            });
-        }
-
-        window.abrirModalAdd = () => {
-            document.getElementById('modal-titulo').innerText = "Novo Cliente";
-            document.getElementById('edit-id').value = ""; document.getElementById('cli-nome').value = "";
-            document.getElementById('cli-painel').value = ""; document.getElementById('cli-vencimento').value = "";
-            document.getElementById('modal-cliente').style.display = 'flex';
-        };
-
-        window.abrirModalEdit = (id, nome, painel, data) => {
-            document.getElementById('modal-titulo').innerText = "Editar Cliente";
-            document.getElementById('edit-id').value = id; document.getElementById('cli-nome').value = nome;
-            document.getElementById('cli-painel').value = painel; document.getElementById('cli-vencimento').value = data;
-            document.getElementById('modal-cliente').style.display = 'flex';
-        };
-
-        window.fecharModal = () => document.getElementById('modal-cliente').style.display = 'none';
-
         window.processarCliente = async () => {
-            const id = document.getElementById('edit-id').value;
-            const n = document.getElementById('cli-nome').value;
-            const p = document.getElementById('cli-painel').value;
-            const d = document.getElementById('cli-vencimento').value;
-            if(!n || !p || !d) return alert("Preencha tudo!");
-            if(confirm("Confirmar salvamento?")) {
+            const id = document.getElementById('edit-id').value, n = document.getElementById('cli-nome').value, p = document.getElementById('cli-painel').value, d = document.getElementById('cli-vencimento').value;
+            if(!n || !p || !d) return;
+            if(confirm("Deseja salvar?")) {
                 if(id) await updateDoc(doc(db, "clientes", id), { nome: n, painel: p, data: d });
                 else await addDoc(collection(db, "clientes"), { nome: n, painel: p, data: d, dono: logado.login });
-                fecharModal();
+                fecharModal('modal-cliente');
             }
         };
 
-        window.renovarConfirmar = async (id, dataAtual) => {
-            if(confirm("Renovar por 1 mês mantendo o dia?")) {
-                const [ano, mes, dia] = dataAtual.split('-').map(Number);
-                let novaData = new Date(ano, mes, dia); 
-                if (novaData.getDate() != dia) novaData.setDate(0); 
-                await updateDoc(doc(db, "clientes", id), { data: novaData.toISOString().split('T')[0] });
-            }
-        };
-
-        window.excluirCli = async (id) => { if(confirm("Deseja excluir?")) await deleteDoc(doc(db, "clientes", id)); };
-        window.excluirMural = async (id) => { if(confirm("Remover nota?")) await deleteDoc(doc(db, "lembretes_privados", id)); };
-        window.confirmarSair = () => { if(confirm("Deseja sair?")) { localStorage.clear(); location.reload(); } };
-        window.filtrar = () => {
-            const t = document.getElementById('busca').value.toLowerCase();
-            render(dadosRaw.filter(x => x.nome.toLowerCase().includes(t)));
-        };
+        window.abrirModalAdd = () => { document.getElementById('edit-id').value = ""; document.getElementById('modal-cliente').style.display='flex'; };
+        window.fecharModal = (id) => document.getElementById(id).style.display='none';
+        window.excluirCli = async (id) => { if(confirm("Excluir?")) await deleteDoc(doc(db, "clientes", id)); };
+        window.excluirNota = async (id) => { if(confirm("Remover nota?")) await deleteDoc(doc(db, "lembretes_privados", id)); };
+        window.confirmarSair = () => { localStorage.clear(); location.reload(); };
     </script>
 </body>
 </html>
