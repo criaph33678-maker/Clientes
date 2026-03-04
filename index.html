@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
-    <title>Gestor Business V13.7</title>
+    <title>Gestor Business V13.8</title>
     <style>
         :root { --bg: #000; --card: #1a1a1a; --text: #fff; --accent: #3b82f6; --danger: #ff3b30; --warning: #ffcc00; --success: #00ff00; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; min-height: 100vh; }
@@ -14,7 +14,7 @@
         /* LOGIN */
         #tela-login { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; }
         .login-card { background: #111; padding: 30px; border-radius: 25px; border: 1px solid #333; width: 100%; max-width: 350px; text-align: center; }
-        .login-card input { width: 100%; padding: 15px; margin: 10px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 12px; }
+        .login-card input { width: 100%; padding: 15px; margin: 10px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 12px; width: 100%; box-sizing: border-box; }
         .btn-entrar { width: 100%; padding: 15px; background: var(--accent); border: none; color: #fff; font-weight: 900; border-radius: 12px; cursor: pointer; }
 
         /* INTERFACE */
@@ -23,21 +23,26 @@
         /* BOTÃO SAIR */
         .btn-sair-topo { position: fixed; top: calc(10px + env(safe-area-inset-top)); right: 15px; background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 11px; z-index: 200; }
 
-        /* HEADER FIXO */
-        .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 10px; padding-top: env(safe-area-inset-top); z-index: 100; border-bottom: 1px solid #333; height: 130px; display: flex; flex-direction: column; justify-content: flex-end; }
+        /* HEADER FIXO CLÁSSICO */
+        .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 10px; padding-top: env(safe-area-inset-top); z-index: 100; border-bottom: 1px solid #333; height: 125px; display: flex; flex-direction: column; justify-content: flex-end; }
+        .stats { font-size: 11px; color: #aaa; display: flex; gap: 8px; margin-bottom: 8px; overflow-x: auto; white-space: nowrap; font-weight: 600; padding-right: 60px; }
+        .stats b { color: var(--accent); }
         .busca-container { display: flex; gap: 8px; align-items: center; background: #222; padding: 8px 15px; border-radius: 20px; border: 1px solid #444; margin-bottom: 5px; }
-        .busca-container input { background: none; border: none; color: white; flex: 1; outline: none; }
+        .busca-container input { background: none; border: none; color: white; flex: 1; outline: none; font-size: 15px; }
 
-        /* MURAL E LISTA */
+        /* MURAL CLÁSSICO */
         .mural-avisos { margin: 20px 0; }
         .secao-titulo { display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--accent); padding-left: 10px; margin-bottom: 10px; }
-        .secao-titulo h5 { margin: 0; text-transform: uppercase; font-size: 14px; }
-        .card-aviso { background: #111; border: 1px solid #333; border-left: 6px solid var(--accent); padding: 15px; border-radius: 12px; margin-bottom: 8px; cursor: pointer; }
-        .cliente-item { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #333; }
-        .acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; border-top: 1px solid #333; padding-top: 12px; }
-        .btn-acao { padding: 10px; border-radius: 8px; border: none; color: white; font-weight: 800; font-size: 10px; text-transform: uppercase; }
+        .secao-titulo h5 { margin: 0; text-transform: uppercase; font-size: 14px; font-weight: 900; }
+        .card-aviso { background: #111; border: 1px solid #333; border-left: 6px solid var(--accent); padding: 18px; border-radius: 12px; margin-bottom: 12px; font-weight: 700; cursor: pointer; }
 
-        #btn-add-cliente { background: var(--success); color: black; border: none; padding: 10px; border-radius: 10px; font-weight: 900; width: 100%; margin-bottom: 20px; cursor: pointer; }
+        /* LISTA DE CLIENTES CLÁSSICA */
+        .cliente-item { background: var(--card); padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #333; }
+        .info h4 { margin: 0; font-size: 20px; font-weight: 900; text-transform: uppercase; }
+        .acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; border-top: 1px solid #333; padding-top: 12px; }
+        .btn-acao { padding: 12px; border-radius: 10px; border: none; color: white; font-weight: 800; font-size: 11px; text-transform: uppercase; }
+
+        #btn-add-geral { background: var(--success); color: black; border: none; padding: 12px; border-radius: 12px; font-weight: 900; width: 100%; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -55,23 +60,23 @@
         <button class="btn-sair-topo" onclick="confirmarSair()">Sair</button>
         
         <div class="header-fixo">
-            <div id="status-venc" style="font-size: 10px; margin-bottom: 5px; color: #888;"></div>
+            <div id="contadores" class="stats">Carregando dados...</div>
             <div class="busca-container">
-                <input type="text" id="inputBusca" placeholder="Pesquisar na minha lista..." oninput="filtrarClientes()">
+                <input type="text" id="inputBusca" placeholder="Pesquisar..." oninput="filtrarClientes()">
             </div>
         </div>
 
-        <button id="btn-add-cliente" onclick="novoCliente()">+ CADASTRAR NOVO CLIENTE</button>
+        <button id="btn-add-geral" onclick="novoCliente()">+ CADASTRAR NOVO CLIENTE</button>
 
         <div class="mural-avisos">
             <div class="secao-titulo">
-                <h5>📝 Meu Mural de Notas</h5>
-                <button onclick="novoLembrete()" style="background:var(--accent); color:white; border:none; border-radius:5px; padding:4px 8px; font-size:10px;">+ NOTA</button>
+                <h5 id="txtMural">📌 Mural</h5>
+                <button onclick="novoLembrete()" style="background:var(--accent); color:white; border:none; border-radius:5px; padding:4px 8px; font-size:10px;">+ NOVO</button>
             </div>
             <div id="listaAvisos"></div>
         </div>
 
-        <div class="secao-titulo"><h5>👥 Meus Clientes Cadastrados</h5></div>
+        <div class="secao-titulo"><h5>👥 Lista de Clientes</h5></div>
         <div id="listaCorpo"></div>
     </div>
 
@@ -90,7 +95,7 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        let todosMeusClientes = [];
+        let todosDados = [];
         let usuarioLogado = null;
 
         window.fazerLogin = async () => {
@@ -98,80 +103,74 @@
             const p = document.getElementById('passInput').value;
             const q = query(collection(db, "usuarios"), where("login", "==", u), where("senha", "==", p));
             const snap = await getDocs(q);
-            
-            if(!snap.empty) {
-                usuarioLogado = snap.docs[0].data();
-                iniciarApp();
-            } else { alert("Acesso negado!"); }
+            if(!snap.empty) { usuarioLogado = snap.docs[0].data(); iniciarApp(); } else { alert("Login incorreto!"); }
         };
 
         function iniciarApp() {
             document.getElementById('tela-login').style.display = 'none';
             document.getElementById('app-interface').style.display = 'block';
-            document.getElementById('status-venc').innerText = `Logado como: ${usuarioLogado.login.toUpperCase()} | Vence: ${usuarioLogado.vencimento.split('-').reverse().join('/')}`;
-            
-            carregarMeusDados();
-            carregarMeuMural();
+            document.getElementById('txtMural').innerText = (usuarioLogado.login === 'admin') ? "📌 Notas do Sistema" : "📝 Minhas Notas";
+            carregarDados();
+            carregarMural();
         }
 
-        // --- CLIENTES DO USUÁRIO ---
-        function carregarMeusDados() {
-            // O segredo está aqui: Ele só busca clientes onde o 'dono' é o login atual
-            const q = query(collection(db, "clientes"), where("dono", "==", usuarioLogado.login), orderBy("data", "asc"));
+        function carregarDados() {
+            // REGRA DE OURO: Admin vê TUDO. Cliente vê apenas o que ele criou.
+            const q = (usuarioLogado.login === 'admin') 
+                ? query(collection(db, "clientes"), orderBy("data", "asc"))
+                : query(collection(db, "clientes"), where("dono", "==", usuarioLogado.login), orderBy("data", "asc"));
+
             onSnapshot(q, (snap) => {
-                todosMeusClientes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                renderizarLista(todosMeusClientes);
+                todosDados = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                const total = todosDados.length;
+                document.getElementById('contadores').innerHTML = `Total de Clientes: <b>${total}</b>`;
+                renderizarLista(todosDados);
             });
         }
-
-        window.novoCliente = async () => {
-            const nome = prompt("Nome do Cliente:");
-            const painel = prompt("Painel/Serviço:");
-            const data = prompt("Data Vencimento (AAAA-MM-DD):", new Date().toISOString().split('T')[0]);
-            
-            if(nome && painel && data) {
-                await addDoc(collection(db, "clientes"), {
-                    nome, painel, data,
-                    dono: usuarioLogado.login // Vincula o cliente ao login de quem criou
-                });
-            }
-        };
 
         function renderizarLista(lista) {
             document.getElementById('listaCorpo').innerHTML = lista.map(c => `
                 <div class="cliente-item">
-                    <h4>${c.nome}</h4>
-                    <p style="font-size:12px; color:#888;">${c.painel} | Venc: ${c.data.split('-').reverse().join('/')}</p>
+                    <div class="info">
+                        <h4>${c.nome}</h4>
+                        <p style="color:#aaa; font-size:13px;">${c.painel} | Venc: ${c.data.split('-').reverse().join('/')}</p>
+                    </div>
                     <div class="acoes">
-                        <button class="btn-acao" style="background:#444" onclick="renovar('${c.id}', '${c.data}')">Renovar</button>
-                        <button class="btn-acao" style="background:var(--danger)" onclick="excluirItem('${c.id}', 'clientes')">Excluir</button>
+                        <button class="btn-acao" style="background:var(--accent)" onclick="renovar('${c.id}', '${c.data}')">Renovar</button>
+                        <button class="btn-acao" style="background:var(--danger)" onclick="excluir('${c.id}', 'clientes')">Excluir</button>
                     </div>
                 </div>`).join('');
         }
 
-        // --- MURAL DO USUÁRIO ---
-        function carregarMeuMural() {
-            const q = query(collection(db, "lembretes_privados"), where("usuarioId", "==", usuarioLogado.login), orderBy("criadoEm", "desc"));
-            onSnapshot(q, (snap) => {
+        function carregarMural() {
+            const qMural = (usuarioLogado.login === 'admin')
+                ? query(collection(db, "avisos"), orderBy("criadoEm", "desc"))
+                : query(collection(db, "lembretes_privados"), where("usuarioId", "==", usuarioLogado.login), orderBy("criadoEm", "desc"));
+
+            onSnapshot(qMural, (snap) => {
                 document.getElementById('listaAvisos').innerHTML = snap.docs.map(d => `
-                    <div class="card-aviso" onclick="excluirItem('${d.id}', 'lembretes_privados')">
-                        ${d.data().texto} <br><small style="color:#666">Clique para apagar</small>
+                    <div class="card-aviso" onclick="excluir('${d.id}', '${(usuarioLogado.login === 'admin') ? 'avisos' : 'lembretes_privados'}')">
+                        ${d.data().texto}
                     </div>`).join('');
             });
         }
 
-        window.novoLembrete = async () => {
-            const t = prompt("Escreva sua nota:");
-            if(t) await addDoc(collection(db, "lembretes_privados"), {
-                texto: t,
-                usuarioId: usuarioLogado.login,
-                criadoEm: Date.now()
-            });
+        window.novoCliente = async () => {
+            const nome = prompt("Nome:");
+            const painel = prompt("Painel:");
+            const data = prompt("Data (AAAA-MM-DD):", new Date().toISOString().split('T')[0]);
+            if(nome && painel && data) {
+                await addDoc(collection(db, "clientes"), { nome, painel, data, dono: usuarioLogado.login });
+            }
         };
 
-        // --- FUNÇÕES GERAIS ---
-        window.excluirItem = async (id, pasta) => {
-            if(confirm("Deseja excluir permanentemente?")) await deleteDoc(doc(db, pasta, id));
+        window.novoLembrete = async () => {
+            const t = prompt("Nota:");
+            if(!t) return;
+            const pasta = (usuarioLogado.login === 'admin') ? "avisos" : "lembretes_privados";
+            const obj = { texto: t, criadoEm: Date.now() };
+            if(usuarioLogado.login !== 'admin') obj.usuarioId = usuarioLogado.login;
+            await addDoc(collection(db, pasta), obj);
         };
 
         window.renovar = async (id, data) => {
@@ -180,11 +179,11 @@
             await updateDoc(doc(db, "clientes", id), { data: d.toISOString().split('T')[0] });
         };
 
+        window.excluir = async (id, pasta) => { if(confirm("Excluir?")) await deleteDoc(doc(db, pasta, id)); };
         window.confirmarSair = () => { location.reload(); };
-        
         window.filtrarClientes = () => {
             const t = document.getElementById('inputBusca').value.toLowerCase();
-            renderizarLista(todosMeusClientes.filter(c => c.nome.toLowerCase().includes(t)));
+            renderizarLista(todosDados.filter(c => c.nome.toLowerCase().includes(t)));
         };
     </script>
 </body>
