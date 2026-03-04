@@ -5,80 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="manifest" href="manifest.json">
-    <title>Gestor Business V13.3</title>
+    <title>Gestor Business V13.11</title>
     <style>
-        :root { --bg: #000; --card: #111; --text: #fff; --accent: #3b82f6; --danger: #e63946; --success: #4ade80; --warning: #facc15; }
+        :root { --bg: #0a0a0a; --card: #161618; --text: #ffffff; --accent: #3b82f6; --danger: #ff3b30; --gray: #8e8e93; }
         
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-        /* HEADER E BUSCA (IGUAL À FOTO) */
-        .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: #000; padding: 10px 15px; padding-top: env(safe-area-inset-top); z-index: 1000; }
-        .stats-topo { font-size: 11px; color: #3b82f6; font-weight: bold; margin-bottom: 8px; }
-        .busca-wrapper { display: flex; gap: 10px; align-items: center; }
-        .busca-container { background: #1a1a1a; flex: 1; display: flex; align-items: center; padding: 10px 15px; border-radius: 25px; border: 1px solid #333; }
+        /* HEADER REDUZIDO */
+        .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: rgba(10,10,10,0.8); backdrop-filter: blur(20px); padding: 10px 15px; padding-top: env(safe-area-inset-top); z-index: 1000; }
+        .stats-topo { font-size: 11px; color: var(--accent); font-weight: bold; margin-bottom: 8px; text-align: center; }
+        .busca-container { background: #1c1c1e; display: flex; align-items: center; padding: 8px 15px; border-radius: 20px; border: 1px solid #2c2c2e; }
         .busca-container input { background: none; border: none; color: #fff; flex: 1; outline: none; font-size: 14px; }
-        .btn-add-total { background: #3b82f6; border: none; width: 40px; height: 40px; border-radius: 50%; color: white; font-size: 20px; font-weight: bold; cursor: pointer; }
 
-        /* MURAL (IGUAL À FOTO) */
-        .secao-mural { margin-top: calc(100px + env(safe-area-inset-top)); padding: 15px; }
-        .mural-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .mural-header h2 { font-size: 16px; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-novo-aviso { background: #3b82f6; border: none; color: white; padding: 8px 15px; border-radius: 8px; font-weight: bold; font-size: 12px; }
-        .card-aviso { background: #1a1a1a; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid #3b82f6; font-weight: bold; display: flex; align-items: center; gap: 10px; }
+        /* MURAL COMPACTO (FOTO) */
+        .secao-mural { margin-top: calc(85px + env(safe-area-inset-top)); padding: 15px; }
+        .mural-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .mural-header h2 { font-size: 14px; font-weight: 800; color: var(--gray); margin: 0; }
+        .card-aviso { background: var(--card); padding: 10px 15px; border-radius: 18px; margin-bottom: 8px; border-left: 3px solid var(--accent); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
 
-        /* CARDS DE CLIENTES (IGUAL À FOTO) */
+        /* CARDS PEQUENOS E REDONDOS (IGUAL À FOTO) */
         .lista-clientes { padding: 0 15px 100px 15px; }
-        .card-cliente { background: #111; border: 2px solid #333; border-radius: 20px; padding: 20px; margin-bottom: 15px; position: relative; }
-        .card-cliente.vence-logo { border-color: #e63946; box-shadow: 0 0 10px rgba(230, 57, 70, 0.2); }
-        .card-cliente h3 { margin: 0 0 10px 0; text-transform: uppercase; font-size: 22px; letter-spacing: 1px; }
-        .info-linha { display: flex; align-items: center; gap: 8px; color: #ccc; font-size: 14px; margin-bottom: 5px; }
-        .aviso-vencimento { color: var(--warning); font-weight: bold; font-size: 13px; margin-top: 5px; display: flex; align-items: center; gap: 5px; }
+        .secao-titulo { font-size: 16px; font-weight: 800; margin: 15px 0; }
+        .card-cliente { background: var(--card); border-radius: 24px; padding: 15px; margin-bottom: 12px; border: 1px solid #1c1c1e; }
+        .card-cliente h3 { margin: 0 0 4px 0; font-size: 17px; font-weight: 800; }
+        .info-p { margin: 0; font-size: 12px; color: var(--gray); }
 
-        /* BOTÕES DO CARD (IGUAL À FOTO) */
-        .grid-botoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .btn-card { padding: 12px; border-radius: 12px; border: none; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .btn-renovar { background: #4ade80; color: #000; }
-        .btn-editar { background: #333; color: #fff; }
-        .btn-excluir { background: #e63946; color: #fff; grid-column: span 2; margin-top: 5px; }
+        /* BOTÕES LADO A LADO (IGUAL À FOTO) */
+        .grid-botoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
+        .btn-card { padding: 10px; border-radius: 14px; border: none; font-weight: 700; font-size: 11px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-renovar { background: rgba(59, 130, 246, 0.1); color: var(--accent); }
+        .btn-excluir { background: rgba(255, 59, 48, 0.1); color: var(--danger); }
 
-        .btn-sair { position: fixed; top: 10px; right: 10px; background: none; border: none; color: #444; font-size: 10px; z-index: 1100; }
+        /* BOTÃO ADICIONAR FLUTUANTE */
+        .btn-flutuante { position: fixed; bottom: 30px; right: 20px; width: 50px; height: 50px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 1100; border: none; color: white; }
+        
+        .btn-sair { position: fixed; top: 12px; right: 15px; background: rgba(255,59,48,0.15); color: var(--danger); border: none; padding: 5px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; z-index: 1200; }
     </style>
 </head>
 <body>
 
     <button class="btn-sair" onclick="confirmarSair()">SAIR</button>
+    <button class="btn-flutuante" onclick="novoCliente()">+</button>
 
-    <div id="tela-login" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;">
-        <div style="background:#111; padding:30px; border-radius:20px; width:80%; max-width:300px; text-align:center; border:1px solid #333;">
-            <h2>GESTOR</h2>
-            <input type="text" id="u" placeholder="Usuário" style="width:100%; padding:12px; margin:10px 0; border-radius:8px; border:1px solid #333; background:#000; color:#fff;">
-            <input type="password" id="p" placeholder="Senha" style="width:100%; padding:12px; margin:10px 0; border-radius:8px; border:1px solid #333; background:#000; color:#fff;">
-            <button onclick="logar()" style="width:100%; padding:12px; background:#3b82f6; border:none; color:#fff; border-radius:8px; font-weight:bold; margin-top:10px;">ENTRAR</button>
+    <div id="tela-login" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px;">
+        <div style="background:var(--card); padding:30px; border-radius:28px; width:100%; max-width:300px; text-align:center; border:1px solid #222;">
+            <h2 style="margin-bottom:25px; letter-spacing:-1px;">GESTOR</h2>
+            <input type="text" id="u" placeholder="Usuário" style="width:100%; padding:14px; margin-bottom:12px; border-radius:14px; border:1px solid #2c2c2e; background:#000; color:#fff; box-sizing:border-box; outline:none;">
+            <input type="password" id="p" placeholder="Senha" style="width:100%; padding:14px; margin-bottom:20px; border-radius:14px; border:1px solid #2c2c2e; background:#000; color:#fff; box-sizing:border-box; outline:none;">
+            <button onclick="logar()" style="width:100%; padding:14px; background:var(--accent); border:none; color:#fff; border-radius:14px; font-weight:900; font-size:15px;">ENTRAR</button>
         </div>
     </div>
 
     <div id="app" style="display:none;">
         <header class="header-fixo">
             <div id="contagem" class="stats-topo"></div>
-            <div class="busca-wrapper">
-                <div class="busca-container">
-                    <span>🔍</span>
-                    <input type="text" id="busca" placeholder="Pesquisar cliente..." oninput="filtrar()">
-                </div>
-                <button class="btn-add-total" onclick="novoCliente()">+</button>
+            <div class="busca-container">
+                <input type="text" id="busca" placeholder="Buscar na lista..." oninput="filtrar()">
             </div>
         </header>
 
         <section class="secao-mural">
             <div class="mural-header">
-                <h2>📌 MURAL DE LEMBRETES</h2>
-                <button class="btn-novo-aviso" onclick="novoAviso()">+ NOVO AVISO</button>
+                <h2>NOTAS DO ADMINISTRADOR</h2>
+                <button onclick="novoAviso()" style="background:none; border:none; color:var(--accent); font-weight:bold; font-size:12px;">+ ADICIONAR</button>
             </div>
             <div id="lista-mural"></div>
         </section>
 
-        <section class="lista-clientes" id="lista-corpo"></section>
+        <div class="lista-clientes">
+            <div class="secao-titulo">Seus Registros</div>
+            <div id="lista-corpo"></div>
+        </div>
     </div>
 
     <script type="module">
@@ -96,66 +93,56 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        let dados = [];
-        let user = null;
+        let dadosRaw = [];
+        let logado = null;
 
         window.logar = async () => {
             const login = document.getElementById('u').value.toLowerCase().trim();
             const pass = document.getElementById('p').value;
             const q = query(collection(db, "usuarios"), where("login", "==", login), where("senha", "==", pass));
             const snap = await getDocs(q);
-            if(!snap.empty) { user = snap.docs[0].data(); iniciar(); } else { alert("Erro!"); }
+            if(!snap.empty) { logado = snap.docs[0].data(); iniciarApp(); } else { alert("Login incorreto!"); }
         };
 
-        function iniciar() {
+        function iniciarApp() {
             document.getElementById('tela-login').style.display = 'none';
             document.getElementById('app').style.display = 'block';
-            carregar();
+            carregarClientes();
             carregarMural();
         }
 
-        function carregar() {
-            const q = (user.login === 'admin') 
+        function carregarClientes() {
+            const q = (logado.login === 'admin') 
                 ? query(collection(db, "clientes"), orderBy("data", "asc"))
-                : query(collection(db, "clientes"), where("dono", "==", user.login), orderBy("data", "asc"));
+                : query(collection(db, "clientes"), where("dono", "==", logado.login), orderBy("data", "asc"));
 
             onSnapshot(q, (snap) => {
-                dados = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                document.getElementById('contagem').innerHTML = `TOTAL: ${dados.length}`;
-                render();
+                dadosRaw = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                document.getElementById('contagem').innerHTML = `Registros ativos: <b>${dadosRaw.length}</b>`;
+                render(dadosRaw);
             });
         }
 
-        function render() {
-            const hoje = new Date(); hoje.setHours(0,0,0,0);
-            document.getElementById('lista-corpo').innerHTML = dados.map(c => {
-                const venc = new Date(c.data + 'T23:59:59');
-                const diff = Math.ceil((venc - hoje) / 86400000);
-                return `
-                <div class="card-cliente ${diff <= 3 ? 'vence-logo' : ''}">
+        function render(lista) {
+            document.getElementById('lista-corpo').innerHTML = lista.map(c => `
+                <div class="card-cliente">
                     <h3>${c.nome}</h3>
-                    <div class="info-linha">🖥️ Painel: <b>${c.painel}</b></div>
-                    <div class="info-linha">📅 Vencimento: <b>${c.data.split('-').reverse().join('/')}</b></div>
-                    ${diff <= 3 && diff >= 0 ? `<div class="aviso-vencimento">⚠️ VENCE EM ${diff} DIAS</div>` : ''}
-                    ${diff < 0 ? `<div class="aviso-vencimento" style="color:red">❌ VENCIDO</div>` : ''}
-                    
+                    <p class="info-p">${c.painel} • Expira em: ${c.data.split('-').reverse().join('/')}</p>
                     <div class="grid-botoes">
-                        <button class="btn-card btn-renovar" onclick="renovar('${c.id}', '${c.data}')">➕ +1 MÊS</button>
-                        <button class="btn-card btn-editar" onclick="editar('${c.id}')">✏️ EDITAR</button>
-                        <button class="btn-card btn-excluir" onclick="excluir('${c.id}', 'clientes')">🗑️ EXCLUIR</button>
+                        <button class="btn-card btn-renovar" onclick="renovar('${c.id}', '${c.data}')">Renovar Mês</button>
+                        <button class="btn-card btn-excluir" onclick="excluir('${c.id}', 'clientes')">Remover</button>
                     </div>
-                </div>`;
-            }).join('');
+                </div>`).join('');
         }
 
         function carregarMural() {
-            const q = (user.login === 'admin') 
+            const q = (logado.login === 'admin') 
                 ? query(collection(db, "avisos"), orderBy("criadoEm", "desc"))
-                : query(collection(db, "lembretes_privados"), where("usuarioId", "==", user.login), orderBy("criadoEm", "desc"));
+                : query(collection(db, "lembretes_privados"), where("usuarioId", "==", logado.login), orderBy("criadoEm", "desc"));
 
             onSnapshot(q, (snap) => {
                 document.getElementById('lista-mural').innerHTML = snap.docs.map(d => `
-                    <div class="card-aviso" onclick="excluir('${d.id}', '${user.login === 'admin' ? 'avisos' : 'lembretes_privados'}')">
+                    <div class="card-aviso" onclick="excluir('${d.id}', '${logado.login === 'admin' ? 'avisos' : 'lembretes_privados'}')">
                         📢 ${d.data().texto}
                     </div>`).join('');
             });
@@ -165,31 +152,29 @@
             const n = prompt("Nome:");
             const p = prompt("Painel:");
             const d = prompt("Vencimento (AAAA-MM-DD):");
-            if(n && p && d) await addDoc(collection(db, "clientes"), { nome: n, painel: p, data: d, dono: user.login });
+            if(n && p && d) await addDoc(collection(db, "clientes"), { nome: n, painel: p, data: d, dono: logado.login });
         };
 
         window.novoAviso = async () => {
-            const t = prompt("Aviso:");
+            const t = prompt("Nota:");
             if(t) {
-                const pasta = (user.login === 'admin') ? "avisos" : "lembretes_privados";
-                await addDoc(collection(db, pasta), { texto: t, usuarioId: user.login, criadoEm: Date.now() });
+                const p = logado.login === 'admin' ? "avisos" : "lembretes_privados";
+                await addDoc(collection(db, p), { texto: t, usuarioId: logado.login, criadoEm: Date.now() });
             }
         };
 
         window.renovar = async (id, data) => {
-            let d = new Date(data + 'T23:59:59');
-            d.setMonth(d.getMonth() + 1);
-            await updateDoc(doc(db, "clientes", id), { data: d.toISOString().split('T')[0] });
+            let dt = new Date(data + 'T23:59:59');
+            dt.setMonth(dt.getMonth() + 1);
+            await updateDoc(doc(db, "clientes", id), { data: dt.toISOString().split('T')[0] });
         };
 
-        window.excluir = async (id, pasta) => { if(confirm("Excluir?")) await deleteDoc(doc(db, pasta, id)); };
+        window.excluir = async (id, pasta) => { if(confirm("Remover?")) await deleteDoc(doc(db, pasta, id)); };
         window.confirmarSair = () => { location.reload(); };
         window.filtrar = () => {
             const t = document.getElementById('busca').value.toLowerCase();
-            const f = dados.filter(c => c.nome.toLowerCase().includes(t));
-            renderF(f);
+            render(dadosRaw.filter(x => x.nome.toLowerCase().includes(t)));
         };
-        function renderF(l) { /* mesma lógica de render mas para lista filtrada */ }
     </script>
 </body>
 </html>
