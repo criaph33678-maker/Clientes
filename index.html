@@ -8,27 +8,43 @@
     <title>Gestor Business V13.18</title>
     <style>
         :root { --bg: #000; --card: #111; --text: #fff; --accent: #3b82f6; --danger: #ff3b30; --success: #4ade80; --warning: #facc15; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0; overflow-x: hidden; }
+
+        /* HEADER ORIGINAL 13.18 */
         .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: #000; padding: 10px 15px; padding-top: env(safe-area-inset-top); z-index: 1000; border-bottom: 1px solid #1a1a1a; }
         .stats-topo { font-size: 11px; color: #888; font-weight: bold; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 8px; padding-right: 60px; }
-        .btn-sair { position: fixed; top: calc(10px + env(safe-area-inset-top)); right: 15px; background: rgba(51, 51, 51, 0.9); border: 1px solid #444; color: #fff; padding: 6px 12px; border-radius: 10px; font-size: 10px; z-index: 2100; font-weight: bold; }
+        .btn-sair { position: fixed; top: calc(10px + env(safe-area-inset-top)); right: 15px; background: rgba(51, 51, 51, 0.9); border: 1px solid #444; color: #fff; padding: 6px 12px; border-radius: 10px; font-size: 10px; z-index: 2100; font-weight: bold; backdrop-filter: blur(5px); }
+
+        .btn-novo-cliente-topo { background: var(--accent); color: white; border: none; width: 100%; padding: 14px; border-radius: 15px; font-weight: 900; font-size: 14px; margin-bottom: 12px; cursor: pointer; text-transform: uppercase; }
+
         .busca-container { background: #1a1a1a; display: flex; align-items: center; padding: 10px 15px; border-radius: 15px; border: 1px solid #333; }
         .busca-container input { background: none; border: none; color: #fff; flex: 1; outline: none; font-size: 14px; }
-        .secao-app { margin-top: calc(120px + env(safe-area-inset-top)); padding: 15px; }
+        
+        .secao-app { margin-top: calc(165px + env(safe-area-inset-top)); padding: 15px; }
+
+        /* MURAL ORIGINAL */
         .card-aviso { background: #1a1a1a; padding: 12px; border-radius: 15px; margin-bottom: 8px; font-size: 13px; font-weight: bold; border-left: 4px solid var(--accent); }
-        .card-cliente { background: #111; border: 1px solid #333; border-radius: 20px; padding: 15px; margin-bottom: 12px; }
+
+        /* CARDS ORIGINAIS */
+        .card-cliente { background: #111; border: 1px solid #333; border-radius: 20px; padding: 15px; margin-bottom: 12px; position: relative; }
         .card-cliente.vence-logo { border: 2px solid var(--danger) !important; box-shadow: 0 0 15px rgba(255, 59, 48, 0.4); }
         .card-cliente h3 { margin: 0 0 5px 0; font-size: 18px; font-weight: 800; text-transform: uppercase; }
+        
         .grid-botoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
         .btn-card { padding: 12px; border-radius: 12px; border: none; font-weight: 800; font-size: 11px; text-transform: uppercase; cursor: pointer; }
         .btn-renovar { background: var(--success); color: #000; }
         .btn-editar { background: #333; color: #fff; }
         .btn-excluir { background: var(--danger); color: #fff; grid-column: span 2; margin-top: 4px; padding: 8px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: #111; width: 100%; max-width: 400px; padding: 25px; border-radius: 30px; border: 1px solid #333; text-align: center; }
-        .modal-content input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #333; background: #000; color: #fff; font-size: 16px; }
+
+        /* LOGIN ORIGINAL */
         .login-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
         .login-card { background: #111; padding: 30px; border-radius: 25px; width: 85%; max-width: 280px; text-align: center; border: 1px solid #333; }
+        .login-card input { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 12px; background: #000; border: 1px solid #333; color: #fff; box-sizing: border-box; }
+
+        /* MODAL ORIGINAL */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: #111; width: 100%; max-width: 400px; padding: 25px; border-radius: 30px; border: 1px solid #333; text-align: center; }
+        .modal-content input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #333; background: #000; color: #fff; font-size: 16px; box-sizing: border-box; }
     </style>
 </head>
 <body>
@@ -40,21 +56,35 @@
             <h2>GESTOR BUSINESS</h2>
             <input type="text" id="u" placeholder="Usuário">
             <input type="password" id="p" placeholder="Senha">
-            <button onclick="logar()" style="width:100%; padding:15px; background:var(--accent); border:none; color:#fff; border-radius:12px; font-weight:900; margin-top:10px;">ACESSAR</button>
+            <button onclick="logar()" style="width:100%; padding:15px; background:var(--accent); border:none; color:#fff; border-radius:12px; font-weight:900;">ACESSAR</button>
         </div>
     </div>
 
     <div id="app" style="display:none;">
         <header class="header-fixo">
             <div id="contagem" class="stats-topo"></div>
+            <button class="btn-novo-cliente-topo" onclick="abrirModalAdd()">+ ADICIONAR CLIENTE</button>
             <div class="busca-container">
-                <input type="text" id="busca" placeholder="Buscar..." oninput="filtrar()">
+                <input type="text" id="busca" placeholder="Pesquisar..." oninput="filtrar()">
             </div>
         </header>
+
         <main class="secao-app">
             <div id="lista-mural"></div>
             <div id="lista-corpo"></div>
         </main>
+    </div>
+
+    <div id="modal-cliente" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-titulo">Novo Cliente</h2>
+            <input type="hidden" id="edit-id">
+            <input type="text" id="cli-nome" placeholder="Nome do Cliente">
+            <input type="text" id="cli-painel" placeholder="Nome do Painel">
+            <input type="date" id="cli-vencimento">
+            <button class="btn-card btn-renovar" style="width:100%; margin-top:10px; padding:15px;" onclick="salvarCliente()">SALVAR</button>
+            <button onclick="fecharModal()" style="background:none; border:none; color:#888; margin-top:15px; font-weight:bold;">CANCELAR</button>
+        </div>
     </div>
 
     <script type="module">
@@ -70,8 +100,8 @@
             appId: "1:1019995087685:web:a063af65a4b7f234b4542c"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const fApp = initializeApp(firebaseConfig);
+        const db = getFirestore(fApp);
         let dadosRaw = [];
         let logado = null;
 
@@ -85,31 +115,30 @@
                 document.getElementById('tela-login').style.display = 'none';
                 document.getElementById('app').style.display = 'block';
                 document.getElementById('btn-sair-global').style.display = 'block';
-                carregarDados();
-            } else { alert("Acesso Negado"); }
+                carregarTudo();
+            } else { alert("Login Incorreto!"); }
         };
 
-        function carregarDados() {
-            // REGRA DE PRIVACIDADE: Admin vê antigos + dele. Cliente vê apenas dele.
-            const q = (logado.login === 'admin') 
+        function carregarTudo() {
+            // CLIENTES COM PRIVACIDADE
+            const qC = (logado.login === 'admin') 
                 ? query(collection(db, "clientes"), orderBy("data", "asc"))
                 : query(collection(db, "clientes"), where("dono", "==", logado.login), orderBy("data", "asc"));
 
-            onSnapshot(q, (snap) => {
+            onSnapshot(qC, (snap) => {
                 let temp = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                // O admin não vê os novos dos clientes, apenas os dele ou os sem dono (antigos)
                 dadosRaw = (logado.login === 'admin') ? temp.filter(c => !c.dono || c.dono === 'admin') : temp;
                 render();
             });
 
-            // MURAL PRIVADO: Ambos têm o poder de ver o mural
+            // MURAL COM PRIVACIDADE
             const qM = (logado.login === 'admin')
                 ? query(collection(db, "avisos"), orderBy("criadoEm", "desc"))
                 : query(collection(db, "lembretes_privados"), where("usuarioId", "==", logado.login), orderBy("criadoEm", "desc"));
 
             onSnapshot(qM, (snap) => {
                 document.getElementById('lista-mural').innerHTML = snap.docs.map(d => `
-                    <div class="card-aviso">📢 ${d.data().texto || d.data().textoAviso}</div>
+                    <div class="card-aviso" onclick="excluirMural('${d.id}')">📢 ${d.data().texto || d.data().textoAviso}</div>
                 `).join('');
             });
         }
@@ -123,26 +152,49 @@
                 return `
                 <div class="card-cliente ${diff <= 3 ? 'vence-logo' : ''}">
                     <h3>${c.nome}</h3>
-                    <p style="font-size:12px; color:#aaa;">Painel: ${c.painel} | Vence: ${dia}/${mes}/${ano}</p>
+                    <p style="font-size:12px; color:#aaa; margin:2px 0;">Painel: <b>${c.painel}</b> | Vence: <b>${dia}/${mes}/${ano}</b></p>
                     <div class="grid-botoes">
                         <button class="btn-card btn-renovar" onclick="renovar('${c.id}','${c.data}')">+1 MÊS</button>
-                        <button class="btn-card btn-editar">EDITAR</button>
-                        <button class="btn-card btn-excluir" onclick="excluir('${c.id}')">EXCLUIR</button>
+                        <button class="btn-card btn-editar" onclick="abrirModalEdit('${c.id}','${c.nome}','${c.painel}','${c.data}')">EDITAR</button>
+                        <button class="btn-card btn-excluir" onclick="excluirCli('${c.id}')">EXCLUIR</button>
                     </div>
                 </div>`;
             }).join('');
         }
 
+        window.abrirModalAdd = () => {
+            document.getElementById('modal-titulo').innerText = "Novo Cliente";
+            document.getElementById('edit-id').value = ""; document.getElementById('cli-nome').value = "";
+            document.getElementById('cli-painel').value = ""; document.getElementById('cli-vencimento').value = "";
+            document.getElementById('modal-cliente').style.display = 'flex';
+        };
+
+        window.abrirModalEdit = (id, n, p, d) => {
+            document.getElementById('modal-titulo').innerText = "Editar Cliente";
+            document.getElementById('edit-id').value = id; document.getElementById('cli-nome').value = n;
+            document.getElementById('cli-painel').value = p; document.getElementById('cli-vencimento').value = d;
+            document.getElementById('modal-cliente').style.display = 'flex';
+        };
+
+        window.fecharModal = () => document.getElementById('modal-cliente').style.display = 'none';
+
+        window.salvarCliente = async () => {
+            const id = document.getElementById('edit-id').value, n = document.getElementById('cli-nome').value, p = document.getElementById('cli-painel').value, d = document.getElementById('cli-vencimento').value;
+            if(!n || !p || !d) return alert("Preencha tudo!");
+            if(id) await updateDoc(doc(db, "clientes", id), { nome: n, painel: p, data: d });
+            else await addDoc(collection(db, "clientes"), { nome: n, painel: p, data: d, dono: logado.login });
+            fecharModal();
+        };
+
         window.renovar = async (id, data) => {
             const [a, m, d] = data.split('-').map(Number);
-            let nova = new Date(a, m, d);
-            if(nova.getDate() != d) nova.setDate(0);
+            let nova = new Date(a, m, d); if(nova.getDate() != d) nova.setDate(0);
             await updateDoc(doc(db, "clientes", id), { data: nova.toISOString().split('T')[0] });
         };
 
-        window.excluir = async (id) => {
-            if(confirm("Excluir cliente?")) await deleteDoc(doc(db, "clientes", id));
-        };
+        window.excluirCli = async (id) => { if(confirm("Excluir cliente?")) await deleteDoc(doc(db, "clientes", id)); };
+        window.excluirMural = async (id) => { if(confirm("Remover nota?")) await deleteDoc(doc(db, logado.login === 'admin' ? "avisos" : "lembretes_privados", id)); };
+        window.filtrar = () => render(); 
     </script>
 </body>
 </html>
