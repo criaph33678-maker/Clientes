@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Painel Admin V13.0</title>
+    <style>
+        :root { --bg: #050505; --card: #111; --accent: #3b82f6; --text: #fff; --success: #00ff00; --warning: #ffcc00; --danger: #ff0000; }
+        body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
+        
+        .header { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #333; margin-bottom: 20px; text-align: center; }
+        .header h2 { margin: 0; color: var(--accent); font-weight: 900; }
+
+        .form-cadastro { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid #444; margin-bottom: 20px; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; background: #222; border: 1px solid #444; color: #fff; border-radius: 8px; box-sizing: border-box; }
+        
+        .btn-principal { width: 100%; padding: 15px; background: var(--accent); border: none; color: #fff; font-weight: 800; border-radius: 10px; cursor: pointer; text-transform: uppercase; }
+        
+        .cliente-card { background: var(--card); padding: 15px; border-radius: 15px; border: 1px solid #333; margin-bottom: 10px; position: relative; }
+        .badge { font-size: 10px; padding: 4px 8px; border-radius: 5px; text-transform: uppercase; font-weight: 800; }
+        .badge-teste { background: var(--warning); color: #000; }
+        .badge-mensal { background: var(--accent); }
+        .badge-vitalicio { background: var(--success); color: #000; }
+        
+        .info-login { background: #222; padding: 8px; border-radius: 5px; margin-top: 10px; font-size: 12px; color: #aaa; border: 1px dashed #444; }
+        .btn-del { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 5px; margin-top: 10px; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>CENTRAL ADMIN V13</h2>
+        <p style="font-size: 12px; color: #888;">Gerenciamento de Acessos e Planos</p>
+    </div>
+
+    <div class="form-cadastro">
+        <h4 style="margin-top:0">➕ Cadastrar Novo Acesso</h4>
+        <input type="text" id="nome" placeholder="Nome do Cliente">
+        <input type="text" id="usuario" placeholder="Login (Usuário)">
+        <input type="password" id="senha" placeholder="Senha">
+        
+        <select id="tipoPlano" onchange="ajustarData()">
+            <option value="mensal">Plano Mensal (30 dias)</option>
+            <option value="teste1">Teste (1 Dia)</option>
+            <option value="teste2">Teste (2 Dias)</option>
+            <option value="vitalicio">Vitalício (Sem expiração)</option>
+        </select>
+        
+        <input type="date" id="dataVenc">
+        
+        <button class="btn-principal" onclick="criarAcesso()">Criar Acesso Agora</button>
+    </div>
+
+    <div id="listaUsuarios"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMQbFBbbKFABCwwTxuESpXsz_Knz-V4FI",
+            authDomain: "meu-gestor-a7d13.firebaseapp.com",
+            projectId: "meu-gestor-a7d13",
+            storageBucket: "meu-gestor-a7d13.firebasestorage.app",
+            messagingSenderId: "1019995087685",
+            appId: "1:1019995087685:web:a063af65a4b7f234b4542c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Função para calcular datas automáticas
+        window.ajustarData = () => {
+            let d = new Date();
+            const tipo = document.getElementById('tipoPlano').value;
+            if(tipo === 'teste1') d.setDate(d.getDate() + 1);
+            else if(tipo === 'teste2') d.setDate(d.getDate() + 2);
+            else if(tipo === 'mensal') d.setMonth(d.getMonth() + 1);
+            else if(tipo === 'vitalicio') {
+                document.getElementById('dataVenc').value = "2099-12-31";
+                return;
+            }
+            document.getElementById('dataVenc').value = d.toISOString().split('T')[0];
+        };
+        ajustarData();
+
+        window.criarAcesso = async () => {
+            const dados = {
+                nome: document.getElementById('nome').value,
+                login: document.getElementById('usuario').value.toLowerCase().trim(),
+                senha: document.getElementById('senha').value,
+                vencimento: document.getElementById('dataVenc').value,
+                plano: document.getElementById('tipoPlano').value,
+                criadoEm: Date.now()
+            };
+
+            if(!dados.login || !dados.senha) return alert("Preencha login e senha!");
+
+            await addDoc(collection(db, "usuarios"), dados);
+            alert("✅ Acesso criado com sucesso!");
+            document.querySelectorAll('input').forEach(i => i.value = "");
+            ajustarData();
+        };
+
+        onSnapshot(query(collection(db, "usuarios"), orderBy("criadoEm", "desc")), (snap) => {
+            document.getElementById('listaUsuarios').innerHTML = snap.docs.map(d => {
+                const u = d.data();
+                return `
+                <div class="cliente-card">
+                    <span class="badge badge-${u.plano}">${u.plano}</span>
+                    <h3 style="margin: 10px 0 5px 0">${u.nome}</h3>
+                    <p style="font-size:12px; color:#aaa">Vence em: ${u.vencimento.split('-').reverse().join('/')}</p>
+                    <div class="info-login">
+                        User: <b>${u.login}</b> | Senha: <b>${u.senha}</b>
+                    </div>
+                    <button class="btn-del" onclick="excluir('${d.id}')">Excluir Acesso</button>
+                </div>`;
+            }).join('');
+        });
+
+        window.excluir = async (id) => {
+            if(confirm("Remover este acesso?")) await deleteDoc(doc(db, "usuarios", id));
+        };
+    </script>
+</body>
+</html>
