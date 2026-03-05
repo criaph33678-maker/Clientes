@@ -26,9 +26,6 @@
 
         /* CARDS E MODAIS */
         .secao-mural { margin-top: calc(155px + env(safe-area-inset-top)); padding: 15px; }
-        /* ESTILO DO CARD DE AVISO (MURAL) */
-        .card-aviso { background: #1a1a1a; padding: 12px; border-radius: 15px; margin-bottom: 8px; font-size: 13px; font-weight: bold; border-left: 4px solid var(--accent); color: #fff; }
-        
         .lista-clientes { padding: 0 15px 120px 15px; }
         .card-cliente { background: #111; border: 1px solid #333; border-radius: 20px; padding: 15px; margin-bottom: 12px; }
         .card-cliente.vence-logo { border: 2px solid var(--danger) !important; box-shadow: 0 0 15px rgba(255, 59, 48, 0.4); }
@@ -153,13 +150,14 @@
         }
 
         function carregarDados() {
-            // CLIENTES
+            // REGRA DE PRIVACIDADE: Admin vê antigos + dele. Cliente vê apenas os dele.
             const q = (logado.login === 'admin') 
                 ? query(collection(db, "clientes"), orderBy("data", "asc"))
                 : query(collection(db, "clientes"), where("dono", "==", logado.login), orderBy("data", "asc"));
 
             onSnapshot(q, (snap) => {
                 let temp = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                // Admin vê apenas dados sem dono (antigos) ou dados onde ele é o dono.
                 dadosRaw = (logado.login === 'admin') ? temp.filter(c => !c.dono || c.dono === 'admin') : temp;
                 
                 const contPaineis = {};
@@ -170,21 +168,15 @@
                 render(dadosRaw);
             });
 
-            // MURAL (RESTAURADO)
-            // Se for admin, busca na coleção 'avisos'. Se for cliente, busca em 'lembretes_privados' apenas os dele.
+            // MURAL PRIVADO
             const qM = (logado.login === 'admin')
                 ? query(collection(db, "avisos"), orderBy("criadoEm", "desc"))
                 : query(collection(db, "lembretes_privados"), where("usuarioId", "==", logado.login), orderBy("criadoEm", "desc"));
 
             onSnapshot(qM, (snap) => {
-                const muralDiv = document.getElementById('lista-mural');
-                if (snap.empty) {
-                    muralDiv.innerHTML = ""; // Esconde se não houver avisos
-                } else {
-                    muralDiv.innerHTML = snap.docs.map(d => `
-                        <div class="card-aviso">📢 ${d.data().texto || d.data().textoAviso}</div>
-                    `).join('');
-                }
+                document.getElementById('lista-mural').innerHTML = snap.docs.map(d => `
+                    <div class="card-aviso" style="margin-bottom:8px">📢 ${d.data().texto || d.data().textoAviso}</div>
+                `).join('');
             });
         }
 
