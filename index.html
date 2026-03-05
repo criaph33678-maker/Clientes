@@ -245,3 +245,14 @@
                 if (novaData.getDate() != dia) novaData.setDate(0); 
                 await updateDoc(doc(db, "clientes", id), { data: novaData.toISOString().split('T')[0] });
             }
+        };
+
+        window.excluirConfirmar = async (id) => { if(confirm("EXCLUIR definitivamente?")) await deleteDoc(doc(db, "clientes", id)); };
+        window.confirmarSair = () => { if(confirm("Deseja sair?")) { localStorage.removeItem('gestor_u'); localStorage.removeItem('gestor_p'); location.reload(); } };
+        window.filtrar = () => {
+            const t = document.getElementById('busca').value.toLowerCase();
+            render(dadosRaw.filter(x => x.nome.toLowerCase().includes(t)));
+        };
+    </script>
+</body>
+</html>
