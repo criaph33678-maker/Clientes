@@ -15,22 +15,21 @@
         :root { --bg: #000; --card: #111; --text: #fff; --accent: #3b82f6; --danger: #ff3b30; --success: #4ade80; --warning: #facc15; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0; }
 
-        /* HEADER ORIGINAL ADAPTADO */
+        /* HEADER */
         .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: #000; padding: 10px 15px; padding-top: env(safe-area-inset-top); z-index: 1000; border-bottom: 1px solid #1a1a1a; }
         .stats-topo { font-size: 11px; color: #888; font-weight: bold; margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
         
-        /* SEÇÃO DE CRÉDITOS FIXA E DISCRETA */
+        /* CRÉDITOS */
         .creditos-topo { display: flex; gap: 15px; background: #111; padding: 6px 12px; border-radius: 10px; border: 1px solid #222; font-size: 11px; font-weight: bold; color: #aaa; margin-bottom: 8px; }
         .credito-item { cursor: pointer; }
         .credito-item span { color: var(--accent); font-weight: 900; }
 
         .btn-novo-cliente-topo { background: var(--accent); color: white; border: none; width: 100%; padding: 12px; border-radius: 15px; font-weight: 900; font-size: 13px; margin-bottom: 8px; cursor: pointer; text-transform: uppercase; }
         
-        /* LINHA DE BOTÕES EXTRA NO TOPO */
         .botoes-topo-flex { display: flex; gap: 8px; margin-bottom: 8px; }
         .btn-topo-acao { flex: 1; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 10px; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
 
-        /* BARRA DE PESQUISA MENOR */
+        /* BUSCA REDUZIDA */
         .busca-container { background: #1a1a1a; display: flex; align-items: center; padding: 6px 12px; border-radius: 12px; border: 1px solid #333; }
         .busca-container input { background: none; border: none; color: #fff; flex: 1; outline: none; font-size: 13px; }
         
@@ -41,12 +40,12 @@
         .remember-box { display: flex; align-items: center; gap: 8px; color: #888; font-size: 13px; margin-bottom: 20px; cursor: pointer; justify-content: flex-start; width: 100%; }
         .remember-box input { accent-color: var(--accent); width: 18px; height: 18px; }
 
-        /* ESPAÇAMENTO MURAL CORRIGIDO PARA NOVOS ELEMENTOS */
+        /* MURAL */
         .secao-mural { margin-top: calc(215px + env(safe-area-inset-top)); padding: 15px 15px 0 15px; }
         .card-aviso { background: #1a1a1a; padding: 12px; border-radius: 15px; margin-bottom: 8px; font-size: 13px; font-weight: bold; border-left: 4px solid var(--accent); color: #fff; cursor: pointer; }
         .btn-add-mural { background: none; border: none; color: var(--accent); font-size: 10px; width: 100%; margin-bottom: 5px; text-transform: uppercase; font-weight: 900; cursor: pointer; }
 
-        /* CARDS E SELOS */
+        /* CARDS */
         .lista-clientes { padding: 0 15px 120px 15px; }
         .card-cliente { background: #111; border: 1px solid #333; border-radius: 20px; padding: 15px; margin-bottom: 12px; position: relative; }
         .card-cliente.vence-logo { border: 2px solid var(--danger) !important; box-shadow: 0 0 15px rgba(255, 59, 48, 0.4); }
@@ -56,7 +55,7 @@
         /* SELO PAGO */
         .selo-pago { background: rgba(74, 222, 128, 0.2); color: var(--success); border: 1px solid var(--success); font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* GRID DE BOTÕES EXPANDIDO */
+        /* BOTÕES */
         .grid-botoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
         .btn-card { padding: 12px; border-radius: 12px; border: none; font-weight: 800; font-size: 11px; text-transform: uppercase; cursor: pointer; }
         .btn-renovar { background: var(--success); color: #000; }
@@ -142,6 +141,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        // ADICIONADO "doc" E "getDoc" CORRETAMENTE NA IMPORTAÇÃO ABAIXO
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, where, getDocs, orderBy, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -168,4 +168,197 @@
         window.logar = async () => {
             const login = document.getElementById('u').value.toLowerCase().trim(), pass = document.getElementById('p').value;
             const q = query(collection(db, "usuarios"), where("login", "==", login), where("senha", "==", pass));
-            const snap = await getDocs(q
+            const snap = await getDocs(q);
+            if(!snap.empty) { 
+                logado = snap.docs[0].data();
+                if(document.getElementById('remember').checked) { localStorage.setItem('gestor_u', login); localStorage.setItem('gestor_p', pass); }
+                document.getElementById('tela-login').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+                carregarDados();
+            } else { alert("Login incorreto!"); }
+        };
+
+        function carregarDados() {
+            // CLIENTES ATIVOS
+            const qC = (logado.login === 'admin') ? query(collection(db, "clientes"), orderBy("data", "asc")) : query(collection(db, "clientes"), where("dono", "==", logado.login), orderBy("data", "asc"));
+            onSnapshot(qC, (snap) => {
+                let temp = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                let filtradoDono = (logado.login === 'admin') ? temp.filter(c => !c.dono || c.dono === 'admin') : temp;
+                dadosRaw = filtradoDono.filter(c => !c.arquivado);
+                arquivadosRaw = filtradoDono.filter(c => c.arquivado === true);
+                
+                atualizarContadores();
+                render(dadosRaw);
+            });
+
+            // CRÉDITOS
+            onSnapshot(doc(db, "creditos", logado.login), (docSnap) => {
+                if(docSnap.exists()){
+                    const data = docSnap.data();
+                    document.getElementById('cred-unitv').innerText = data.unitv || 0;
+                    document.getElementById('cred-uniplay').innerText = data.uniplay || 0;
+                } else {
+                    setDoc(doc(db, "creditos", logado.login), { unitv: 0, uniplay: 0 });
+                }
+            });
+
+            // MURAL
+            const colMural = logado.login === 'admin' ? "avisos" : "lembretes_privados";
+            const qM = (logado.login === 'admin') ? query(collection(db, "avisos"), orderBy("criadoEm", "desc")) : query(collection(db, "lembretes_privados"), where("usuarioId", "==", logado.login), orderBy("criadoEm", "desc"));
+            onSnapshot(qM, (snap) => {
+                document.getElementById('lista-mural').innerHTML = snap.docs.map(d => `
+                    <div class="card-aviso" onclick="muralAcao('edit', '${d.id}', '${d.data().texto || d.data().textoAviso}')">📢 ${d.data().texto || d.data().textoAviso}</div>
+                `).join('');
+            });
+        }
+
+        window.toggleOcultarStatus = () => {
+            ocultarValores = !ocultarValores;
+            document.getElementById('btn-ocultar-olho').innerText = ocultarValores ? "🙈" : "👁️";
+            atualizarContadores();
+        };
+
+        function atualizarContadores() {
+            document.getElementById('btn-aba-arquivados').innerText = `Arquivados (${arquivadosRaw.length})`;
+            if(ocultarValores) {
+                document.getElementById('contagem').innerHTML = "Dados ocultados com sucesso!";
+                return;
+            }
+            const contPaineis = {};
+            dadosRaw.forEach(c => contPaineis[c.painel] = (contPaineis[c.painel] || 0) + 1);
+            let htmlS = ""; for (const p in contPaineis) htmlS += `${p}: <b>${contPaineis[p]}</b> | `;
+            document.getElementById('contagem').innerHTML = htmlS + `Total: <b>${dadosRaw.length}</b>`;
+        }
+
+        window.editarCredito = async (painel) => {
+            const atual = parseInt(document.getElementById(`cred-${painel}`).innerText) || 0;
+            const novo = prompt(`Digite a nova quantidade de créditos para ${painel.toUpperCase()}:`, atual);
+            if(novo !== null && !isNaN(novo)) {
+                const obj = {}; obj[painel] = parseInt(novo);
+                await updateDoc(doc(db, "creditos", logado.login), obj);
+            }
+        };
+
+        window.muralAcao = async (tipo, id, textoAntigo) => {
+            const col = logado.login === 'admin' ? "avisos" : "lembretes_privados";
+            if(tipo === 'add') {
+                const t = prompt("Nova anotação:");
+                if(t) await addDoc(collection(db, col), logado.login === 'admin' ? { textoAviso: t, criadoEm: Date.now() } : { texto: t, usuarioId: logado.login, criadoEm: Date.now() });
+            } else {
+                const acao = confirm("Deseja EXCLUIR? (Cancele para EDITAR)");
+                if(acao) { if(confirm("Apagar nota?")) await deleteDoc(doc(db, col, id)); }
+                else {
+                    const nt = prompt("Editar nota:", textoAntigo);
+                    if(nt && nt !== textoAntigo) await updateDoc(doc(db, col, id), logado.login === 'admin' ? { textoAviso: nt } : { texto: nt });
+                }
+            }
+        };
+
+        function render(lista) {
+            const hoje = new Date(); hoje.setHours(0,0,0,0);
+            document.getElementById('lista-corpo').innerHTML = lista.map(c => {
+                const [ano, mes, dia] = c.data.split('-');
+                const v = new Date(ano, mes - 1, dia, 23, 59, 59);
+                const diff = Math.ceil((v - hoje) / 86400000);
+                const seloPago = c.pago ? `<span class="selo-pago">✓ Pago</span>` : '';
+                
+                return `
+                <div class="card-cliente ${diff <= 3 ? 'vence-logo' : ''}">
+                    <h3><span>${c.nome}</span> ${seloPago}</h3>
+                    <p class="info-p">Painel: <b>${c.painel}</b> | Expira: <b>${dia}/${mes}/${ano}</b></p>
+                    <div class="grid-botoes">
+                        <button class="btn-card btn-renovar" onclick="renovarConfirmar('${c.id}', '${c.data}', '${c.painel}')">+1 MÊS</button>
+                        <button class="btn-card btn-editar" onclick="abrirModalEdit('${c.id}','${c.nome}','${c.painel}','${c.data}')">EDITAR</button>
+                        <button class="btn-card btn-pago" onclick="marcarPago('${c.id}', ${c.pago || false})">PAGO</button>
+                        <button class="btn-card btn-arquivar" onclick="arquivarCliente('${c.id}', true)">ARQUIVAR</button>
+                        <button class="btn-card btn-excluir" onclick="excluirConfirmar('${c.id}')">EXCLUIR</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        window.marcarPago = async (id, statusAtual) => {
+            await updateDoc(doc(db, "clientes", id), { pago: !statusAtual });
+        };
+
+        window.arquivarCliente = async (id, status) => {
+            const msg = status ? "Arquivar este cliente?" : "Desarquivar este cliente?";
+            if(confirm(msg)) {
+                await updateDoc(doc(db, "clientes", id), { arquivado: status });
+                if(!status) document.getElementById('modal-arquivados').style.display = 'none';
+            }
+        };
+
+        window.abrirModalArquivados = () => {
+            const corpo = document.getElementById('lista-arquivados-corpo');
+            if(arquivadosRaw.length === 0) {
+                corpo.innerHTML = "<p style='color:#666;text-align:center;'>Nenhum cliente arquivado.</p>";
+            } else {
+                corpo.innerHTML = arquivadosRaw.map(c => `
+                    <div style="background:#222; padding:12px; border-radius:12px; margin-bottom:8px; border:1px solid #333;">
+                        <b style="text-transform:uppercase; color:#fff">${c.nome}</b><br>
+                        <span style="font-size:11px; color:#aaa">Painel: ${c.painel}</span>
+                        <div style="display:flex; gap:8px; margin-top:8px;">
+                            <button onclick="arquivarCliente('${c.id}', false)" style="background:var(--accent); color:#fff; border:none; padding:6px 10px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer;">DESARQUIVAR</button>
+                            <button onclick="excluirConfirmar('${c.id}')" style="background:var(--danger); color:#fff; border:none; padding:6px 10px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer;">EXCLUIR PERMANENTE</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('modal-arquivados').style.display = 'flex';
+        };
+
+        window.abrirModalAdd = () => { document.getElementById('edit-id').value = ""; document.getElementById('cli-nome').value = ""; document.getElementById('cli-painel').value = ""; document.getElementById('cli-vencimento').value = ""; document.getElementById('modal-titulo').innerText = "Novo Cliente"; document.getElementById('modal-cliente').style.display = 'flex'; };
+        window.abrirModalEdit = (id, n, p, d) => { document.getElementById('edit-id').value = id; document.getElementById('cli-nome').value = n; document.getElementById('cli-painel').value = p; document.getElementById('cli-vencimento').value = d; document.getElementById('modal-titulo').innerText = "Editar Cliente"; document.getElementById('modal-cliente').style.display = 'flex'; };
+        window.fecharModal = () => document.getElementById('modal-cliente').style.display = 'none';
+        
+        window.processarCliente = async () => {
+            const id = document.getElementById('edit-id').value, n = document.getElementById('cli-nome').value, p = document.getElementById('cli-painel').value.toLowerCase().trim(), d = document.getElementById('cli-vencimento').value;
+            if(!n || !p || !d) return alert("Preencha tudo!");
+            if(id) {
+                await updateDoc(doc(db, "clientes", id), { nome: n, painel: p, data: d });
+            } else {
+                await addDoc(collection(db, "clientes"), { nome: n, painel: p, data: d, dono: logado.login, arquivado: false, pago: false });
+            }
+            fecharModal();
+        };
+
+        window.renovarConfirmar = async (id, data, painelCli) => {
+            if(confirm("Deseja renovar por mais 1 mês?")) {
+                const [a, m, d] = data.split('-').map(Number);
+                let nd = new Date(a, m, d); if (nd.getDate() != d) nd.setDate(0);
+                
+                await updateDoc(doc(db, "clientes", id), { data: nd.toISOString().split('T')[0], pago: false });
+
+                const painelNormalizado = painelCli.toLowerCase().trim();
+                if(painelNormalizado === 'unitv' || painelNormalizado === 'uniplay') {
+                    const docRef = doc(db, "creditos", logado.login);
+                    const docSnap = await getDoc(docRef);
+                    if(docSnap.exists()){
+                        const totalAtual = docSnap.data()[painelNormalizado] || 0;
+                        if(totalAtual > 0) {
+                            const dec = {}; dec[painelNormalizado] = totalAtual - 1;
+                            await updateDoc(docRef, dec);
+                        }
+                    }
+                }
+            }
+        };
+
+        window.excluirConfirmar = async (id) => { 
+            if(confirm("Excluir cliente definitivamente?")) {
+                await deleteDoc(doc(db, "clientes", id));
+                document.getElementById('modal-arquivados').style.display = 'none';
+            } 
+        };
+        
+        window.confirmarSair = () => { localStorage.clear(); location.reload(); };
+        
+        window.filtrar = () => { 
+            const t = document.getElementById('busca').value.toLowerCase(); 
+            const filtrados = dadosRaw.filter(x => x.nome.toLowerCase().includes(t) || x.painel.toLowerCase().includes(t));
+            render(filtrados); 
+        };
+    </script>
+</body>
+</html>
