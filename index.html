@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#000000">
-    <title>Gestor Business V13.18</title>
+    <title>Gestor Business V13.20</title>
     
     <link rel="manifest" href="data:application/manifest+json,{%22display%22:%22standalone%22,%22start_url%22:%22/%22,%22name%22:%22Gestor%20Business%22,%22theme_color%22:%22#000000%22,%22background_color%22:%22#000000%22}">
 
@@ -15,7 +15,7 @@
         :root { --bg: #000; --card: #0c0c0e; --card-brd: #16161a; --text: #fff; --accent: #2563eb; --danger: #dc2626; --success: #16a34a; --warning: #ca8a04; }
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; overflow: hidden; height: 100vh; }
 
-        /* HEADER TOTALMENTE CONGELADO NO TOPO (NÃO ROLA) */
+        /* HEADER TOTALMENTE CONGELADO NO TOPO */
         .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: #000; padding: 10px 15px; padding-top: env(safe-area-inset-top); z-index: 1000; border-bottom: 1px solid var(--card-brd); box-sizing: border-box; }
         .stats-topo { font-size: 11px; color: #666; font-weight: 600; margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
         
@@ -31,17 +31,17 @@
         .busca-container { background: var(--card); display: flex; align-items: center; padding: 6px 12px; border-radius: 10px; border: 1px solid var(--card-brd); }
         .busca-container input { background: none; border: none; color: #fff; flex: 1; outline: none; font-size: 12px; }
         
-        /* LOGIN */
-        .login-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; z-index: 5000; position: relative; background: #000; }
+        /* TELA DE LOGIN FIXED */
+        .login-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; width: 100vw; z-index: 5000; position: fixed; top: 0; left: 0; background: #000; }
         .login-card { background: var(--card); padding: 30px; border-radius: 20px; width: 85%; max-width: 280px; text-align: center; border: 1px solid var(--card-brd); }
         .login-card input[type="text"], .login-card input[type="password"] { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--card-brd); background: #000; color: #fff; box-sizing: border-box; margin-bottom: 10px; outline: none; font-size: 14px; }
         .remember-box { display: flex; align-items: center; gap: 8px; color: #666; font-size: 12px; margin-bottom: 20px; cursor: pointer; justify-content: flex-start; width: 100%; }
         .remember-box input { accent-color: var(--accent); width: 16px; height: 16px; }
 
-        /* CONTAINER DE ROLAGEM EXCLUSIVO DOS CLIENTES */
-        .conteudo-rolavel { position: absolute; top: calc(205px + env(safe-area-inset-top)); bottom: 0; left: 0; right: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 15px 40px 15px; box-sizing: border-box; }
+        /* CONTAINER DE ROLAGEM DOS CLIENTES RECALCULADO */
+        .conteudo-rolavel { position: absolute; top: calc(230px + env(safe-area-inset-top)); bottom: 0; left: 0; right: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 15px 40px 15px; box-sizing: border-box; }
         
-        /* SEÇÃO DO MURAL DENTRO DA ÁREA ROLÁVEL (PODE SER OCULTADO) */
+        /* SEÇÃO DO MURAL RETRÁTIL */
         .secao-mural { padding: 15px 0 5px 0; }
         .mural-header-toggle { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
         .btn-toggle-mural { background: var(--card); border: 1px solid var(--card-brd); color: #888; font-size: 9px; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 6px; cursor: pointer; }
@@ -49,22 +49,20 @@
         .card-aviso { background: var(--card); padding: 10px 12px; border-radius: 10px; margin-bottom: 6px; font-size: 12px; font-weight: 500; border-left: 3px solid var(--accent); color: #ccc; cursor: pointer; border-top: 1px solid var(--card-brd); border-right: 1px solid var(--card-brd); border-bottom: 1px solid var(--card-brd); }
         .btn-add-mural { background: none; border: none; color: #60a5fa; font-size: 9px; text-transform: uppercase; font-weight: 700; cursor: pointer; padding: 2px 0; text-align: left; }
 
-        /* CARDS REFINADOS E SELOS */
+        /* CARDS E SELOS DE VENCIMENTO */
         .card-cliente { background: var(--card); border: 1px solid var(--card-brd); border-radius: 16px; padding: 14px; margin-bottom: 10px; position: relative; }
         .card-cliente h3 { margin: 0 0 4px 0; font-size: 15px; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 6px; width: 70%; letter-spacing: 0.3px; }
         .info-p { font-size: 11px; color: #71717a; margin: 2px 0; }
         
-        /* CONTAINER DE SELOS NO CANTO SUPERIOR DIREITO */
         .container-badges { position: absolute; top: 14px; right: 14px; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
         .selo-pago { background: rgba(22, 163, 74, 0.1); color: #4ade80; border: 1px solid rgba(22, 163, 74, 0.3); font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 6px; text-transform: uppercase; }
         
-        /* STATUS DE VENCIMENTOS */
         .status-vencimento { font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.2px; }
         .status-vencimento.em-dia { background: rgba(22, 163, 74, 0.15); color: #4ade80; border: 1px solid rgba(22, 163, 74, 0.3); }
         .status-vencimento.vence-logo { background: rgba(202, 138, 4, 0.15); color: #facc15; border: 1px solid rgba(202, 138, 4, 0.3); }
         .status-vencimento.vencido { background: rgba(220, 38, 38, 0.15); color: #f87171; border: 1px solid rgba(220, 38, 38, 0.3); }
 
-        /* GRID DE BOTÕES PEQUENOS */
+        /* BOTÕES PEQUENOS E ELEGANTES */
         .grid-botoes { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
         .btn-card { padding: 8px; border-radius: 8px; border: 1px solid transparent; font-weight: 600; font-size: 10px; text-transform: uppercase; cursor: pointer; letter-spacing: 0.2px; }
         .btn-renovar { background: var(--success); color: #fff; }
@@ -73,13 +71,13 @@
         .btn-arquivar { background: #16161a; color: #aaa; border-color: #27272a; }
         .btn-excluir { background: rgba(220, 38, 38, 0.1); color: #f87171; border-color: rgba(220, 38, 38, 0.2); grid-column: span 2; margin-top: 2px; padding: 6px; font-size: 9px; }
 
-        /* MODAIS */
+        /* MODAIS REFINADOS */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); z-index: 2000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
         .modal-content { background: var(--card); width: 100%; max-width: 360px; padding: 20px; border-radius: 20px; border: 1px solid var(--card-brd); text-align: center; max-height: 80vh; overflow-y: auto; }
         .modal-content input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid var(--card-brd); background: #000; color: #fff; box-sizing: border-box; font-size: 14px; outline: none; }
         .btn-acao-modal { background: var(--accent); color: #fff; border: none; width: 100%; padding: 12px; border-radius: 10px; font-weight: 700; margin-top: 12px; cursor: pointer; font-size: 13px; text-transform: uppercase; }
 
-        .btn-sair { position: fixed; top: 12px; right: 15px; background: none; border: none; color: #444; font-size: 9px; z-index: 1100; font-weight: 600; letter-spacing: 0.5px; }
+        .btn-sair { position: fixed; top: 12px; right: 15px; background: none; border: none; color: #555; font-size: 10px; z-index: 6000; font-weight: bold; cursor: pointer; }
         .oculto-click { cursor: pointer; margin-left: 5px; font-size: 11px; }
     </style>
 </head>
@@ -178,7 +176,12 @@
 
         window.onload = () => {
             const savedU = localStorage.getItem('gestor_u'), savedP = localStorage.getItem('gestor_p');
-            if(savedU && savedP) { document.getElementById('u').value = savedU; document.getElementById('p').value = savedP; document.getElementById('remember').checked = true; logar(); }
+            if(savedU && savedP) { 
+                document.getElementById('u').value = savedU; 
+                document.getElementById('p').value = savedP; 
+                document.getElementById('remember').checked = true; 
+                logar(); 
+            }
             if(localStorage.getItem('mural_oculto') === 'true') {
                 muralOculto = true;
                 document.getElementById('wrapper-mural-retratil').style.display = 'none';
@@ -187,16 +190,29 @@
         };
 
         window.logar = async () => {
-            const login = document.getElementById('u').value.toLowerCase().trim(), pass = document.getElementById('p').value;
-            const q = query(collection(db, "usuarios"), where("login", "==", login), where("senha", "==", pass));
-            const snap = await getDocs(q);
-            if(!snap.empty) { 
-                logado = snap.docs[0].data();
-                if(document.getElementById('remember').checked) { localStorage.setItem('gestor_u', login); localStorage.setItem('gestor_p', pass); }
-                document.getElementById('tela-login').style.display = 'none';
-                document.getElementById('app').style.display = 'block';
-                carregarDados();
-            } else { alert("Login incorreto!"); }
+            try {
+                const login = document.getElementById('u').value.toLowerCase().trim(), pass = document.getElementById('p').value;
+                if(!login || !pass) return alert("Preencha o login e senha!");
+                
+                const q = query(collection(db, "usuarios"), where("login", "==", login), where("senha", "==", pass));
+                const snap = await getDocs(q);
+                
+                if(!snap.empty) { 
+                    logado = snap.docs[0].data();
+                    if(document.getElementById('remember').checked) { 
+                        localStorage.setItem('gestor_u', login); 
+                        localStorage.setItem('gestor_p', pass); 
+                    }
+                    document.getElementById('tela-login').style.display = 'none';
+                    document.getElementById('app').style.display = 'block';
+                    carregarDados();
+                } else { 
+                    alert("Login ou senha incorretos!"); 
+                }
+            } catch (error) {
+                alert("Erro ao conectar com Banco de Dados: " + error.message);
+                console.error(error);
+            }
         };
 
         function carregarDados() {
@@ -233,4 +249,148 @@
         window.toggleMuralVisivel = () => {
             muralOculto = !muralOculto;
             document.getElementById('wrapper-mural-retratil').style.display = muralOculto ? 'none' : 'block';
-            document.getElementById('btn-hide-mural
+            document.getElementById('btn-hide-mural').innerText = muralOculto ? "Exibir Mural" : "Ocultar Mural";
+            localStorage.setItem('mural_oculto', muralOculto);
+        };
+
+        window.toggleOcultarStatus = () => {
+            ocultarValores = !ocultarValores;
+            document.getElementById('btn-ocultar-olho').innerText = ocultarValores ? "🙈" : "👁️";
+            atualizarContadores();
+        };
+
+        function atualizarContadores() {
+            document.getElementById('btn-aba-arquivados').innerText = `Arquivados (${arquivadosRaw.length})`;
+            if(ocultarValores) {
+                document.getElementById('contagem').innerHTML = "Dados ocultados com sucesso!";
+                return;
+            }
+            const contPaineis = {};
+            dadosRaw.forEach(c => contPaineis[c.painel] = (contPaineis[c.painel] || 0) + 1);
+            let htmlS = ""; for (const p in contPaineis) htmlS += `${p}: <b>${contPaineis[p]}</b> | `;
+            document.getElementById('contagem').innerHTML = htmlS + `Total: <b>${dadosRaw.length}</b>`;
+        }
+
+        window.editarCredito = async (painel) => {
+            const adminCheck = prompt("Senha Master para Alterar Créditos:");
+            if(adminCheck !== "2024") return alert("Senha incorreta!");
+            
+            const atual = parseInt(document.getElementById(`cred-${painel}`).innerText) || 0;
+            const novo = prompt(`Digite a nova quantidade de créditos para ${painel.toUpperCase()}:`, atual);
+            if(novo !== null && !isNaN(novo)) {
+                const obj = {}; obj[painel] = parseInt(novo);
+                await updateDoc(doc(db, "creditos", logado.login), obj);
+            }
+        };
+
+        window.muralAcao = async (tipo, id, textoAntigo) => {
+            const col = logado.login === 'admin' ? "avisos" : "lembretes_privados";
+            if(tipo === 'add') {
+                const t = prompt("Nova anotação:");
+                if(t) await addDoc(collection(db, col), logado.login === 'admin' ? { textoAviso: t, criadoEm: Date.now() } : { texto: t, usuarioId: logado.login, criadoEm: Date.now() });
+            } else {
+                const acao = confirm("Deseja EXCLUIR? (Cancele para EDITAR)");
+                if(acao) { if(confirm("Apagar nota?")) await deleteDoc(doc(db, col, id)); }
+                else {
+                    const nt = prompt("Editar nota:", textoAntigo);
+                    if(nt && nt !== textoAntigo) await updateDoc(doc(db, col, id), logado.login === 'admin' ? { textoAviso: nt } : { texto: nt });
+                }
+            }
+        };
+
+        function render(lista) {
+            const hoje = new Date(); hoje.setHours(0,0,0,0);
+            document.getElementById('lista-corpo').innerHTML = lista.map(c => {
+                const [ano, mes, dia] = c.data.split('-');
+                const v = new Date(ano, mes - 1, dia, 23, 59, 59);
+                const diff = Math.ceil((v - hoje) / 86400000);
+                
+                let classeSelo = "em-dia", textoSelo = "Em Dia";
+                if (diff <= 0) {
+                    classeSelo = "vencido";
+                    textoSelo = "Vencido";
+                } else if (diff <= 3) {
+                    classeSelo = "vence-logo";
+                    textoSelo = "Próx. Vencimento";
+                }
+
+                const seloPago = c.pago ? `<span class="selo-pago">✓ Pago</span>` : '';
+                
+                return `
+                <div class="card-cliente">
+                    <h3><span>${c.nome}</span></h3>
+                    
+                    <div class="container-badges">
+                        <span class="status-vencimento ${classeSelo}">${textoSelo}</span>
+                        ${seloPago}
+                    </div>
+
+                    <p class="info-p">Painel: <b>${c.painel}</b> | Expira: <b>${dia}/${mes}/${ano}</b></p>
+                    <div class="grid-botoes">
+                        <button class="btn-card btn-renovar" onclick="renovarConfirmar('${c.id}', '${c.data}', '${c.painel}')">+1 MÊS</button>
+                        <button class="btn-card btn-editar" onclick="abrirModalEdit('${c.id}','${c.nome}','${c.painel}','${c.data}')">EDITAR</button>
+                        <button class="btn-card btn-pago" onclick="marcarPago('${c.id}', ${c.pago || false})">PAGO</button>
+                        <button class="btn-card btn-arquivar" onclick="arquivarCliente('${c.id}', true)">ARQUIVAR</button>
+                        <button class="btn-card btn-excluir" onclick="excluirConfirmar('${c.id}')">EXCLUIR</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        window.marcarPago = async (id, statusAtual) => {
+            await updateDoc(doc(db, "clientes", id), { pago: !statusAtual });
+        };
+
+        window.arquivarCliente = async (id, status) => {
+            const msg = status ? "Arquivar este cliente?" : "Desarquivar este cliente?";
+            if(confirm(msg)) {
+                await updateDoc(doc(db, "clientes", id), { arquivado: status });
+                if(!status) document.getElementById('modal-arquivados').style.display = 'none';
+            }
+        };
+
+        window.abrirModalArquivados = () => {
+            const corpo = document.getElementById('lista-arquivados-corpo');
+            if(arquivadosRaw.length === 0) {
+                corpo.innerHTML = "<p style='color:#444;text-align:center;font-size:12px;'>Nenhum cliente arquivado.</p>";
+            } else {
+                corpo.innerHTML = arquivadosRaw.map(c => `
+                    <div style="background:#0c0c0e; padding:12px; border-radius:12px; margin-bottom:8px; border:1px solid #16161a;">
+                        <b style="text-transform:uppercase; color:#fff; font-size:13px;">${c.nome}</b><br>
+                        <span style="font-size:11px; color:#666">Painel: ${c.painel}</span>
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <button onclick="arquivarCliente('${c.id}', false)" style="background:var(--accent); color:#fff; border:none; padding:6px 10px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer;">DESARQUIVAR</button>
+                            <button onclick="excluirConfirmar('${c.id}')" style="background:rgba(220,38,38,0.1); color:#f87171; border:1px solid rgba(220,38,38,0.2); padding:6px 10px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer;">EXCLUIR</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('modal-arquivados').style.display = 'flex';
+        };
+
+        window.abrirModalAdd = () => { document.getElementById('edit-id').value = ""; document.getElementById('cli-nome').value = ""; document.getElementById('cli-painel').value = ""; document.getElementById('cli-vencimento').value = ""; document.getElementById('modal-titulo').innerText = "Novo Cliente"; document.getElementById('modal-cliente').style.display = 'flex'; };
+        window.abrirModalEdit = (id, n, p, d) => { document.getElementById('edit-id').value = id; document.getElementById('cli-nome').value = n; document.getElementById('cli-painel').value = p; document.getElementById('cli-vencimento').value = d; document.getElementById('modal-titulo').innerText = "Editar Cliente"; document.getElementById('modal-cliente').style.display = 'flex'; };
+        window.fecharModal = () => document.getElementById('modal-cliente').style.display = 'none';
+        
+        window.processarCliente = async () => {
+            const id = document.getElementById('edit-id').value, n = document.getElementById('cli-nome').value, p = document.getElementById('cli-painel').value.toLowerCase().trim(), d = document.getElementById('cli-vencimento').value;
+            if(!n || !p || !d) return alert("Preencha tudo!");
+            if(id) {
+                await updateDoc(doc(db, "clientes", id), { nome: n, painel: p, data: d });
+            } else {
+                await addDoc(collection(db, "clientes"), { nome: n, painel: p, data: d, dono: logado.login, arquivado: false, pago: false });
+            }
+            fecharModal();
+        };
+
+        window.renovarConfirmar = async (id, data, painelCli) => {
+            if(confirm("Deseja renovar por mais 1 mês?")) {
+                const [a, m, d] = data.split('-').map(Number);
+                let nd = new Date(a, m, d); if (nd.getDate() != d) nd.setDate(0);
+                
+                await updateDoc(doc(db, "clientes", id), { data: nd.toISOString().split('T')[0], pago: false });
+
+                const painelNormalizado = painelCli.toLowerCase().trim();
+                if(painelNormalizado === 'unitv' || painelNormalizado === 'uniplay') {
+                    const docRef = doc(db, "creditos", logado.login);
+                    const docSnap
