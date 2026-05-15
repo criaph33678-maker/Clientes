@@ -180,7 +180,7 @@
                 document.getElementById('u').value = savedU; 
                 document.getElementById('p').value = savedP; 
                 document.getElementById('remember').checked = true; 
-                logar(); 
+                window.logar(); 
             }
             if(localStorage.getItem('mural_oculto') === 'true') {
                 muralOculto = true;
@@ -241,7 +241,7 @@
             const qM = (logado.login === 'admin') ? query(collection(db, "avisos"), orderBy("criadoEm", "desc")) : query(collection(db, "lembretes_privados"), where("usuarioId", "==", logado.login), orderBy("criadoEm", "desc"));
             onSnapshot(qM, (snap) => {
                 document.getElementById('lista-mural').innerHTML = snap.docs.map(d => `
-                    <div class="card-aviso" onclick="muralAcao('edit', '${d.id}', '${d.data().texto || d.data().textoAviso}')">📢 ${d.data().texto || d.data().textoAviso}</div>
+                    <div class="card-aviso" onclick="window.muralAcao('edit', '${d.id}', '${d.data().texto || d.data().textoAviso}')">📢 ${d.data().texto || d.data().textoAviso}</div>
                 `).join('');
             });
         }
@@ -327,11 +327,11 @@
 
                     <p class="info-p">Painel: <b>${c.painel}</b> | Expira: <b>${dia}/${mes}/${ano}</b></p>
                     <div class="grid-botoes">
-                        <button class="btn-card btn-renovar" onclick="renovarConfirmar('${c.id}', '${c.data}', '${c.painel}')">+1 MÊS</button>
-                        <button class="btn-card btn-editar" onclick="abrirModalEdit('${c.id}','${c.nome}','${c.painel}','${c.data}')">EDITAR</button>
-                        <button class="btn-card btn-pago" onclick="marcarPago('${c.id}', ${c.pago || false})">PAGO</button>
-                        <button class="btn-card btn-arquivar" onclick="arquivarCliente('${c.id}', true)">ARQUIVAR</button>
-                        <button class="btn-card btn-excluir" onclick="excluirConfirmar('${c.id}')">EXCLUIR</button>
+                        <button class="btn-card btn-renovar" onclick="window.renovarConfirmar('${c.id}', '${c.data}', '${c.painel}')">+1 MÊS</button>
+                        <button class="btn-card btn-editar" onclick="window.abrirModalEdit('${c.id}','${c.nome}','${c.painel}','${c.data}')">EDITAR</button>
+                        <button class="btn-card btn-pago" onclick="window.marcarPago('${c.id}', ${c.pago || false})">PAGO</button>
+                        <button class="btn-card btn-arquivar" onclick="window.arquivarCliente('${c.id}', true)">ARQUIVAR</button>
+                        <button class="btn-card btn-excluir" onclick="window.excluirConfirmar('${c.id}')">EXCLUIR</button>
                     </div>
                 </div>`;
             }).join('');
@@ -359,8 +359,8 @@
                         <b style="text-transform:uppercase; color:#fff; font-size:13px;">${c.nome}</b><br>
                         <span style="font-size:11px; color:#666">Painel: ${c.painel}</span>
                         <div style="display:flex; gap:6px; margin-top:8px;">
-                            <button onclick="arquivarCliente('${c.id}', false)" style="background:var(--accent); color:#fff; border:none; padding:6px 10px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer;">DESARQUIVAR</button>
-                            <button onclick="excluirConfirmar('${c.id}')" style="background:rgba(220,38,38,0.1); color:#f87171; border:1px solid rgba(220,38,38,0.2); padding:6px 10px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer;">EXCLUIR</button>
+                            <button onclick="window.arquivarCliente('${c.id}', false)" style="background:var(--accent); color:#fff; border:none; padding:6px 10px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer;">DESARQUIVAR</button>
+                            <button onclick="window.excluirConfirmar('${c.id}')" style="background:rgba(220,38,38,0.1); color:#f87171; border:1px solid rgba(220,38,38,0.2); padding:6px 10px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer;">EXCLUIR</button>
                         </div>
                     </div>
                 `).join('');
@@ -380,7 +380,7 @@
             } else {
                 await addDoc(collection(db, "clientes"), { nome: n, painel: p, data: d, dono: logado.login, arquivado: false, pago: false });
             }
-            fecharModal();
+            window.fecharModal();
         };
 
         window.renovarConfirmar = async (id, data, painelCli) => {
@@ -393,4 +393,32 @@
                 const painelNormalizado = painelCli.toLowerCase().trim();
                 if(painelNormalizado === 'unitv' || painelNormalizado === 'uniplay') {
                     const docRef = doc(db, "creditos", logado.login);
-                    const docSnap
+                    const docSnap = await getDoc(docRef);
+                    if(docSnap.exists()){
+                        const totalAtual = docSnap.data()[painelNormalizado] || 0;
+                        if(totalAtual > 0) {
+                            const dec = {}; dec[painelNormalizado] = totalAtual - 1;
+                            await updateDoc(docRef, dec);
+                        }
+                    }
+                }
+            }
+        };
+
+        window.excluirConfirmar = async (id) => { 
+            if(confirm("Excluir cliente definitivamente?")) {
+                await deleteDoc(doc(db, "clientes", id));
+                document.getElementById('modal-arquivados').style.display = 'none';
+            } 
+        };
+        
+        window.confirmarSair = () => { localStorage.clear(); location.reload(); };
+        
+        window.filtrar = () => { 
+            const t = document.getElementById('busca').value.toLowerCase(); 
+            const filtrados = dadosRaw.filter(x => x.nome.toLowerCase().includes(t) || x.painel.toLowerCase().includes(t));
+            render(filtrados); 
+        };
+    </script>
+</body>
+</html>
