@@ -2,423 +2,149 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#000000">
-    <title>Gestor Business V13.20</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <link rel="manifest" href="data:application/manifest+json,{%22display%22:%22standalone%22,%22start_url%22:%22/%22,%22name%22:%22Gestor%20Business%22,%22theme_color%22:%22#000000%22,%22background_color%22:%22#000000%22}">
-
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
+    
+    <title>Finanças Black</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --bg: #000; --card: #0c0c0e; --card-brd: #16161a; --text: #fff; --accent: #2563eb; --danger: #dc2626; --success: #16a34a; --warning: #ca8a04; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; overflow: hidden; height: 100vh; }
-
-        /* HEADER TOTALMENTE CONGELADO NO TOPO */
-        .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: #000; padding: 10px 15px; padding-top: env(safe-area-inset-top); z-index: 1000; border-bottom: 1px solid var(--card-brd); box-sizing: border-box; }
-        .stats-topo { font-size: 11px; color: #666; font-weight: 600; margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-        
-        .creditos-topo { display: flex; gap: 12px; background: var(--card); padding: 6px 12px; border-radius: 10px; border: 1px solid var(--card-brd); font-size: 11px; font-weight: 600; color: #888; margin-bottom: 8px; }
-        .credito-item { cursor: pointer; }
-        .credito-item span { color: #60a5fa; font-weight: 700; }
-
-        .btn-novo-cliente-topo { background: var(--accent); color: white; border: none; width: 100%; padding: 10px; border-radius: 12px; font-weight: 700; font-size: 12px; margin-bottom: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.3px; }
-        
-        .botoes-topo-flex { display: flex; gap: 6px; margin-bottom: 8px; }
-        .btn-topo-acao { flex: 1; background: var(--card); border: 1px solid var(--card-brd); color: #aaa; padding: 6px; border-radius: 8px; font-size: 10px; font-weight: 700; cursor: pointer; text-transform: uppercase; }
-
-        .busca-container { background: var(--card); display: flex; align-items: center; padding: 6px 12px; border-radius: 10px; border: 1px solid var(--card-brd); }
-        .busca-container input { background: none; border: none; color: #fff; flex: 1; outline: none; font-size: 12px; }
-        
-        /* TELA DE LOGIN FIXED */
-        .login-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; width: 100vw; z-index: 5000; position: fixed; top: 0; left: 0; background: #000; }
-        .login-card { background: var(--card); padding: 30px; border-radius: 20px; width: 85%; max-width: 280px; text-align: center; border: 1px solid var(--card-brd); }
-        .login-card input[type="text"], .login-card input[type="password"] { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--card-brd); background: #000; color: #fff; box-sizing: border-box; margin-bottom: 10px; outline: none; font-size: 14px; }
-        .remember-box { display: flex; align-items: center; gap: 8px; color: #666; font-size: 12px; margin-bottom: 20px; cursor: pointer; justify-content: flex-start; width: 100%; }
-        .remember-box input { accent-color: var(--accent); width: 16px; height: 16px; }
-
-        /* CONTAINER DE ROLAGEM DOS CLIENTES RECALCULADO */
-        .conteudo-rolavel { position: absolute; top: calc(230px + env(safe-area-inset-top)); bottom: 0; left: 0; right: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 15px 40px 15px; box-sizing: border-box; }
-        
-        /* SEÇÃO DO MURAL RETRÁTIL */
-        .secao-mural { padding: 15px 0 5px 0; }
-        .mural-header-toggle { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .btn-toggle-mural { background: var(--card); border: 1px solid var(--card-brd); color: #888; font-size: 9px; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 6px; cursor: pointer; }
-        
-        .card-aviso { background: var(--card); padding: 10px 12px; border-radius: 10px; margin-bottom: 6px; font-size: 12px; font-weight: 500; border-left: 3px solid var(--accent); color: #ccc; cursor: pointer; border-top: 1px solid var(--card-brd); border-right: 1px solid var(--card-brd); border-bottom: 1px solid var(--card-brd); }
-        .btn-add-mural { background: none; border: none; color: #60a5fa; font-size: 9px; text-transform: uppercase; font-weight: 700; cursor: pointer; padding: 2px 0; text-align: left; }
-
-        /* CARDS E SELOS DE VENCIMENTO */
-        .card-cliente { background: var(--card); border: 1px solid var(--card-brd); border-radius: 16px; padding: 14px; margin-bottom: 10px; position: relative; }
-        .card-cliente h3 { margin: 0 0 4px 0; font-size: 15px; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 6px; width: 70%; letter-spacing: 0.3px; }
-        .info-p { font-size: 11px; color: #71717a; margin: 2px 0; }
-        
-        .container-badges { position: absolute; top: 14px; right: 14px; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-        .selo-pago { background: rgba(22, 163, 74, 0.1); color: #4ade80; border: 1px solid rgba(22, 163, 74, 0.3); font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 6px; text-transform: uppercase; }
-        
-        .status-vencimento { font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.2px; }
-        .status-vencimento.em-dia { background: rgba(22, 163, 74, 0.15); color: #4ade80; border: 1px solid rgba(22, 163, 74, 0.3); }
-        .status-vencimento.vence-logo { background: rgba(202, 138, 4, 0.15); color: #facc15; border: 1px solid rgba(202, 138, 4, 0.3); }
-        .status-vencimento.vencido { background: rgba(220, 38, 38, 0.15); color: #f87171; border: 1px solid rgba(220, 38, 38, 0.3); }
-
-        /* BOTÕES PEQUENOS E ELEGANTES */
-        .grid-botoes { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
-        .btn-card { padding: 8px; border-radius: 8px; border: 1px solid transparent; font-weight: 600; font-size: 10px; text-transform: uppercase; cursor: pointer; letter-spacing: 0.2px; }
-        .btn-renovar { background: var(--success); color: #fff; }
-        .btn-editar { background: #16161a; color: #ccc; border-color: #27272a; }
-        .btn-pago { background: #14281a; color: #4ade80; border-color: #1b3d25; }
-        .btn-arquivar { background: #16161a; color: #aaa; border-color: #27272a; }
-        .btn-excluir { background: rgba(220, 38, 38, 0.1); color: #f87171; border-color: rgba(220, 38, 38, 0.2); grid-column: span 2; margin-top: 2px; padding: 6px; font-size: 9px; }
-
-        /* MODAIS REFINADOS */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); z-index: 2000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
-        .modal-content { background: var(--card); width: 100%; max-width: 360px; padding: 20px; border-radius: 20px; border: 1px solid var(--card-brd); text-align: center; max-height: 80vh; overflow-y: auto; }
-        .modal-content input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid var(--card-brd); background: #000; color: #fff; box-sizing: border-box; font-size: 14px; outline: none; }
-        .btn-acao-modal { background: var(--accent); color: #fff; border: none; width: 100%; padding: 12px; border-radius: 10px; font-weight: 700; margin-top: 12px; cursor: pointer; font-size: 13px; text-transform: uppercase; }
-
-        .btn-sair { position: fixed; top: 12px; right: 15px; background: none; border: none; color: #555; font-size: 10px; z-index: 6000; font-weight: bold; cursor: pointer; }
-        .oculto-click { cursor: pointer; margin-left: 5px; font-size: 11px; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { background-color: #000000; color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .card-dark { background: #121212; border: 1px solid #1f1f1f; }
+        .btn-action { background: #1a1a1a; border: 1px solid #333; transition: all 0.2s; }
+        .btn-action:active { background: #333; scale: 0.95; }
+        /* Esconde a barra de rolagem */
+        ::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body>
+<body class="p-6 pb-24">
 
-    <button class="btn-sair" onclick="confirmarSair()">SAIR</button>
+    <div class="flex justify-between items-start mb-8 pt-6">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest">Saldo Total</p>
+                <button onclick="toggleVisibilidade()" class="text-gray-600 text-xs">
+                    <span id="eye-icon">👁️</span>
+                </button>
+            </div>
+            <h1 id="saldo-total" class="text-3xl font-extrabold tracking-tight">R$ 0,00</h1>
+        </div>
+        <button onclick="document.getElementById('relatorio').classList.toggle('hidden')" class="bg-[#1a1a1a] text-gray-400 text-[9px] font-bold px-4 py-2 rounded-full border border-[#333]">
+            RELATÓRIOS
+        </button>
+    </div>
 
-    <div id="tela-login" class="login-container">
-        <div class="login-card">
-            <h2 style="margin-bottom:20px; font-size:18px; font-weight:800; letter-spacing:0.5px;">GESTOR BUSINESS</h2>
-            <input type="text" id="u" placeholder="Usuário">
-            <input type="password" id="p" placeholder="Senha">
-            <label class="remember-box"><input type="checkbox" id="remember"> Lembrar meu acesso</label>
-            <button onclick="logar()" style="width:100%; padding:12px; background:var(--accent); border:none; color:#fff; border-radius:10px; font-weight:700; cursor:pointer; font-size:13px;">ACESSAR</button>
+    <div id="relatorio" class="hidden mb-8 animate-in fade-in duration-300">
+        <div class="card-dark rounded-3xl p-5">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-[9px] text-gray-500 font-bold uppercase mb-1">Ganhos</p>
+                    <p class="text-green-500 font-bold text-sm">+ R$ <span id="ganho-mes">0,00</span></p>
+                </div>
+                <div class="border-l border-[#222] pl-4">
+                    <p class="text-[9px] text-gray-500 font-bold uppercase mb-1">Gastos</p>
+                    <p class="text-red-500 font-bold text-sm">- R$ <span id="gasto-mes">0,00</span></p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div id="modal-cliente" class="modal">
-        <div class="modal-content">
-            <h2 id="modal-titulo" style="margin-top:0; font-size:16px;">Novo Cliente</h2>
+    <div class="flex gap-3 mb-10">
+        <button onclick="abrirModal('entrada')" class="flex-1 btn-action h-12 rounded-2xl flex items-center justify-center gap-2">
+            <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-gray-300">Entrada</span>
+        </button>
+        <button onclick="abrirModal('saida')" class="flex-1 btn-action h-12 rounded-2xl flex items-center justify-center gap-2">
+            <div class="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-gray-300">Saída</span>
+        </button>
+    </div>
+
+    <div id="historico" class="space-y-3"></div>
+
+    <div id="modal" class="hidden fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-6">
+        <div class="w-full max-w-xs">
+            <h3 id="modal-titulo" class="text-center text-gray-500 font-bold text-xs uppercase mb-8"></h3>
             <input type="hidden" id="edit-id">
-            <input type="text" id="cli-nome" placeholder="Nome do Cliente">
-            <input type="text" id="cli-painel" placeholder="Nome do Painel (Ex: unitv, uniplay)">
-            <input type="date" id="cli-vencimento">
-            <button id="btn-salvar" class="btn-acao-modal" onclick="processarCliente()">SALVAR DADOS</button>
-            <button onclick="fecharModal()" style="background:none; border:none; color:#666; margin-top:12px; font-weight:600; font-size:11px; cursor:pointer;">CANCELAR</button>
+            <input type="number" id="valor" placeholder="0.00" class="w-full bg-transparent text-center text-5xl font-extrabold outline-none mb-8">
+            <input type="text" id="descricao" placeholder="Descrição" class="w-full bg-[#121212] border border-[#222] p-4 rounded-2xl text-center mb-8 outline-none">
+            <div class="flex gap-4">
+                <button onclick="fecharModal()" class="flex-1 text-gray-600 font-bold text-xs">VOLTAR</button>
+                <button onclick="salvar()" class="flex-1 bg-white text-black rounded-2xl font-bold text-xs py-4">CONFIRMAR</button>
+            </div>
         </div>
     </div>
 
-    <div id="modal-arquivados" class="modal">
-        <div class="modal-content">
-            <h2 style="margin-top:0; font-size:16px;">Clientes Arquivados</h2>
-            <div id="lista-arquivados-corpo" style="text-align:left; margin-top:12px;"></div>
-            <button onclick="document.getElementById('modal-arquivados').style.display='none'" class="btn-acao-modal" style="background:#16161a; color:#ccc; font-size:11px;">FECHAR JANELA</button>
-        </div>
-    </div>
+    <script>
+        let transacoes = JSON.parse(localStorage.getItem('fin_black_v1')) || [];
+        let oculto = false;
+        let saldoReal = 0;
 
-    <div id="app" style="display:none;">
-        <header class="header-fixo">
-            <div class="stats-topo">
-                <span id="contagem"></span>
-                <span id="btn-ocultar-olho" class="oculto-click" onclick="toggleOcultarStatus()">👁️</span>
-            </div>
+        function atualizarUI() {
+            localStorage.setItem('fin_black_v1', JSON.stringify(transacoes));
+            saldoReal = transacoes.reduce((acc, t) => t.tipo === 'entrada' ? acc + t.valor : acc - t.valor, 0);
             
-            <div class="creditos-topo">
-                <div class="credito-item" onclick="editarCredito('unitv')">UniTV: <span id="cred-unitv">0</span> cd.</div>
-                <div class="credito-item" onclick="editarCredito('uniplay')">UniPlay: <span id="cred-uniplay">0</span> cd.</div>
-            </div>
-
-            <button class="btn-novo-cliente-topo" onclick="abrirModalAdd()">+ Adicionar Cliente</button>
+            const gMes = transacoes.filter(t => t.tipo === 'entrada').reduce((a, b) => a + b.valor, 0);
+            const sMes = transacoes.filter(t => t.tipo === 'saida').reduce((a, b) => a + b.valor, 0);
             
-            <div class="botoes-topo-flex">
-                <button class="btn-topo-acao" id="btn-aba-arquivados" onclick="abrirModalArquivados()">Arquivados (0)</button>
-            </div>
-
-            <div class="busca-container">
-                <input type="text" id="busca" placeholder="Buscar cliente ou painel..." oninput="filtrar()">
-            </div>
-        </header>
-
-        <div class="conteudo-rolavel">
-            <section class="secao-mural">
-                <div class="mural-header-toggle">
-                    <button class="btn-add-mural" onclick="muralAcao('add')">+ Nota no Mural</button>
-                    <button class="btn-toggle-mural" id="btn-hide-mural" onclick="toggleMuralVisivel()">Ocultar Mural</button>
-                </div>
-                <div id="wrapper-mural-retratil">
-                    <div id="lista-mural"></div>
-                </div>
-            </section>
-
-            <section class="lista-clientes" id="lista-corpo"></section>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, where, getDocs, orderBy, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDMQbFBbbKFABCwwTxuESpXsz_Knz-V4FI",
-            authDomain: "meu-gestor-a7d13.firebaseapp.com",
-            projectId: "meu-gestor-a7d13",
-            storageBucket: "meu-gestor-a7d13.firebasestorage.app",
-            messagingSenderId: "1019995087685",
-            appId: "1:1019995087685:web:a063af65a4b7f234b4542c"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        let dadosRaw = [];
-        let arquivadosRaw = [];
-        let logado = null;
-        let ocultarValores = false;
-        let muralOculto = false;
-
-        window.onload = () => {
-            const savedU = localStorage.getItem('gestor_u'), savedP = localStorage.getItem('gestor_p');
-            if(savedU && savedP) { 
-                document.getElementById('u').value = savedU; 
-                document.getElementById('p').value = savedP; 
-                document.getElementById('remember').checked = true; 
-                window.logar(); 
-            }
-            if(localStorage.getItem('mural_oculto') === 'true') {
-                muralOculto = true;
-                document.getElementById('wrapper-mural-retratil').style.display = 'none';
-                document.getElementById('btn-hide-mural').innerText = "Exibir Mural";
-            }
-        };
-
-        window.logar = async () => {
-            try {
-                const login = document.getElementById('u').value.toLowerCase().trim(), pass = document.getElementById('p').value;
-                if(!login || !pass) return alert("Preencha o login e senha!");
-                
-                const q = query(collection(db, "usuarios"), where("login", "==", login), where("senha", "==", pass));
-                const snap = await getDocs(q);
-                
-                if(!snap.empty) { 
-                    logado = snap.docs[0].data();
-                    if(document.getElementById('remember').checked) { 
-                        localStorage.setItem('gestor_u', login); 
-                        localStorage.setItem('gestor_p', pass); 
-                    }
-                    document.getElementById('tela-login').style.display = 'none';
-                    document.getElementById('app').style.display = 'block';
-                    carregarDados();
-                } else { 
-                    alert("Login ou senha incorretos!"); 
-                }
-            } catch (error) {
-                alert("Erro ao conectar com Banco de Dados: " + error.message);
-                console.error(error);
-            }
-        };
-
-        function carregarDados() {
-            const qC = (logado.login === 'admin') ? query(collection(db, "clientes"), orderBy("data", "asc")) : query(collection(db, "clientes"), where("dono", "==", logado.login), orderBy("data", "asc"));
-            onSnapshot(qC, (snap) => {
-                let temp = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                let filtradoDono = (logado.login === 'admin') ? temp.filter(c => !c.dono || c.dono === 'admin') : temp;
-                dadosRaw = filtradoDono.filter(c => !c.arquivado);
-                arquivadosRaw = filtradoDono.filter(c => c.arquivado === true);
-                
-                atualizarContadores();
-                render(dadosRaw);
-            });
-
-            onSnapshot(doc(db, "creditos", logado.login), (docSnap) => {
-                if(docSnap.exists()){
-                    const data = docSnap.data();
-                    document.getElementById('cred-unitv').innerText = data.unitv || 0;
-                    document.getElementById('cred-uniplay').innerText = data.uniplay || 0;
-                } else {
-                    setDoc(doc(db, "creditos", logado.login), { unitv: 0, uniplay: 0 });
-                }
-            });
-
-            const colMural = logado.login === 'admin' ? "avisos" : "lembretes_privados";
-            const qM = (logado.login === 'admin') ? query(collection(db, "avisos"), orderBy("criadoEm", "desc")) : query(collection(db, "lembretes_privados"), where("usuarioId", "==", logado.login), orderBy("criadoEm", "desc"));
-            onSnapshot(qM, (snap) => {
-                document.getElementById('lista-mural').innerHTML = snap.docs.map(d => `
-                    <div class="card-aviso" onclick="window.muralAcao('edit', '${d.id}', '${d.data().texto || d.data().textoAviso}')">📢 ${d.data().texto || d.data().textoAviso}</div>
-                `).join('');
-            });
-        }
-
-        window.toggleMuralVisivel = () => {
-            muralOculto = !muralOculto;
-            document.getElementById('wrapper-mural-retratil').style.display = muralOculto ? 'none' : 'block';
-            document.getElementById('btn-hide-mural').innerText = muralOculto ? "Exibir Mural" : "Ocultar Mural";
-            localStorage.setItem('mural_oculto', muralOculto);
-        };
-
-        window.toggleOcultarStatus = () => {
-            ocultarValores = !ocultarValores;
-            document.getElementById('btn-ocultar-olho').innerText = ocultarValores ? "🙈" : "👁️";
-            atualizarContadores();
-        };
-
-        function atualizarContadores() {
-            document.getElementById('btn-aba-arquivados').innerText = `Arquivados (${arquivadosRaw.length})`;
-            if(ocultarValores) {
-                document.getElementById('contagem').innerHTML = "Dados ocultados com sucesso!";
-                return;
-            }
-            const contPaineis = {};
-            dadosRaw.forEach(c => contPaineis[c.painel] = (contPaineis[c.painel] || 0) + 1);
-            let htmlS = ""; for (const p in contPaineis) htmlS += `${p}: <b>${contPaineis[p]}</b> | `;
-            document.getElementById('contagem').innerHTML = htmlS + `Total: <b>${dadosRaw.length}</b>`;
-        }
-
-        window.editarCredito = async (painel) => {
-            const adminCheck = prompt("Senha Master para Alterar Créditos:");
-            if(adminCheck !== "2024") return alert("Senha incorreta!");
+            document.getElementById('ganho-mes').innerText = gMes.toFixed(2);
+            document.getElementById('gasto-mes').innerText = sMes.toFixed(2);
             
-            const atual = parseInt(document.getElementById(`cred-${painel}`).innerText) || 0;
-            const novo = prompt(`Digite a nova quantidade de créditos para ${painel.toUpperCase()}:`, atual);
-            if(novo !== null && !isNaN(novo)) {
-                const obj = {}; obj[painel] = parseInt(novo);
-                await updateDoc(doc(db, "creditos", logado.login), obj);
-            }
-        };
+            renderSaldo();
 
-        window.muralAcao = async (tipo, id, textoAntigo) => {
-            const col = logado.login === 'admin' ? "avisos" : "lembretes_privados";
-            if(tipo === 'add') {
-                const t = prompt("Nova anotação:");
-                if(t) await addDoc(collection(db, col), logado.login === 'admin' ? { textoAviso: t, criadoEm: Date.now() } : { texto: t, usuarioId: logado.login, criadoEm: Date.now() });
-            } else {
-                const acao = confirm("Deseja EXCLUIR? (Cancele para EDITAR)");
-                if(acao) { if(confirm("Apagar nota?")) await deleteDoc(doc(db, col, id)); }
-                else {
-                    const nt = prompt("Editar nota:", textoAntigo);
-                    if(nt && nt !== textoAntigo) await updateDoc(doc(db, col, id), logado.login === 'admin' ? { textoAviso: nt } : { texto: nt });
-                }
-            }
-        };
-
-        function render(lista) {
-            const hoje = new Date(); hoje.setHours(0,0,0,0);
-            document.getElementById('lista-corpo').innerHTML = lista.map(c => {
-                const [ano, mes, dia] = c.data.split('-');
-                const v = new Date(ano, mes - 1, dia, 23, 59, 59);
-                const diff = Math.ceil((v - hoje) / 86400000);
-                
-                let classeSelo = "em-dia", textoSelo = "Em Dia";
-                if (diff <= 0) {
-                    classeSelo = "vencido";
-                    textoSelo = "Vencido";
-                } else if (diff <= 3) {
-                    classeSelo = "vence-logo";
-                    textoSelo = "Próx. Vencimento";
-                }
-
-                const seloPago = c.pago ? `<span class="selo-pago">✓ Pago</span>` : '';
-                
-                return `
-                <div class="card-cliente">
-                    <h3><span>${c.nome}</span></h3>
-                    
-                    <div class="container-badges">
-                        <span class="status-vencimento ${classeSelo}">${textoSelo}</span>
-                        ${seloPago}
-                    </div>
-
-                    <p class="info-p">Painel: <b>${c.painel}</b> | Expira: <b>${dia}/${mes}/${ano}</b></p>
-                    <div class="grid-botoes">
-                        <button class="btn-card btn-renovar" onclick="window.renovarConfirmar('${c.id}', '${c.data}', '${c.painel}')">+1 MÊS</button>
-                        <button class="btn-card btn-editar" onclick="window.abrirModalEdit('${c.id}','${c.nome}','${c.painel}','${c.data}')">EDITAR</button>
-                        <button class="btn-card btn-pago" onclick="window.marcarPago('${c.id}', ${c.pago || false})">PAGO</button>
-                        <button class="btn-card btn-arquivar" onclick="window.arquivarCliente('${c.id}', true)">ARQUIVAR</button>
-                        <button class="btn-card btn-excluir" onclick="window.excluirConfirmar('${c.id}')">EXCLUIR</button>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        window.marcarPago = async (id, statusAtual) => {
-            await updateDoc(doc(db, "clientes", id), { pago: !statusAtual });
-        };
-
-        window.arquivarCliente = async (id, status) => {
-            const msg = status ? "Arquivar este cliente?" : "Desarquivar este cliente?";
-            if(confirm(msg)) {
-                await updateDoc(doc(db, "clientes", id), { arquivado: status });
-                if(!status) document.getElementById('modal-arquivados').style.display = 'none';
-            }
-        };
-
-        window.abrirModalArquivados = () => {
-            const corpo = document.getElementById('lista-arquivados-corpo');
-            if(arquivadosRaw.length === 0) {
-                corpo.innerHTML = "<p style='color:#444;text-align:center;font-size:12px;'>Nenhum cliente arquivado.</p>";
-            } else {
-                corpo.innerHTML = arquivadosRaw.map(c => `
-                    <div style="background:#0c0c0e; padding:12px; border-radius:12px; margin-bottom:8px; border:1px solid #16161a;">
-                        <b style="text-transform:uppercase; color:#fff; font-size:13px;">${c.nome}</b><br>
-                        <span style="font-size:11px; color:#666">Painel: ${c.painel}</span>
-                        <div style="display:flex; gap:6px; margin-top:8px;">
-                            <button onclick="window.arquivarCliente('${c.id}', false)" style="background:var(--accent); color:#fff; border:none; padding:6px 10px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer;">DESARQUIVAR</button>
-                            <button onclick="window.excluirConfirmar('${c.id}')" style="background:rgba(220,38,38,0.1); color:#f87171; border:1px solid rgba(220,38,38,0.2); padding:6px 10px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer;">EXCLUIR</button>
+            document.getElementById('historico').innerHTML = transacoes.map(t => `
+                <div class="card-dark p-4 rounded-2xl flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="w-1 h-1 rounded-full ${t.tipo === 'entrada' ? 'bg-green-500' : 'bg-red-500'}"></div>
+                        <div>
+                            <p class="font-bold text-xs text-gray-200">${t.descricao}</p>
+                            <p class="text-[8px] text-gray-600 uppercase">${new Date(t.ts).toLocaleDateString()}</p>
                         </div>
                     </div>
-                `).join('');
-            }
-            document.getElementById('modal-arquivados').style.display = 'flex';
-        };
+                    <div class="flex items-center gap-4">
+                        <span class="font-bold text-xs ${t.tipo === 'entrada' ? 'text-green-500' : 'text-gray-200'}">
+                            ${oculto ? '••••' : 'R$ ' + t.valor.toFixed(2)}
+                        </span>
+                        <button onclick="excluir('${t.id}')" class="text-[10px] opacity-30">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-        window.abrirModalAdd = () => { document.getElementById('edit-id').value = ""; document.getElementById('cli-nome').value = ""; document.getElementById('cli-painel').value = ""; document.getElementById('cli-vencimento').value = ""; document.getElementById('modal-titulo').innerText = "Novo Cliente"; document.getElementById('modal-cliente').style.display = 'flex'; };
-        window.abrirModalEdit = (id, n, p, d) => { document.getElementById('edit-id').value = id; document.getElementById('cli-nome').value = n; document.getElementById('cli-painel').value = p; document.getElementById('cli-vencimento').value = d; document.getElementById('modal-titulo').innerText = "Editar Cliente"; document.getElementById('modal-cliente').style.display = 'flex'; };
-        window.fecharModal = () => document.getElementById('modal-cliente').style.display = 'none';
-        
-        window.processarCliente = async () => {
-            const id = document.getElementById('edit-id').value, n = document.getElementById('cli-nome').value, p = document.getElementById('cli-painel').value.toLowerCase().trim(), d = document.getElementById('cli-vencimento').value;
-            if(!n || !p || !d) return alert("Preencha tudo!");
-            if(id) {
-                await updateDoc(doc(db, "clientes", id), { nome: n, painel: p, data: d });
-            } else {
-                await addDoc(collection(db, "clientes"), { nome: n, painel: p, data: d, dono: logado.login, arquivado: false, pago: false });
-            }
-            window.fecharModal();
-        };
+        function renderSaldo() {
+            const el = document.getElementById('saldo-total');
+            el.innerText = oculto ? 'R$ ••••••' : `R$ ${saldoReal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        }
 
-        window.renovarConfirmar = async (id, data, painelCli) => {
-            if(confirm("Deseja renovar por mais 1 mês?")) {
-                const [a, m, d] = data.split('-').map(Number);
-                let nd = new Date(a, m, d); if (nd.getDate() != d) nd.setDate(0);
-                
-                await updateDoc(doc(db, "clientes", id), { data: nd.toISOString().split('T')[0], pago: false });
+        function toggleVisibilidade() {
+            oculto = !oculto;
+            document.getElementById('eye-icon').innerText = oculto ? '🙈' : '👁️';
+            atualizarUI();
+        }
 
-                const painelNormalizado = painelCli.toLowerCase().trim();
-                if(painelNormalizado === 'unitv' || painelNormalizado === 'uniplay') {
-                    const docRef = doc(db, "creditos", logado.login);
-                    const docSnap = await getDoc(docRef);
-                    if(docSnap.exists()){
-                        const totalAtual = docSnap.data()[painelNormalizado] || 0;
-                        if(totalAtual > 0) {
-                            const dec = {}; dec[painelNormalizado] = totalAtual - 1;
-                            await updateDoc(docRef, dec);
-                        }
-                    }
-                }
-            }
-        };
+        function abrirModal(t, id = null) {
+            tipoAt = t;
+            document.getElementById('modal-titulo').innerText = t === 'entrada' ? 'Adicionar Ganho' : 'Adicionar Gasto';
+            document.getElementById('modal').classList.remove('hidden');
+            if(!id) { document.getElementById('valor').value = ''; document.getElementById('descricao').value = ''; }
+        }
 
-        window.excluirConfirmar = async (id) => { 
-            if(confirm("Excluir cliente definitivamente?")) {
-                await deleteDoc(doc(db, "clientes", id));
-                document.getElementById('modal-arquivados').style.display = 'none';
-            } 
-        };
-        
-        window.confirmarSair = () => { localStorage.clear(); location.reload(); };
-        
-        window.filtrar = () => { 
-            const t = document.getElementById('busca').value.toLowerCase(); 
-            const filtrados = dadosRaw.filter(x => x.nome.toLowerCase().includes(t) || x.painel.toLowerCase().includes(t));
-            render(filtrados); 
-        };
+        function fecharModal() { document.getElementById('modal').classList.add('hidden'); }
+
+        function salvar() {
+            const v = parseFloat(document.getElementById('valor').value);
+            const d = document.getElementById('descricao').value || 'Geral';
+            if(!v) return;
+            transacoes.unshift({ id: Date.now(), tipo: tipoAt, valor: v, descricao: d, ts: Date.now() });
+            fecharModal(); atualizarUI();
+        }
+
+        function excluir(id) { if(confirm("Apagar?")) { transacoes = transacoes.filter(t => t.id != id); atualizarUI(); } }
+
+        atualizarUI();
     </script>
 </body>
 </html>
