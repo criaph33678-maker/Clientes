@@ -7,10 +7,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#000000">
-    <title>Gestor Business V13.22</title>
+    <title>Gestor Business V13.23</title>
     
-    <link rel="manifest" href="data:application/manifest+json,{%22display%22:%22standalone%22,%22start_url%22:%22/%22,%22name%22:%22Gestor%20Business%22,%22theme_color%22:%22#000000%22,%22background_color%22:%22#000000%22}">
-
     <style>
         :root { 
             --bg: #000; 
@@ -18,7 +16,6 @@
             --card-brd: #1f1f26; 
             --text: #fff; 
             
-            /* CORES ULTRA CHAMATIVAS PARA OS BOTÕES 3D */
             --3d-blue: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
             --3d-blue-shadow: #1e3a8a;
             
@@ -61,10 +58,22 @@
         .btn-topo-acao { flex: 1; background: var(--3d-gray); border: none; border-bottom: 3px solid var(--3d-gray-shadow); color: #fff; padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
         .btn-topo-acao:active { border-bottom-width: 1px; padding-top: 9px; padding-bottom: 7px; }
 
-        /* TELA DE LOGIN COM ADIÇÃO DE VERMELHO FORTE NEON COBRADO */
+        /* TELA DE LOGIN - VERMELHO EXTRA FORTE GARANTIDO */
         .login-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; width: 100vw; z-index: 5000; position: fixed; top: 0; left: 0; background: #000; }
-        .login-card { background: var(--card); padding: 35px 25px; border-radius: 24px; width: 85%; max-width: 290px; text-align: center; border: 3px solid #ff0033; box-shadow: 0 0 25px rgba(255, 0, 51, 0.6), inset 0 0 15px rgba(255, 0, 51, 0.2); }
-        .login-card h2 { color: #fff; font-size: 20px; font-weight: 900; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .login-card { background: var(--card); padding: 35px 25px; border-radius: 24px; width: 85%; max-width: 290px; text-align: center; border: 3px solid #ff0033; box-shadow: 0 0 25px rgba(255, 0, 51, 0.7), inset 0 0 15px rgba(255, 0, 51, 0.2); }
+        .login-card h2 { color: #fff; font-size: 20px; font-weight: 900; margin-top: 0; margin-bottom: 20px; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         .login-card input[type="text"], .login-card input[type="password"] { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #2d2d3a; background: #000; color: #fff; box-sizing: border-box; margin-bottom: 12px; outline: none; font-size: 15px; font-weight: 600; }
         .remember-box { display: flex; align-items: center; gap: 8px; color: #999; font-size: 13px; margin-bottom: 22px; cursor: pointer; justify-content: flex-start; width: 100%; font-weight: 600; }
-        .remember-box input { accent-color: #ff
+        .remember-box input { accent-color: #ff0033; width: 18px; height: 18px; }
+        
+        .btn-login-3d { background: var(--3d-danger); border: none; border-bottom: 4px solid var(--3d-danger-shadow); color: #fff; width: 100%; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 14px; letter-spacing: 0.5px; cursor: pointer; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .btn-login-3d:active { border-bottom-width: 1px; padding-top: 14px; padding-bottom: 10px; }
+
+        /* CONTAINER DE ROLAGEM */
+        .conteudo-rolavel { position: absolute; top: calc(250px + env(safe-area-inset-top)); bottom: 0; left: 0; right: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 15px 40px 15px; box-sizing: border-box; }
+        
+        /* SEÇÃO DO MURAL COM BOTÃO AZUL DESTACADO */
+        .secao-mural { padding: 15px 0 5px 0; }
+        .mural-header-toggle { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; }
+        
+        .btn-add-mural { background: var(--3d-blue); border: none; border-bottom: 3px solid var(--3d-blue-shadow); color: #fff; font-size: 12px; text-transform: uppercase; font-weight: 800; cursor: pointer; padding:
