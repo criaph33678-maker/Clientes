@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
+    <title>Gestor Business V13.25</title>
+    
+    <style>
+        :root { 
+            --bg: #000; 
+            --card: #0d0d11; 
+            --card-brd: #1f1f26; 
+            --text: #fff; 
+            
+            --3d-blue: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+            --3d-blue-shadow: #1e3a8a;
+            
+            --3d-green: linear-gradient(180deg, #22c55e 0%, #15803d 100%);
+            --3d-green-shadow: #14532d;
+            
+            --3d-pago: linear-gradient(180deg, #06b6d4 0%, #0369a1 100%);
+            --3d-pago-shadow: #0c4a6e;
+            
+            --3d-purple: linear-gradient(180deg, #a855f7 0%, #6b21a8 100%);
+            --3d-purple-shadow: #4c1d95;
+            
+            --3d-danger: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+            --3d-danger-shadow: #7f1d1d;
+
+            --3d-gray: linear-gradient(180deg, #4b5563 0%, #1f2937 100%);
+            --3d-gray-shadow: #111827;
+        }
+        
+        body { font-family: -apple-system, system-ui, sans-serif; background-color: #000; color: #fff; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+        /* TELA DE LOGIN */
+        .login-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; width: 100vw; background: #000; box-sizing: border-box; padding: 20px; }
+        .login-card { background: var(--card); padding: 35px 25px; border-radius: 24px; width: 100%; max-width: 290px; text-align: center; border: 3px solid #ff0033; box-shadow: 0 0 25px rgba(255, 0, 51, 0.7), inset 0 0 15px rgba(255, 0, 51, 0.2); box-sizing: border-box; }
+        .login-card h2 { color: #fff; font-size: 20px; font-weight: 900; margin-top: 0; margin-bottom: 20px; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .login-card input[type="text"], .login-card input[type="password"] { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #2d2d3a; background: #000; color: #fff; box-sizing: border-box; margin-bottom: 12px; outline: none; font-size: 15px; font-weight: 600; }
+        .remember-box { display: flex; align-items: center; gap: 8px; color: #999; font-size: 13px; margin-bottom: 22px; cursor: pointer; justify-content: flex-start; width: 100%; font-weight: 600; }
+        .remember-box input { accent-color: #ff0033; width: 18px; height: 18px; }
+        
+        .btn-login-3d { background: var(--3d-danger); border: none; border-bottom: 4px solid var(--3d-danger-shadow); color: #fff; width: 100%; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 14px; letter-spacing: 0.5px; cursor: pointer; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .btn-login-3d:active { border-bottom-width: 1px; padding-top: 14px; padding-bottom: 10px; }
+
+        /* ESTRUTURA DO APP (SÓ APARECE APÓS LOGIN) */
+        #app { display: none; position: relative; height: 100vh; width: 100vw; overflow: hidden; }
+
+        /* HEADER FIXO - BARRA NO INÍCIO */
+        .header-fixo { position: fixed; top: 0; left: 0; right: 0; background: #000; padding: 12px 15px; padding-top: env(safe-area-inset-top); z-index: 1000; border-bottom: 1px solid var(--card-brd); box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; }
+        
+        /* BUSCA NO INÍCIO */
+        .busca-container { background: #16161f; display: flex; align-items: center; padding: 10px 14px; border-radius: 12px; border: 1px solid #2d2d3d; }
+        .busca-container input { background: none; border: none; color: #fff; flex: 1; outline: none; font-size: 14px; font-weight: 600; }
+        
+        .stats-topo { font-size: 11px; color: #aaa; font-weight: 700; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+        
+        .creditos-topo { display: flex; gap: 12px; background: #111116; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--card-brd); font-size: 12px; font-weight: 700; color: #bbb; }
+        .credito-item { cursor: pointer; }
+        .credito-item span { color: #38bdf8; font-weight: 800; text-shadow: 0 0 5px rgba(56,189,248,0.4); }
+
+        /* BOTÃO ADICIONAR CLIENTE 3D */
+        .btn-novo-cliente-topo { background: var(--3d-blue); border: none; border-bottom: 3px solid var(--3d-blue-shadow); color: white; width: 100%; padding: 11px; border-radius: 12px; font-weight: 800; font-size: 13px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+        .btn-novo-cliente-topo:active { border-bottom-width: 1px; margin-top: 2px; margin-bottom: -2px; }
+        
+        .botoes-topo-flex { display: flex; gap: 6px; }
+        .btn-topo-acao { flex: 1; background: var(--3d-gray); border: none; border-bottom: 3px solid var(--3d-gray-shadow); color: #fff; padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        .btn-topo-acao:active { border-bottom-width: 1px; padding-top: 9px; padding-bottom: 7px; }
+
+        /* CONTAINER DE ROLAGEM */
+        .conteudo-rolavel { position: absolute; top: calc(250px + env(safe-area-inset-top)); bottom: 0; left: 0; right: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 15px 40px 15px; box-sizing: border-box; }
+        
+        /* SEÇÃO DO MURAL COM BOTÃO AZUL DESTACADO */
+        .secao-mural { padding: 15px 0 5px 0; }
+        .mural-header-toggle { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; }
+        
+        .btn-add-mural { background: var(--3d-blue); border: none; border-bottom: 3px solid var(--3d-blue-shadow); color: #fff; font-size: 12px; text-transform: uppercase; font-weight: 800; cursor: pointer; padding: 10px 14px; border-radius: 10px; flex: 1; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        .btn-add-mural:active { border-bottom-width: 1px; margin-top: 2px; margin-bottom: -2px; }
+        
+        .btn-toggle-mural { background: var(--3d-gray); border: none; border-bottom: 3px solid var(--3d-gray-shadow); color: #bbb; font-size: 11px; font-weight: 800; text-transform: uppercase; padding: 10px 14px; border-radius: 10px; cursor: pointer; }
+        .btn-toggle-mural:active { border-bottom-width: 1px; margin-top: 2px; margin-bottom: -2px; }
+        
+        .card-aviso { background: var(--card); padding: 12px; border-radius: 12px; margin-bottom: 6px; font-size: 13px; font-weight: 600; border-left: 5px solid #2563eb; color: #eee; cursor: pointer; border-top: 1px solid var(--card-brd); border-right: 1px solid var(--card-brd); border-bottom: 1px solid var(--card-brd); }
+
+        /* CARDS DOS CLIENTES */
+        .card-cliente { background: var(--card); border: 1px solid var(--card-brd); border-radius: 20px; padding: 16px; margin-bottom: 14px; position: relative; box-shadow: 0 6px 16px rgba(0,0,0,0.5); }
+        .card-cliente h3 { margin: 0 0 6px 0; font-size: 16px; font-weight: 800; text-transform: uppercase; display: flex; align-items: center; gap: 6px; width: 65%; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .info-p { font-size: 12px; color: #a1a1aa; margin: 4px 0; font-weight: 500; }
+        .info-p b { color: #fff; }
+        
+        .container-badges { position: absolute; top: 16px; right: 16px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+        .selo-pago { background: #15803d; color: #fff; font-size: 9px; font-weight: 900; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        
+        .status-vencimento { font-size: 9px; font-weight: 900; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; text-shadow: 0 1px 1px rgba(0,0,0,0.3); }
+        .status-vencimento.em-dia { background: #16a34a; color: #fff; }
+        .status-vencimento.vence-logo { background: #ca8a04; color: #fff; }
+        .status-vencimento.vencido { background: #dc2626; color: #fff; box-shadow: 0 0 8px rgba(220,38,38,0.5); }
+
+        /* BOTÕES EM CORES RESSALTADAS E MODELO 3D */
+        .grid-botoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn-card { padding: 11px 10px; border-radius: 10px; border: none; font-weight: 900; font-size: 11px; text-transform: uppercase; cursor: pointer; letter-spacing: 0.5px; text-align: center; text-shadow: 0 1px 2px rgba(0,0,0,0.6); box-shadow: 0 3px 6px rgba(0,0,0,0.4); }
+        
+        .btn-renovar { background: var(--3d-green); border-bottom: 3.5px solid var(--3d-green-shadow); color: #fff; }
+        .btn-editar { background: var(--3d-gray); border-bottom: 3.5px solid var(--3d-gray-shadow); color: #fff; }
+        .btn-pago { background: var(--3d-pago); border-bottom: 3.5px solid var(--3d-pago-shadow); color: #fff; }
+        .btn-arquivar { background: var(--3d-purple); border-bottom: 3.5px solid var(--3d-purple-shadow); color: #fff; }
+        .btn-excluir { background: var(--3d-danger); border-bottom: 3.5px solid var(--3d-danger-shadow); color: #fff; grid-column: span 2; margin-top: 4px; padding: 9px; font-size: 10px; }
+
+        .btn-card:active { border-bottom-width: 1px; padding-top: 13px; padding-bottom: 8.5px; transform: translateY(2.5px); box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .btn-excluir:active { padding-top: 11px; padding-bottom: 6.5px; }
+
+        /* MODAIS */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); z-index: 2000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
+        .modal-content { background: var(--card); width: 100%; max-width: 360px; padding: 22px; border-radius: 20px; border: 2px solid var(--card-brd); text-align: center; max-height: 80vh; overflow-y: auto; }
+        .modal-content input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid var(--card-brd); background: #000; color: #fff; box-sizing: border-box; font-size: 14px; outline: none; }
+        
+        .btn-acao-modal { background: var(--3d-blue); border: none; border-bottom: 3px solid var(--3d-blue-shadow); color: #fff; width: 100%; padding: 12px; border-radius: 10px; font-weight: 800; margin-top: 12px; cursor: pointer; font-size: 13px; text-transform: uppercase; }
+        .btn-acao-modal:active { border-bottom-width: 1px; padding-top: 14px; padding-bottom: 10px; }
+
+        .btn-sair { position: fixed; top: 12px; right: 15px; background: none; border: none; color: #666; font-size: 11px; z-index: 6000; font-weight: 900; cursor: pointer; display: none; }
+        .oculto-click { cursor: pointer; margin-left: 5px; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <button id="btn-sair-global" class="btn-sair" onclick="confirmarSair()">SAIR</button>
+
+    <div id="tela-login" class="login-container">
+        <div class="login-card">
+            <h2>GESTOR BUSINESS</h2>
+            <input type="text" id="u" placeholder="Usuário">
+            <input type="password" id="p" placeholder="Senha">
+            <label class="remember-box"><input type="checkbox" id="remember"> Lembrar meu acesso</label>
+            <button class="btn-login-3d" onclick="window.logar()">ACESSAR CONTA</button>
+        </div>
+    </div>
+
+    <div id="modal-cliente" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-titulo" style="margin-top:0; font-size:17px; font-weight:800;">Novo Cliente</h2>
+            <input type="hidden" id="edit-id">
+            <input type="text" id="cli-nome" placeholder="Nome do Cliente">
+            <input type="text" id="cli-painel" placeholder="Nome do Painel (Ex: unitv, uniplay)">
+            <input type="date" id="cli-vencimento">
+            <button id="btn-salvar" class="btn-acao-modal" onclick="window.processarCliente()">SALVAR DADOS</button>
+            <button onclick="window.fecharModal()" style="background:none; border:none; color:#777; margin-top:14px; font-weight:800; font-size:12px; cursor:pointer; text-transform:uppercase;">CANCELAR</button>
+        </div>
+    </div>
+
+    <div id="modal-arquivados" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-top:0; font-size:17px; font-weight:800;">Clientes Arquivados</h2>
+            <div id="lista-arquivados-corpo" style="text-align:left; margin-top:12px;"></div>
+            <button onclick="document.getElementById('modal-arquivados').style.display='none'" class="btn-acao-modal" style="background:var(--3d-gray); border-bottom-color:var(--3d-gray-shadow); color:#fff; font-size:11px;">FECHAR JANELA</button>
+        </div>
+    </div>
+
+    <div id="app">
+        <header class="header-fixo">
+            <div class="busca-container">
+                <input type="text" id="busca" placeholder="Buscar cliente ou painel..." oninput="window.filtrar()">
+            </div>
+
+            <div class="stats-topo">
+                <span id="contagem"></span>
+                <span id="btn-ocultar-olho" class="oculto-click" onclick="window.toggleOcultarStatus()">👁️</span>
+            </div>
+            
+            <div class="creditos-topo">
+                <div class="credito-item" onclick="window.editarCredito('unitv')">UniTV: <span id="cred-unitv">0</span> cd.</div>
+                <div class="credito-item" onclick="window.editarCredito('uniplay')">UniPlay: <span id="cred-uniplay">0</span> cd.</div>
+            </div>
+
+            <button class="btn-novo-cliente-topo" onclick="window.abrirModalAdd()">+ Adicionar Cliente</button>
+            
+            <div class="botoes-topo-flex">
+                <button class="btn-topo-acao" id="btn-aba-arquivados" onclick="window.abrirModalArquivados()">Arquivados (0)</button>
+            </div>
+        </header>
+
+        <div class="conteudo-rolavel">
+            <section class="secao-mural">
+                <div class="mural-header-toggle">
+                    <button class="btn-add-mural" onclick="window.muralAcao('add')">+ Nota no Mural</button>
+                    <button class="btn-toggle-mural" id="btn-hide-mural" onclick="window.toggleMuralVisivel()">Ocultar Mural</button>
+                </div>
+                <div id="wrapper-mural-retratil">
+                    <div id="lista-mural"></div>
+                </div>
+            </section>
+
+            <section class="lista-clientes" id="lista-corpo"></section>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, where, getDocs, orderBy, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMQbFBbbKFABCwwTxuESpXsz_Knz-V4FI",
+            authDomain: "meu-gestor-a7d13.firebaseapp.com",
+            projectId: "meu-gestor-a7d13",
+            storageBucket: "meu-gestor-a7d13.firebasestorage.app",
+            messagingSenderId: "1019995087685",
+            appId: "1:1019995087685:web:a063af65a4b7f234b4542c"
+        };
+
+        let app, db;
+        let dadosRaw = [];
+        let arquivadosRaw = [];
+        let logado = null;
+        let ocultarValores = false;
+        let muralOculto = false;
+
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+        } catch (e) {
+            alert("Erro Firebase: " + e.message);
+        }
+
+        window.onload = () => {
+            const savedU = localStorage.getItem('gestor_u'), savedP = localStorage.getItem('gestor_p');
+            if(savedU && savedP) { 
+                document.getElementById('u').value = savedU; 
+                document.getElementById('p').value = savedP; 
+                document.getElementById('remember').checked = true; 
+                window.logar(); 
+            }
+            if(localStorage.getItem('mural_oculto') === 'true') {
+                muralOculto = true;
+                const el = document.getElementById('wrapper-mural-retratil');
+                if(el) el.style.display = 'none';
+                const btn = document.getElementById('btn-hide-mural');
+                if(btn) btn.innerText = "Exibir Mural";
+            }
+        };
+
+        window.logar = async () => {
+            try {
+                const login = document.getElementById('u').value.toLowerCase().trim(), pass = document.getElementById('p').value;
+                if(!login || !pass) return alert("Preencha o login e senha!");
+                
+                const q = query(collection(db, "usuarios"), where("login", "==", login), where("senha", "==", pass));
+                const snap = await getDocs(q);
+                
+                if(!snap.empty) { 
+                    logado = snap.docs[0].data();
+                    if(document.getElementById('remember').checked) { 
+                        localStorage.setItem('gestor_u', login); 
+                        localStorage.setItem('gestor_p', pass); 
+                    }
+                    document.getElementById('tela-login').style.display = 'none';
+                    document.getElementById('btn-sair-global').style.display = 'block';
+                    document.getElementById('app').style.display = 'block';
+                    carregarDados();
+                } else { 
+                    alert("Login ou senha incorretos!"); 
+                }
+            } catch (error) {
+                alert("Erro ao conectar Banco: " + error.message);
+            }
+        };
+
+        function carregarDados() {
+            const qC = (logado.login === 'admin') ? query(collection(db, "clientes"), orderBy("data", "asc")) : query(collection(db, "clientes"), where("dono", "==", logado.login), orderBy("data", "asc"));
+            onSnapshot(qC, (snap) => {
+                let temp = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                let filtradoDono = (logado.login === 'admin') ? temp.filter(c => !c.dono || c.dono === 'admin') : temp;
+                dadosRaw = filtradoDono.filter(c => !c.arquivado);
+                arquivadosRaw = filtradoDono.filter(c => c.arquivado === true);
+                
+                atualizarContadores();
+                render(dadosRaw);
+            });
+
+            onSnapshot(doc(db, "creditos", logado.login), (docSnap) => {
+                if(docSnap.exists()){
+                    const data = docSnap.data();
+                    const u = document.getElementById('cred-unitv');
+                    const p = document.getElementById('cred-uniplay');
+                    if(u) u.innerText = data.unitv || 0;
+                    if(p) p.innerText = data.uniplay || 0;
+                } else {
+                    setDoc(doc(db, "creditos", logado.login), { unitv: 0, uniplay: 0 });
+                }
+            });
+
+            const colMural = logado.login === 'admin' ? "avisos" : "lembretes_privados";
+            const qM = (logado.login === 'admin') ? query(collection(db, "avisos"), orderBy("criadoEm", "desc")) : query(collection(db, "lembretes_privados"), where("usuarioId", "==", logado.login), orderBy("criadoEm", "desc"));
+            onSnapshot(qM, (snap) => {
+                const lm = document.getElementById('lista-mural');
+                if(lm) {
+                    lm.innerHTML = snap.docs.map(d => `
+                        <div class="card-aviso" onclick="window.muralAcao('edit', '${d.id}', '${d.data().texto || d.data().textoAviso}')">📢 ${d.data().texto || d.data().textoAviso}</div>
+                    `).join('');
+                }
+            });
+        }
+
+        window.toggleMuralVisivel = () => {
+            muralOculto = !muralOculto;
+            document.getElementById('wrapper-mural-retratil').style.display = muralOculto ? 'none' : 'block';
+            document.getElementById('btn-hide-mural').innerText = muralOculto ? "Exibir Mural" : "Ocultar Mural";
+            localStorage.setItem('mural_oculto', muralOculto);
+        };
+
+        window.toggleOcultarStatus = () => {
+            ocultarValores = !ocultarValores;
+            document.getElementById('btn-ocultar-olho').innerText = ocultarValores ? "🙈" : "👁️";
+            atualizarContadores();
+        };
+
+        function atualizarContadores() {
+            const btnArq = document.getElementById('btn-aba-arquivados');
+            if(btnArq) btnArq.innerText = `Arquivados (${arquivadosRaw.length})`;
+            
+            const contElement = document.getElementById('contagem');
+            if(!contElement) return;
+
+            if(ocultarValores) {
+                contElement.innerHTML = "Dados ocultados!";
+                return;
+            }
+            const contPaineis = {};
+            dadosRaw.forEach(c => contPaineis[c.painel] = (contPaineis[c.painel] || 0) + 1);
+            let htmlS = ""; for (const p in contPaineis) htmlS += `${p}: <b>${contPaineis[p]}</b> | `;
+            contElement.innerHTML = htmlS + `Total: <b>${dadosRaw.length}</b>`;
+        }
+
+        window.editarCredito = async (painel) => {
+            const adminCheck = prompt("Senha Master para Alterar Créditos:");
+            if(adminCheck !== "2024") return alert("Senha incorreta!");
+            
+            const el = document.getElementById(`cred-${painel}`);
+            const atual = el ? (parseInt(el.innerText) || 0) : 0;
+            const novo = prompt(`Digite a nova quantidade de créditos para ${painel.toUpperCase()}:`, atual);
+            if(novo !== null && !isNaN(novo)) {
+                const obj = {}; obj[painel] = parseInt(novo);
+                await updateDoc(doc(db, "creditos", logado.login), obj);
+            }
+        };
+
+        window.muralAcao = async (tipo, id, textoAntigo) => {
+            const col = logado.login === 'admin' ? "avisos" : "lembretes_privados";
+            if(tipo === 'add') {
+                const t = prompt("Nova anotação:");
+                if(t) await addDoc(collection(db, col), logado.login === 'admin' ? { textoAviso: t, criadoEm: Date.now() } : { texto: t, usuarioId: logado.login, criadoEm: Date.now() });
+            } else {
+                const acao = confirm("Deseja EXCLUIR? (Cancele para EDITAR)");
+                if(acao) { if(confirm("Apagar nota?")) await deleteDoc(doc(db, col, id)); }
+                else {
+                    const nt = prompt("Editar nota:", textoAntigo);
+                    if(nt && nt !== textoAntigo) await updateDoc(doc(db, col, id), logado.login === 'admin' ? { textoAviso: nt } : { texto: nt });
+                }
+            }
+        };
+
+        function render(lista) {
+            const hoje = new Date(); hoje.setHours(0,0,0,0);
+            const lc = document.getElementById('lista-corpo');
+            if(!lc) return;
+
+            lc.innerHTML = lista.map(c => {
+                const [ano, mes, dia] = c.data.split('-');
+                const v = new Date(ano, mes - 1, dia, 23, 59, 59);
+                const diff = Math.ceil((v - hoje) / 86400000);
+                
+                let classeSelo = "em-dia", textoSelo = "Em Dia";
+                if (diff <= 0) {
+                    classeSelo = "vencido";
+                    textoSelo = "Vencido";
+                } else if (diff <= 3) {
+                    classeSelo = "vence-logo";
+                    textoSelo = "Próx. Vencimento";
+                }
+
+                const seloPago = c.pago ? `<span class="selo-pago">✓ Pago</span>` : '';
+                
+                return `
+                <div class="card-cliente">
+                    <h3><span>${c.nome}</span></h3>
+                    
+                    <div class="container-badges">
+                        <span class="status-vencimento ${classeSelo}">${textoSelo}</span>
+                        ${seloPago}
+                    </div>
+
+                    <p class="info-p">Painel: <b>${c.painel}</b> | Expira: <b>${dia}/${mes}/${ano}</b></p>
+                    <div class="grid-botoes">
+                        <button class="btn-card btn-renovar" onclick="window.renovarConfirmar('${c.id}', '${c.data}', '${c.painel}')">RENOVAR</button>
+                        <button class="btn-card btn-editar" onclick="window.abrirModalEdit('${c.id}','${c.nome}','${c.painel}','${c.data}')">EDITAR</button>
+                        <button class="btn-card btn-pago" onclick="window.marcarPago('${c.id}', ${c.pago || false})">PAGO</button>
+                        <button class="btn-card btn-arquivar" onclick="window.arquivarCliente('${c.id}', true)">ARQUIVAR</button>
+                        <button class="btn-card btn-excluir" onclick="window.excluirConfirmar('${c.id}')">EXCLUIR CLIENTE</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        window.marcarPago = async (id, statusAtual) => {
+            await updateDoc(doc(db, "clientes", id), { pago: !statusAtual });
+        };
+
+        window.arquivarCliente = async (id, status) => {
+            const msg = status ? "Arquivar este cliente?" : "Desarquivar este cliente?";
+            if(confirm(msg)) {
+                await updateDoc(doc(db, "clientes", id), { arquivado: status });
+                if(!status) document.getElementById('modal-arquivados').style.display = 'none';
+            }
+        };
+
+        window.abrirModalArquivados = () => {
+            const corpo = document.getElementById('lista-arquivados-corpo');
+            if(!corpo) return;
+            if(arquivadosRaw.length === 0) {
+                corpo.innerHTML = "<p style='color:#666;text-align:center;font-size:13px;font-weight:bold;'>Nenhum cliente arquivado.</p>";
+            } else {
+                corpo.innerHTML = arquivadosRaw.map(c => `
+                    <div style="background:#16161f; padding:14px; border-radius:14px; margin-bottom:8px; border:1px solid #2d2d3d;">
+                        <b style="text-transform:uppercase; color:#fff; font-size:14px;">${c.nome}</b><br>
+                        <span style="font-size:12px; color:#aaa">Painel: ${c.painel}</span>
+                        <div style="display:flex; gap:8px; margin-top:10px;">
+                            <button onclick="window.arquivarCliente('${c.id}', false)" style="background:var(--3d-blue); border:none; border-bottom:3px solid var(--3d-blue-shadow); color:#fff; padding:8px 12px; border-radius:8px; font-size:11px; font-weight:900; cursor:pointer;">DESARQUIVAR</button>
+                            <button onclick="window.excluirConfirmar('${c.id}')" style="background:var(--3d-danger); border:none; border-bottom:3px solid var(--3d-danger-shadow); color:#fff; padding:8px 12px; border-radius:8px; font-size:11px; font-weight:900; cursor:pointer;">EXCLUIR</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('modal-arquivados').style.display = 'flex';
+        };
+
+        window.abrirModalAdd = () => { document.getElementById('edit-id').value = ""; document.getElementById('cli-nome').value = ""; document.getElementById('cli-painel').value = ""; document.getElementById('cli-vencimento').value = ""; document.getElementById('modal-titulo').innerText = "Novo Cliente"; document.getElementById('modal-cliente').style.display = 'flex'; };
+        window.abrirModalEdit = (id, n, p, d) => { document.getElementById('edit-id').value = id; document.getElementById('cli-nome').value = n; document.getElementById('cli-painel').value = p; document.getElementById('cli-vencimento').value = d; document.getElementById('modal-titulo').innerText = "Editar Cliente"; document.getElementById('modal-cliente').style.display = 'flex'; };
+        window.fecharModal = () => document.getElementById('modal-cliente').style.display = 'none';
+        
+        window.processarCliente = async () => {
+            const id = document.getElementById('edit-id').value, n = document.getElementById('cli-nome').value, p = document.getElementById('cli-painel').value.toLowerCase().trim(), d = document.getElementById('cli-vencimento').value;
+            if(!n || !p || !d) return alert("Preencha tudo!");
+            if(id) {
+                await updateDoc(doc(db, "clientes", id), { nome: n, painel: p, data: d });
+            } else {
+                await addDoc(collection(db, "clientes"), { nome: n, painel: p, data: d, dono: logado.login, arquivado: false, pago: false });
+            }
+            window.fecharModal();
+        };
+
+        window.renovarConfirmar = async (id, data, painelCli) => {
+            if(confirm("Deseja renovar por mais 1 mês?")) {
+                const [a, m, d] = data.split('-').map(Number);
+                let nd = new Date(a, m, d); if (nd.getDate() != d) nd.setDate(0);
+                
+                await updateDoc(doc(db, "clientes", id), { data: nd.toISOString().split('T')[0], pago: false });
+
+                const painelNormalizado = painelCli.toLowerCase().trim();
+                if(painelNormalizado === 'unitv' || painelNormalizado === 'uniplay') {
+                    const docRef = doc(db, "creditos", logado.login);
+                    const docSnap = await getDoc(docRef);
+                    if(docSnap.exists()){
+                        const totalAtual = docSnap.data()[painelNormalizado] || 0;
+                        if(totalAtual > 0) {
+                            const dec = {}; dec[painelNormalizado] = totalAtual - 1;
+                            await updateDoc(docRef, dec);
+                        }
+                    }
+                }
+            }
+        };
+
+        window.excluirConfirmar = async (id) => { 
+            if(confirm("Excluir cliente definitivamente?")) {
+                await deleteDoc(doc(db, "clientes", id));
+                document.getElementById('modal-arquivados').style.display = 'none';
+            } 
+        };
+        
+        window.confirmarSair = () => { localStorage.clear(); location.reload(); };
+        
+        window.filtrar = () => { 
+            const t = document.getElementById('busca').value.toLowerCase(); 
+            const filtrados = dadosRaw.filter(x => x.nome.toLowerCase().includes(t) || x.painel.toLowerCase().includes(t));
+            render(filtrados); 
+        };
+    </script>
+</body>
+</html>
