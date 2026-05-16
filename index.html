@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#000000">
-    <title>Gestor Business V13.27</title>
+    <title>Gestor Business V13.28</title>
     
     <style>
         :root { 
@@ -35,14 +35,17 @@
         .btn-login-3d { background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); border: none; border-bottom: 4px solid #7f1d1d; color: #fff; width: 100%; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 14px; letter-spacing: 0.5px; cursor: pointer; }
 
         /* ESTRUTURA DO APP */
-        #app { display: none; height: 100vh; width: 100vw; display: flex; flex-direction: column; background: #000000; }
+        #app { display: none; height: 100vh; width: 100vw; flex-direction: column; background: #000000; }
 
-        /* HEADER FIXO QUE COBRE TODO O TOPO INDESLOCÁVEL */
-        .header-fixo { position: shrink; background: #000000; padding: 15px; padding-top: env(safe-area-inset-top); z-index: 4000; border-bottom: 1px solid var(--card-brd); box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        /* HEADER FIXO NO TOPO */
+        .header-fixo { background: #000000; padding: 15px; padding-top: env(safe-area-inset-top); z-index: 4000; border-bottom: 1px solid var(--card-brd); box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; width: 100%; }
         
-        .busca-container { background: #0d0d11; display: flex; align-items: center; padding: 12px 14px; border-radius: 14px; border: 1px solid #2d2d3d; }
+        /* LINHA DA BUSCA COM BOTÃO SAIR INTEGRADO COERENTE COM O PRINT */
+        .busca-container { background: #0d0d11; display: flex; align-items: center; padding: 12px 14px; border-radius: 14px; border: 1px solid #2d2d3d; gap: 10px; }
         .busca-container input { background: none; border: none; color: #fff; flex: 1; outline: none; font-size: 14px; font-weight: 600; }
         
+        .btn-sair-input { background: none; border: none; color: #ff4444; font-size: 12px; font-weight: 800; cursor: pointer; padding: 4px 8px; letter-spacing: 0.5px; text-transform: uppercase; }
+
         .stats-topo { font-size: 12px; color: #aaa; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
         
         .creditos-topo { display: flex; gap: 12px; background: #0d0d11; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--card-brd); font-size: 12px; font-weight: 700; color: #bbb; }
@@ -61,20 +64,19 @@
         #wrapper-mural-retratil { max-height: 110px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         .card-aviso { background: var(--card); padding: 10px; border-radius: 10px; margin-bottom: 6px; font-size: 12px; font-weight: 600; border-left: 5px solid #2563eb; color: #eee; border-top: 1px solid var(--card-brd); border-right: 1px solid var(--card-brd); border-bottom: 1px solid var(--card-brd); }
 
-        /* CONTEÚDO ROLÁVEL ABAIXO DO TOPO FIXO SEM ESCONDER CARTÕES */
+        /* CONTEÚDO ROLÁVEL ABAIXO DO TOPO FIXO */
         .conteudo-rolavel { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 15px; box-sizing: border-box; background: #000000; }
         
         /* CARDS DOS CLIENTES ESTILO FOTO */
         .card-cliente { background: #0c0c0e; border: 1px solid #1c1c24; border-radius: 18px; padding: 16px; margin-bottom: 14px; position: relative; box-sizing: border-box; display: flex; flex-direction: column; }
         
-        /* BORDA NEON VERMELHA CASO ESTEJA VENCIDO */
+        /* BORDA NEON VERMELHA SE ESTIVER VENCIDO */
         .card-cliente.vencido-border { border: 1px solid rgba(239, 68, 68, 0.8) !important; box-shadow: 0 0 12px rgba(239, 68, 68, 0.25); }
         
         .card-cliente h3 { margin: 0 0 4px 0; font-size: 18px; font-weight: 800; text-transform: uppercase; color: #fff; width: 65%; letter-spacing: 0.3px; }
         .info-p { font-size: 13px; color: #7e7e86; margin: 4px 0; font-weight: 600; }
         .info-p b { color: #d1d1d6; }
         
-        /* DIVISOR DO CARD */
         .card-linha { height: 1px; background: #1c1c24; margin: 16px 0 12px 0; border: none; width: 100%; }
 
         .container-badges { position: absolute; top: 16px; right: 16px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
@@ -90,7 +92,6 @@
         
         .btn-icone { width: 42px; height: 42px; border-radius: 12px; border: 1px solid transparent; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; padding: 0; box-sizing: border-box; }
         
-        /* Cores e Neons individuais baseados na foto */
         .btn-i-renovar { border-color: rgba(168, 85, 247, 0.4); background: rgba(168, 85, 247, 0.05); box-shadow: 0 0 8px rgba(168, 85, 247, 0.15); }
         .btn-i-editar { border-color: rgba(234, 179, 8, 0.4); background: rgba(234, 179, 8, 0.05); box-shadow: 0 0 8px rgba(234, 179, 8, 0.15); }
         .btn-i-pago { border-color: rgba(34, 197, 94, 0.4); background: rgba(34, 197, 94, 0.05); box-shadow: 0 0 8px rgba(34, 197, 94, 0.15); }
@@ -112,13 +113,9 @@
         .modal-content input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid var(--card-brd); background: #000; color: #fff; box-sizing: border-box; font-size: 14px; outline: none; }
         
         .btn-acao-modal { background: var(--3d-blue); border: none; border-bottom: 3px solid var(--3d-blue-shadow); color: #fff; width: 100%; padding: 12px; border-radius: 10px; font-weight: 800; margin-top: 12px; cursor: pointer; text-transform: uppercase; }
-
-        .btn-sair { position: fixed; top: 15px; right: 15px; background: none; border: none; color: #555; font-size: 11px; z-index: 8000; font-weight: 900; cursor: pointer; display: none; letter-spacing: 1px; }
     </style>
 </head>
 <body>
-
-    <button id="btn-sair-global" class="btn-sair" onclick="confirmarSair()">SAIR</button>
 
     <div id="tela-login" class="login-container">
         <div class="login-card">
@@ -154,6 +151,7 @@
         <header class="header-fixo">
             <div class="busca-container">
                 <input type="text" id="busca" placeholder="Buscar cliente ou painel..." oninput="window.filtrar()">
+                <button class="btn-sair-input" onclick="window.confirmarSair()">SAIR</button>
             </div>
 
             <div class="stats-topo">
@@ -247,7 +245,6 @@
                         localStorage.setItem('gestor_p', pass); 
                     }
                     document.getElementById('tela-login').style.display = 'none';
-                    document.getElementById('btn-sair-global').style.display = 'block';
                     document.getElementById('app').style.display = 'flex';
                     carregarDados();
                 } else { 
@@ -302,4 +299,199 @@
         };
 
         window.toggleOcultarStatus = () => {
-            oc
+            ocultarValores = !ocultarValores;
+            document.getElementById('btn-ocultar-olho').innerText = ocultarValores ? "🙈" : "👁️";
+            atualizarContadores();
+        };
+
+        function atualizarContadores() {
+            const btnArq = document.getElementById('btn-aba-arquivados');
+            if(btnArq) btnArq.innerText = `Arquivados (${arquivadosRaw.length})`;
+            
+            const contElement = document.getElementById('contagem');
+            if(!contElement) return;
+
+            if(ocultarValores) {
+                contElement.innerHTML = "Dados ocultados!";
+                return;
+            }
+            const contPaineis = {};
+            dadosRaw.forEach(c => contPaineis[c.painel] = (contPaineis[c.painel] || 0) + 1);
+            let htmlS = ""; for (const p in contPaineis) htmlS += `${p}: <b>${contPaineis[p]}</b> | `;
+            contElement.innerHTML = htmlS + `Total: <b>${dadosRaw.length}</b>`;
+        }
+
+        window.editarCredito = async (painel) => {
+            const adminCheck = prompt("Senha Master para Alterar Créditos:");
+            if(adminCheck !== "2024") return alert("Senha incorreta!");
+            
+            const el = document.getElementById(`cred-${painel}`);
+            const atual = el ? (parseInt(el.innerText) || 0) : 0;
+            const novo = prompt(`Digite a nova quantidade de créditos para ${painel.toUpperCase()}:`, atual);
+            if(novo !== null && !isNaN(novo)) {
+                const obj = {}; obj[painel] = parseInt(novo);
+                await updateDoc(doc(db, "creditos", logado.login), obj);
+            }
+        };
+
+        window.muralAcao = async (tipo, id, textoAntigo) => {
+            const col = logado.login === 'admin' ? "avisos" : "lembretes_privados";
+            if(tipo === 'add') {
+                const t = prompt("Nova anotação:");
+                if(t) await addDoc(collection(db, col), logado.login === 'admin' ? { textoAviso: t, criadoEm: Date.now() } : { texto: t, usuarioId: logado.login, criadoEm: Date.now() });
+            } else {
+                const acao = confirm("Deseja EXCLUIR? (Cancele para EDITAR)");
+                if(acao) { if(confirm("Apagar nota?")) await deleteDoc(doc(db, col, id)); }
+                else {
+                    const nt = prompt("Editar nota:", textoAntigo);
+                    if(nt && nt !== textoAntigo) await updateDoc(doc(db, col, id), logado.login === 'admin' ? { textoAviso: nt } : { texto: nt });
+                }
+            }
+        };
+
+        function render(lista) {
+            const hoje = new Date(); hoje.setHours(0,0,0,0);
+            const lc = document.getElementById('lista-corpo');
+            if(!lc) return;
+
+            lc.innerHTML = lista.map(c => {
+                const [ano, mes, dia] = c.data.split('-');
+                const v = new Date(ano, mes - 1, dia, 23, 59, 59);
+                const diff = Math.ceil((v - hoje) / 86400000);
+                
+                let classeSelo = "em-dia", textoSelo = "Em Dia", cardClasseExtra = "";
+                if (diff <= 0) {
+                    classeSelo = "vencido";
+                    textoSelo = "Vencido";
+                    cardClasseExtra = "vencido-border";
+                } else if (diff <= 3) {
+                    classeSelo = "vence-logo";
+                    textoSelo = "Próx. Vencimento";
+                }
+
+                const seloPago = c.pago ? `<span class="selo-pago">✓ Pago</span>` : '';
+                
+                return `
+                <div class="card-cliente ${cardClasseExtra}">
+                    <h3>${c.nome}</h3>
+                    
+                    <div class="container-badges">
+                        <span class="status-vencimento ${classeSelo}">${textoSelo}</span>
+                        ${seloPago}
+                    </div>
+
+                    <p class="info-p">Painel: <b>${c.painel}</b> | Expira: <b>${dia}/${mes}/${ano}</b></p>
+                    
+                    <hr class="card-linha">
+
+                    <div class="flex-botoes-icones">
+                        <button class="btn-icone btn-i-renovar" title="RENOVAR" onclick="window.renovarConfirmar('${c.id}', '${c.data}', '${c.painel}')">
+                            <svg viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.57-1.19"/></svg>
+                        </button>
+                        
+                        <button class="btn-icone btn-i-editar" title="EDITAR" onclick="window.abrirModalEdit('${c.id}','${c.nome}','${c.painel}','${c.data}')">
+                            <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                        </button>
+                        
+                        <button class="btn-icone btn-i-pago" title="MARCAR PAGO" onclick="window.marcarPago('${c.id}', ${c.pago || false})">
+                            <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        </button>
+                        
+                        <button class="btn-icone btn-i-arquivar" title="ARQUIVAR" onclick="window.arquivarCliente('${c.id}', true)">
+                            <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                        </button>
+                        
+                        <button class="btn-icone btn-i-excluir" title="EXCLUIR" onclick="window.excluirConfirmar('${c.id}')">
+                            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        window.marcarPago = async (id, statusAtual) => {
+            await updateDoc(doc(db, "clientes", id), { pago: !statusAtual });
+        };
+
+        window.arquivarCliente = async (id, status) => {
+            const msg = status ? "Arquivar este cliente?" : "Desarquivar este cliente?";
+            if(confirm(msg)) {
+                await updateDoc(doc(db, "clientes", id), { arquivado: status });
+                if(!status) document.getElementById('modal-arquivados').style.display = 'none';
+            }
+        };
+
+        window.abrirModalArquivados = () => {
+            const corpo = document.getElementById('lista-arquivados-corpo');
+            if(!corpo) return;
+            if(arquivadosRaw.length === 0) {
+                corpo.innerHTML = "<p style='color:#666;text-align:center;font-size:13px;font-weight:bold;'>Nenhum cliente arquivado.</p>";
+            } else {
+                corpo.innerHTML = arquivadosRaw.map(c => `
+                    <div style="background:#0d0d11; padding:14px; border-radius:14px; margin-bottom:8px; border:1px solid #1c1c24;">
+                        <b style="text-transform:uppercase; color:#fff; font-size:14px;">${c.nome}</b><br>
+                        <span style="font-size:12px; color:#aaa">Painel: ${c.painel}</span>
+                        <div style="display:flex; gap:8px; margin-top:10px;">
+                            <button onclick="window.arquivarCliente('${c.id}', false)" style="background:var(--3d-blue); border:none; border-bottom:3px solid var(--3d-blue-shadow); color:#fff; padding:8px 12px; border-radius:8px; font-size:11px; font-weight:900; cursor:pointer;">DESARQUIVAR</button>
+                            <button onclick="window.excluirConfirmar('${c.id}')" style="background:linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); border:none; border-bottom:3px solid #7f1d1d; color:#fff; padding:8px 12px; border-radius:8px; font-size:11px; font-weight:900; cursor:pointer;">EXCLUIR</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('modal-arquivados').style.display = 'flex';
+        };
+
+        window.abrirModalAdd = () => { document.getElementById('edit-id').value = ""; document.getElementById('cli-nome').value = ""; document.getElementById('cli-painel').value = ""; document.getElementById('cli-vencimento').value = ""; document.getElementById('modal-titulo').innerText = "Novo Cliente"; document.getElementById('modal-cliente').style.display = 'flex'; };
+        window.abrirModalEdit = (id, n, p, d) => { document.getElementById('edit-id').value = id; document.getElementById('cli-nome').value = n; document.getElementById('cli-painel').value = p; document.getElementById('cli-vencimento').value = d; document.getElementById('modal-titulo').innerText = "Editar Cliente"; document.getElementById('modal-cliente').style.display = 'flex'; };
+        window.fecharModal = () => document.getElementById('modal-cliente').style.display = 'none';
+        
+        window.processarCliente = async () => {
+            const id = document.getElementById('edit-id').value, n = document.getElementById('cli-nome').value, p = document.getElementById('cli-painel').value.toLowerCase().trim(), d = document.getElementById('cli-vencimento').value;
+            if(!n || !p || !d) return alert("Preencha tudo!");
+            if(id) {
+                await updateDoc(doc(db, "clientes", id), { nome: n, painel: p, data: d });
+            } else {
+                await addDoc(collection(db, "clientes"), { nome: n, painel: p, data: d, dono: logado.login, arquivado: false, pago: false });
+            }
+            window.fecharModal();
+        };
+
+        window.renovarConfirmar = async (id, data, painelCli) => {
+            if(confirm("Deseja renovar por mais 1 mês?")) {
+                const [a, m, d] = data.split('-').map(Number);
+                let nd = new Date(a, m, d); if (nd.getDate() != d) nd.setDate(0);
+                
+                await updateDoc(doc(db, "clientes", id), { data: nd.toISOString().split('T')[0], pago: false });
+
+                const painelNormalizado = painelCli.toLowerCase().trim();
+                if(painelNormalizado === 'unitv' || painelNormalizado === 'uniplay') {
+                    const docRef = doc(db, "creditos", logado.login);
+                    const docSnap = await getDoc(docRef);
+                    if(docSnap.exists()){
+                        const totalAtual = docSnap.data()[painelNormalizado] || 0;
+                        if(totalAtual > 0) {
+                            const dec = {}; dec[painelNormalizado] = totalAtual - 1;
+                            await updateDoc(docRef, dec);
+                        }
+                    }
+                }
+            }
+        };
+
+        window.excluirConfirmar = async (id) => { 
+            if(confirm("Excluir cliente definitivamente?")) {
+                await deleteDoc(doc(db, "clientes", id));
+                document.getElementById('modal-arquivados').style.display = 'none';
+            } 
+        };
+        
+        window.confirmarSair = () => { localStorage.clear(); location.reload(); };
+        
+        window.filtrar = () => { 
+            const t = document.getElementById('busca').value.toLowerCase(); 
+            const filtrados = dadosRaw.filter(x => x.nome.toLowerCase().includes(t) || x.painel.toLowerCase().includes(t));
+            render(filtrados); 
+        };
+    </script>
+</body>
+</html>
