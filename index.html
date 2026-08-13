@@ -7,118 +7,127 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#ffffff">
-    <title>Gestor Business V14.0</title>
+    <title>Gestor Business V15.0 - Modern</title>
     
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
         :root { 
-            --bg: #ffffff; 
-            --card: #f8f9fa; 
-            --card-brd: #e9ecef; 
-            --text: #1a1a1a; 
-            --text-sub: #6c757d;
+            --bg: #f8fafc; 
+            --card: #ffffff; 
+            --card-brd: #e2e8f0; 
+            --text: #0f172a; 
+            --text-sub: #64748b;
             
-            --3d-blue: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
-            --3d-blue-shadow: #1e3a8a;
-            --3d-gray: linear-gradient(180deg, #6c757d 0%, #495057 100%);
-            --3d-gray-shadow: #343a40;
-            --3d-green: linear-gradient(180deg, #22c55e 0%, #15803d 100%);
-            --3d-green-shadow: #14532d;
-            --3d-orange: linear-gradient(180deg, #f97316 0%, #c2410c 100%);
-            --3d-orange-shadow: #7c2d12;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --danger: #ef4444;
+            --warning: #eab308;
+            --success: #10b981;
+            
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 10px 25px -3px rgba(15, 23, 42, 0.12);
         }
         
-        body { font-family: -apple-system, system-ui, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; -webkit-font-smoothing: antialiased; overflow: hidden; }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; }
+
+        body { background-color: var(--bg); color: var(--text); margin: 0; padding: 0; -webkit-font-smoothing: antialiased; overflow: hidden; }
 
         /* TELA DE LOGIN */
-        .login-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; width: 100vw; background: #f1f3f5; box-sizing: border-box; padding: 20px; position: relative; z-index: 5000; }
-        .login-card { background: #ffffff; padding: 35px 25px; border-radius: 24px; width: 100%; max-width: 290px; text-align: center; border: 2px solid #ef4444; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.15); box-sizing: border-box; }
-        .login-card h2 { color: #1a1a1a; font-size: 20px; font-weight: 900; margin-top: 0; margin-bottom: 20px; letter-spacing: 1px; }
-        .login-card input[type="text"], .login-card input[type="password"] { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #ced4da; background: #fff; color: #000; box-sizing: border-box; margin-bottom: 12px; outline: none; font-size: 15px; font-weight: 600; }
-        .remember-box { display: flex; align-items: center; gap: 8px; color: #6c757d; font-size: 13px; margin-bottom: 22px; cursor: pointer; justify-content: flex-start; width: 100%; font-weight: 600; }
-        .remember-box input { accent-color: #ef4444; width: 18px; height: 18px; }
+        .login-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; width: 100vw; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); padding: 20px; position: relative; z-index: 5000; }
+        .login-card { background: #ffffff; padding: 36px 28px; border-radius: 28px; width: 100%; max-width: 320px; text-align: center; border: 1px solid rgba(255,255,255,0.8); box-shadow: var(--shadow-lg); }
+        .login-card h2 { color: var(--text); font-size: 22px; font-weight: 800; margin-top: 0; margin-bottom: 24px; letter-spacing: -0.5px; }
+        .login-card input[type="text"], .login-card input[type="password"] { width: 100%; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--card-brd); background: #f8fafc; color: var(--text); margin-bottom: 14px; outline: none; font-size: 14px; font-weight: 600; transition: border-color 0.2s; }
+        .login-card input:focus { border-color: var(--primary); background: #fff; }
+        .remember-box { display: flex; align-items: center; gap: 10px; color: var(--text-sub); font-size: 13px; margin-bottom: 24px; cursor: pointer; justify-content: flex-start; width: 100%; font-weight: 600; }
+        .remember-box input { accent-color: var(--primary); width: 18px; height: 18px; border-radius: 6px; }
         
-        .btn-login-3d { background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); border: none; border-bottom: 4px solid #7f1d1d; color: #fff; width: 100%; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 14px; letter-spacing: 0.5px; cursor: pointer; }
+        .btn-login-3d { background: var(--primary); border: none; color: #fff; width: 100%; padding: 14px; border-radius: 14px; font-weight: 700; font-size: 15px; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); transition: transform 0.1s, background 0.2s; }
+        .btn-login-3d:active { transform: scale(0.98); }
 
         /* ESTRUTURA DO APP */
         #app { display: none; height: 100vh; width: 100vw; flex-direction: column; background: var(--bg); }
 
         /* HEADER FIXO NO TOPO */
-        .header-fixo { background: var(--bg); padding: 15px; padding-top: env(safe-area-inset-top); z-index: 4000; border-bottom: 1px solid var(--card-brd); box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        .header-fixo { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 16px; padding-top: calc(env(safe-area-inset-top) + 12px); z-index: 4000; border-bottom: 1px solid var(--card-brd); display: flex; flex-direction: column; gap: 12px; width: 100%; }
         
-        .busca-container { background: #f1f3f5; display: flex; align-items: center; padding: 10px 14px; border-radius: 14px; border: 1px solid #e9ecef; gap: 10px; }
+        .busca-container { background: #f1f5f9; display: flex; align-items: center; padding: 10px 16px; border-radius: 16px; border: 1px solid #e2e8f0; gap: 10px; }
         .busca-container input { background: none; border: none; color: var(--text); flex: 1; outline: none; font-size: 14px; font-weight: 600; }
+        .busca-container input::placeholder { color: #94a3b8; }
         
-        .botoes-header-direita { display: flex; align-items: center; gap: 12px; }
-        .btn-robo-config { background: none; border: none; font-size: 18px; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; }
-        .btn-sair-input { background: none; border: none; color: #ff4444; font-size: 12px; font-weight: 800; cursor: pointer; padding: 4px 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .botoes-header-direita { display: flex; align-items: center; gap: 10px; }
+        .btn-robo-config { background: #f1f5f9; border: 1px solid #e2e8f0; font-size: 16px; cursor: pointer; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+        .btn-sair-input { background: rgba(239, 68, 68, 0.1); border: none; color: var(--danger); font-size: 11px; font-weight: 800; cursor: pointer; padding: 8px 12px; border-radius: 10px; letter-spacing: 0.5px; text-transform: uppercase; }
 
-        .stats-topo { font-size: 12px; color: var(--text-sub); font-weight: 700; display: flex; align-items: center; justify-content: space-between; padding: 2px 4px; }
+        .stats-topo { font-size: 12px; color: var(--text-sub); font-weight: 700; display: flex; align-items: center; justify-content: space-between; padding: 0 4px; }
 
-        .btn-novo-cliente-topo { background: var(--3d-blue); border: none; border-bottom: 3px solid var(--3d-blue-shadow); color: white; width: 100%; padding: 12px; border-radius: 14px; font-weight: 800; font-size: 13px; cursor: pointer; text-transform: uppercase; }
-        .botoes-topo-flex { display: flex; gap: 6px; }
-        .btn-topo-acao { flex: 1; background: var(--3d-gray); border: none; border-bottom: 3px solid var(--3d-gray-shadow); color: #fff; padding: 10px; border-radius: 10px; font-size: 11px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
-        .btn-topo-pagos { background: var(--3d-green); border-bottom-color: var(--3d-green-shadow); }
+        .btn-novo-cliente-topo { background: var(--primary); border: none; color: white; width: 100%; padding: 14px; border-radius: 16px; font-weight: 800; font-size: 13px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
+        .botoes-topo-flex { display: flex; gap: 8px; }
+        .btn-topo-acao { flex: 1; background: #ffffff; border: 1px solid var(--card-brd); color: var(--text); padding: 10px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; text-transform: uppercase; box-shadow: var(--shadow-sm); }
+        .btn-topo-pagos { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
 
-        /* MURAL ADAPTADO CLARO */
-        .secao-mural { background: var(--bg); padding: 2px 0; border-radius: 12px; width: 100%; box-sizing: border-box; }
-        .mural-header-toggle { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 10px; }
-        .btn-add-mural { background: var(--3d-blue); border: none; border-bottom: 3px solid var(--3d-blue-shadow); color: #fff; font-size: 11px; text-transform: uppercase; font-weight: 800; cursor: pointer; padding: 9px; border-radius: 10px; flex: 1; }
-        .btn-toggle-mural { background: var(--3d-gray); border: none; border-bottom: 3px solid var(--3d-gray-shadow); color: #fff; font-size: 11px; font-weight: 800; padding: 9px; border-radius: 10px; cursor: pointer; }
+        /* MURAL */
+        .secao-mural { background: transparent; padding: 0; width: 100%; }
+        .mural-header-toggle { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        .btn-add-mural { background: #f1f5f9; border: 1px solid #e2e8f0; color: var(--text); font-size: 11px; text-transform: uppercase; font-weight: 800; cursor: pointer; padding: 8px 12px; border-radius: 10px; flex: 1; }
+        .btn-toggle-mural { background: transparent; border: none; color: var(--text-sub); font-size: 11px; font-weight: 700; padding: 8px; cursor: pointer; }
         
-        #wrapper-mural-retratil { max-height: 110px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        .card-aviso { background: var(--card); padding: 10px; border-radius: 10px; margin-bottom: 6px; font-size: 12px; font-weight: 600; border-left: 5px solid #2563eb; color: var(--text); border-top: 1px solid var(--card-brd); border-right: 1px solid var(--card-brd); border-bottom: 1px solid var(--card-brd); }
+        #wrapper-mural-retratil { max-height: 100px; overflow-y: auto; margin-top: 8px; }
+        .card-aviso { background: #ffffff; padding: 10px 14px; border-radius: 12px; margin-bottom: 6px; font-size: 12px; font-weight: 600; border-left: 4px solid var(--primary); color: var(--text); box-shadow: var(--shadow-sm); border-top: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
 
-        /* CONTEÚDO ROLÁVEL ABAIXO DO TOPO FIXO */
-        .conteudo-rolavel { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 15px; box-sizing: border-box; background: var(--bg); }
+        /* CONTEÚDO ROLÁVEL */
+        .conteudo-rolavel { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px; background: var(--bg); }
         
-        /* CARDS DOS CLIENTES ESTILO BRANCO ALTO PADRÃO */
-        .card-cliente { background: var(--card); border: 1px solid var(--card-brd); border-radius: 18px; padding: 16px; margin-bottom: 14px; position: relative; box-sizing: border-box; display: flex; flex-direction: column; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .card-cliente.vencido-border { border: 1.5px solid rgba(239, 68, 68, 0.6) !important; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.08); }
+        /* CARDS DOS CLIENTES (MODERNO) */
+        .card-cliente { background: var(--card); border: 1px solid var(--card-brd); border-radius: 20px; padding: 18px; margin-bottom: 14px; position: relative; display: flex; flex-direction: column; box-shadow: var(--shadow-md); transition: transform 0.2s, box-shadow 0.2s; }
+        .card-cliente.vencido-border { border: 1.5px solid rgba(239, 68, 68, 0.4) !important; box-shadow: 0 4px 16px rgba(239, 68, 68, 0.08); }
         
-        .card-cliente h3 { margin: 0 0 4px 0; font-size: 17px; font-weight: 800; text-transform: uppercase; color: var(--text); width: 65%; letter-spacing: 0.3px; }
-        .info-p { font-size: 13px; color: var(--text-sub); margin: 4px 0; font-weight: 600; }
-        .info-p b { color: var(--text); }
-        .obs-box { background: #fff; border: 1px dashed #ced4da; padding: 8px; border-radius: 8px; font-size: 12px; color: #495057; margin-top: 6px; font-style: italic; }
+        .card-cliente h3 { margin: 0 0 6px 0; font-size: 17px; font-weight: 800; color: var(--text); width: 60%; letter-spacing: -0.3px; }
+        .info-p { font-size: 13px; color: var(--text-sub); margin: 3px 0; font-weight: 500; }
+        .info-p b { color: var(--text); font-weight: 700; }
+        .obs-box { background: #f8fafc; border: 1px dashed #cbd5e1; padding: 10px; border-radius: 10px; font-size: 12px; color: #475569; margin-top: 8px; font-weight: 500; }
         
-        .card-linha { height: 1px; background: var(--card-brd); margin: 14px 0 12px 0; border: none; width: 100%; }
+        .card-linha { height: 1px; background: #f1f5f9; margin: 14px 0; border: none; width: 100%; }
 
-        .container-badges { position: absolute; top: 16px; right: 16px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-        .selo-prolongado { background: #ea580c; color: #fff; font-size: 9px; font-weight: 900; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; }
+        .container-badges { position: absolute; top: 18px; right: 18px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+        .selo-prolongado { background: #ffedd5; color: #c2410c; font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 8px; text-transform: uppercase; border: 1px solid #fed7aa; }
         
-        .status-vencimento { font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid transparent; }
-        .status-vencimento.em-dia { background: rgba(22, 163, 74, 0.1); color: #16a34a; border-color: rgba(22, 163, 74, 0.2); }
-        .status-vencimento.vence-logo { background: rgba(202, 138, 4, 0.1); color: #ca8a04; border-color: rgba(202, 138, 4, 0.2); }
-        .status-vencimento.vencido { background: rgba(220, 38, 38, 0.1); color: #dc2626; border-color: rgba(220, 38, 38, 0.2); }
+        .status-vencimento { font-size: 10px; font-weight: 800; padding: 5px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.3px; }
+        .status-vencimento.em-dia { background: #dcfce7; color: #15803d; }
+        .status-vencimento.vence-logo { background: #fef9c3; color: #a16207; }
+        .status-vencimento.vencido { background: #fee2e2; color: #b91c1c; }
 
-        /* GRID DE BOTÕES DE AÇÃO */
-        .flex-botoes-icones { display: flex; gap: 6px; justify-content: flex-end; align-items: center; width: 100%; margin-top: 4px; flex-wrap: wrap; }
+        /* BOTÕES DE AÇÃO */
+        .flex-botoes-icones { display: flex; gap: 8px; justify-content: flex-end; align-items: center; width: 100%; flex-wrap: wrap; }
         
-        .btn-icone { width: 38px; height: 38px; border-radius: 10px; border: 1px solid transparent; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; padding: 0; box-sizing: border-box; border: 1px solid #e5e7eb; }
+        .btn-icone { width: 40px; height: 40px; border-radius: 12px; border: 1px solid transparent; background: #f8fafc; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease; padding: 0; box-shadow: var(--shadow-sm); }
         
-        .btn-i-renovar { border-color: #e9d5ff; background: #f3e8ff; }
-        .btn-i-editar { border-color: #fef08a; background: #fef9c3; }
-        .btn-i-pago { border-color: #bbf7d0; background: #dcfce7; }
-        .btn-i-prolongar { border-color: #ffedd5; background: #fff7ed; }
-        .btn-i-arquivar { border-color: #bfdbfe; background: #dbeafe; }
-        .btn-i-excluir { border-color: #fecaca; background: #fee2e2; }
+        .btn-i-renovar { background: #f3e8ff; border-color: #e9d5ff; }
+        .btn-i-editar { background: #fef9c3; border-color: #fef08a; }
+        .btn-i-pago { background: #dcfce7; border-color: #bbf7d0; }
+        .btn-i-prolongar { background: #fff7ed; border-color: #ffedd5; }
+        .btn-i-arquivar { background: #dbeafe; border-color: #bfdbfe; }
+        .btn-i-excluir { background: #fee2e2; border-color: #fecaca; }
 
         .btn-icone svg { width: 18px; height: 18px; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-        .btn-i-renovar svg { stroke: #a855f7; }
+        .btn-i-renovar svg { stroke: #9333ea; }
         .btn-i-editar svg { stroke: #ca8a04; }
         .btn-i-pago svg { stroke: #16a34a; }
         .btn-i-prolongar svg { stroke: #ea580c; }
         .btn-i-arquivar svg { stroke: #2563eb; }
         .btn-i-excluir svg { stroke: #dc2626; }
 
-        .btn-icone:active { transform: scale(0.92); opacity: 0.8; }
+        .btn-icone:active { transform: scale(0.92); }
 
         /* MODAIS */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 6000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
-        .modal-content { background: #ffffff; width: 100%; max-width: 360px; padding: 25px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); text-align: center; border: 1px solid #e9ecef; max-height: 90vh; overflow-y: auto; }
-        .modal-content input, .modal-content textarea, .modal-content select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid #ced4da; background: #fff; color: #000; box-sizing: border-box; font-size: 14px; outline: none; font-family: inherit; }
-        .modal-content label { display: block; text-align: left; font-size: 12px; font-weight: 700; color: var(--text-sub); margin-top: 10px; text-transform: uppercase; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px); z-index: 6000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: #ffffff; width: 100%; max-width: 360px; padding: 28px; border-radius: 24px; box-shadow: var(--shadow-lg); text-align: center; border: 1px solid #f1f5f9; max-height: 90vh; overflow-y: auto; }
+        .modal-content input, .modal-content textarea, .modal-content select { width: 100%; padding: 12px 14px; margin: 8px 0; border-radius: 12px; border: 1px solid var(--card-brd); background: #f8fafc; color: var(--text); font-size: 14px; outline: none; font-weight: 500; }
+        .modal-content input:focus, .modal-content textarea:focus { border-color: var(--primary); background: #fff; }
+        .modal-content label { display: block; text-align: left; font-size: 11px; font-weight: 800; color: var(--text-sub); margin-top: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        .btn-acao-modal { background: var(--3d-blue); border: none; border-bottom: 3px solid var(--3d-blue-shadow); color: #fff; width: 100%; padding: 12px; border-radius: 10px; font-weight: 800; margin-top: 12px; cursor: pointer; text-transform: uppercase; }
+        .btn-acao-modal { background: var(--primary); border: none; color: #fff; width: 100%; padding: 14px; border-radius: 14px; font-weight: 700; margin-top: 16px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
     </style>
 </head>
 <body>
@@ -130,14 +139,14 @@
             <input type="text" id="u" placeholder="Usuário">
             <input type="password" id="p" placeholder="Senha">
             <label class="remember-box"><input type="checkbox" id="remember"> Lembrar meu acesso</label>
-            <button class="btn-login-3d" onclick="window.logar()">ACESSAR CONTA</button>
+            <button class="btn-login-3d" onclick="window.logar()">ENTRAR</button>
         </div>
     </div>
 
     <!-- MODAL CONFIGURAÇÃO DO ROBÔ -->
     <div id="modal-robo" class="modal">
         <div class="modal-content">
-            <h2 style="margin-top:0; font-size:18px; font-weight:900; color:#1a1a1a;">⚙️ Configurações do Robô</h2>
+            <h2 style="margin-top:0; font-size:18px; font-weight:800; color:var(--text);">⚙️ Configurações do Robô</h2>
             
             <label>Mensagem: Próximo Vencimento (2 dias)</label>
             <textarea id="msg-aviso" rows="3" placeholder="Ex: Olá {nome}, seu acesso vence em 2 dias..."></textarea>
@@ -167,14 +176,14 @@
             </div>
 
             <button class="btn-acao-modal" onclick="window.salvarConfigRobo()">SALVAR CONFIGURAÇÕES</button>
-            <button onclick="document.getElementById('modal-robo').style.display='none'" style="background:none; border:none; color:#777; margin-top:14px; font-weight:800; font-size:12px; cursor:pointer; text-transform:uppercase;">FECHAR</button>
+            <button onclick="document.getElementById('modal-robo').style.display='none'" style="background:none; border:none; color:var(--text-sub); margin-top:14px; font-weight:700; font-size:12px; cursor:pointer; text-transform:uppercase;">FECHAR</button>
         </div>
     </div>
 
     <!-- MODAL CLIENTE (NOVO / EDITAR) -->
     <div id="modal-cliente" class="modal">
         <div class="modal-content">
-            <h2 id="modal-titulo" style="margin-top:0; font-size:17px; font-weight:800;">Novo Cliente</h2>
+            <h2 id="modal-titulo" style="margin-top:0; font-size:18px; font-weight:800;">Novo Cliente</h2>
             <input type="hidden" id="edit-id">
             <input type="text" id="cli-nome" placeholder="Nome do Cliente">
             <input type="text" id="cli-painel" placeholder="Nome do Painel (Ex: unitv, uniplay)">
@@ -182,25 +191,25 @@
             <input type="date" id="cli-vencimento">
             <textarea id="cli-obs" rows="2" placeholder="Observações (Ex: Usa 2 aparelhos, paga via Pix)"></textarea>
             <button id="btn-salvar" class="btn-acao-modal" onclick="window.processarCliente()">SALVAR DADOS</button>
-            <button onclick="window.fecharModal()" style="background:none; border:none; color:#777; margin-top:14px; font-weight:800; font-size:12px; cursor:pointer; text-transform:uppercase;">CANCELAR</button>
+            <button onclick="window.fecharModal()" style="background:none; border:none; color:var(--text-sub); margin-top:14px; font-weight:700; font-size:12px; cursor:pointer; text-transform:uppercase;">CANCELAR</button>
         </div>
     </div>
 
     <!-- MODAL LISTA DE PAGOS -->
     <div id="modal-pagos" class="modal">
         <div class="modal-content">
-            <h2 style="margin-top:0; font-size:17px; font-weight:800; color:#16a34a;">Clientes Pagos</h2>
+            <h2 style="margin-top:0; font-size:18px; font-weight:800; color:var(--success);">Clientes Pagos</h2>
             <div id="lista-pagos-corpo" style="text-align:left; margin-top:12px; max-height: 50vh; overflow-y: auto;"></div>
-            <button onclick="document.getElementById('modal-pagos').style.display='none'" class="btn-acao-modal" style="background:var(--3d-gray); border-bottom-color:var(--3d-gray-shadow); color:#fff;">FECHAR JANELA</button>
+            <button onclick="document.getElementById('modal-pagos').style.display='none'" class="btn-acao-modal" style="background:#f1f5f9; color:var(--text); box-shadow:none;">FECHAR JANELA</button>
         </div>
     </div>
 
     <!-- MODAL ARQUIVADOS -->
     <div id="modal-arquivados" class="modal">
         <div class="modal-content">
-            <h2 style="margin-top:0; font-size:17px; font-weight:800;">Clientes Arquivados</h2>
+            <h2 style="margin-top:0; font-size:18px; font-weight:800;">Clientes Arquivados</h2>
             <div id="lista-arquivados-corpo" style="text-align:left; margin-top:12px; max-height: 50vh; overflow-y: auto;"></div>
-            <button onclick="document.getElementById('modal-arquivados').style.display='none'" class="btn-acao-modal" style="background:var(--3d-gray); border-bottom-color:var(--3d-gray-shadow); color:#fff;">FECHAR JANELA</button>
+            <button onclick="document.getElementById('modal-arquivados').style.display='none'" class="btn-acao-modal" style="background:#f1f5f9; color:var(--text); box-shadow:none;">FECHAR JANELA</button>
         </div>
     </div>
 
@@ -227,7 +236,7 @@
                 <button class="btn-topo-acao" id="btn-aba-arquivados" onclick="window.abrirModalArquivados()">Arquivados (0)</button>
             </div>
 
-            <!-- MURAL INTEGRADO AO TOPO FIXADO -->
+            <!-- MURAL INTEGRADO -->
             <section class="secao-mural">
                 <div class="mural-header-toggle">
                     <button class="btn-add-mural" onclick="window.muralAcao('add')">+ Nota no Mural</button>
@@ -239,7 +248,7 @@
             </section>
         </header>
 
-        <!-- CONTAINER EXCLUSIVO PARA ROLAGEM DOS CARDS -->
+        <!-- CONTAINER EXCLUSIVO PARA ROLAGEM -->
         <div class="conteudo-rolavel">
             <section class="lista-clientes" id="lista-corpo"></section>
         </div>
@@ -296,375 +305,4 @@
                 if(!login || !pass) return alert("Preencha o login e senha!");
                 
                 const q = query(collection(db, "usuarios"), where("login", "==", login), where("senha", "==", pass));
-                const snap = await getDocs(q);
-                
-                if(!snap.empty) { 
-                    logado = snap.docs[0].data();
-                    if(document.getElementById('remember').checked) { 
-                        localStorage.setItem('gestor_u', login); 
-                        localStorage.setItem('gestor_p', pass); 
-                    }
-                    document.getElementById('tela-login').style.display = 'none';
-                    document.getElementById('app').style.display = 'flex';
-                    carregarDados();
-                } else { 
-                    alert("Login ou senha incorretos!"); 
-                }
-            } catch (error) {
-                alert("Erro ao conectar Banco: " + error.message);
-            }
-        };
-
-        function carregarDados() {
-            const qC = (logado.login === 'admin') ? query(collection(db, "clientes"), orderBy("data", "asc")) : query(collection(db, "clientes"), where("dono", "==", logado.login), orderBy("data", "asc"));
-            onSnapshot(qC, (snap) => {
-                let temp = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                let filtradoDono = (logado.login === 'admin') ? temp.filter(c => !c.dono || c.dono === 'admin') : temp;
-                
-                dadosRaw = filtradoDono.filter(c => !c.arquivado && !c.pago);
-                pagosRaw = filtradoDono.filter(c => !c.arquivado && c.pago === true);
-                arquivadosRaw = filtradoDono.filter(c => c.arquivado === true);
-                
-                atualizarContadores();
-                render(dadosRaw);
-            });
-
-            const colMural = logado.login === 'admin' ? "avisos" : "lembretes_privados";
-            const qM = (logado.login === 'admin') ? query(collection(db, "avisos"), orderBy("criadoEm", "desc")) : query(collection(db, "lembretes_privados"), where("usuarioId", "==", logado.login), orderBy("criadoEm", "desc"));
-            onSnapshot(qM, (snap) => {
-                const lm = document.getElementById('lista-mural');
-                if(lm) {
-                    lm.innerHTML = snap.docs.map(d => `
-                        <div class="card-aviso" onclick="window.muralAcao('edit', '${d.id}', '${d.data().texto || d.data().textoAviso}')">📢 ${d.data().texto || d.data().textoAviso}</div>
-                    `).join('');
-                }
-            });
-        }
-
-        window.abrirModalRobo = async () => {
-            document.getElementById('modal-robo').style.display = 'flex';
-            const docRef = doc(db, "config_robo", logado.login);
-            const snap = await getDoc(docRef);
-            if(snap.exists()) {
-                const d = snap.data();
-                document.getElementById('msg-aviso').value = d.msgAviso || "";
-                document.getElementById('msg-expirado').value = d.msgExpirado || "";
-                document.getElementById('robo-frequencia').value = d.frequencia || "1";
-                document.getElementById('hora-disparo-1').value = d.hora1 || "09:00";
-                document.getElementById('hora-disparo-2').value = d.hora2 || "18:00";
-            }
-        };
-
-        window.salvarConfigRobo = async () => {
-            const docRef = doc(db, "config_robo", logado.login);
-            await setDoc(docRef, {
-                msgAviso: document.getElementById('msg-aviso').value,
-                msgExpirado: document.getElementById('msg-expirado').value,
-                frequencia: document.getElementById('robo-frequencia').value,
-                hora1: document.getElementById('hora-disparo-1').value,
-                hora2: document.getElementById('hora-disparo-2').value
-            });
-            alert("Configurações do Robô salvas com sucesso!");
-            document.getElementById('modal-robo').style.display = 'none';
-        };
-
-        window.toggleMuralVisivel = () => {
-            muralOculto = !muralOculto;
-            document.getElementById('wrapper-mural-retratil').style.display = muralOculto ? 'none' : 'block';
-            document.getElementById('btn-hide-mural').innerText = muralOculto ? "Exibir Mural" : "Ocultar Mural";
-            localStorage.setItem('mural_oculto', muralOculto);
-        };
-
-        window.toggleOcultarStatus = () => {
-            ocultarValores = !ocultarValores;
-            document.getElementById('btn-ocultar-olho').innerText = ocultarValores ? "🙈" : "👁️";
-            atualizarContadores();
-        };
-
-        function atualizarContadores() {
-            const btnArq = document.getElementById('btn-aba-arquivados');
-            if(btnArq) btnArq.innerText = `Arquivados (${arquivadosRaw.length})`;
-            
-            const btnPagos = document.getElementById('btn-aba-pagos');
-            const hoje = new Date(); hoje.setHours(0,0,0,0);
-            
-            // CHECA SE HÁ CLIENTES PAGOS CUJA DATA DO NOVO CICLO JÁ ESTÁ EXPIRANDO (REGRA DE 1 DIA ANTES)
-            let pagosExpirando = pagosRaw.some(c => {
-                const dataUso = c.dataExibicao || c.data;
-                const [ano, mes, dia] = dataUso.split('-').map(Number);
-                const v = new Date(ano, mes - 1, dia, 23, 59, 59);
-                const diff = Math.ceil((v - hoje) / 86400000);
-                return diff <= 1; // 1 dia antes ou menos
-            });
-
-            if(btnPagos) {
-                btnPagos.innerText = pagosExpirando ? `Pagos 🔴 (${pagosRaw.length})` : `Pagos (${pagosRaw.length})`;
-            }
-            
-            const contElement = document.getElementById('contagem');
-            if(!contElement) return;
-
-            if(ocultarValores) {
-                contElement.innerHTML = "Dados ocultados!";
-                return;
-            }
-            const contPaineis = {};
-            dadosRaw.forEach(c => contPaineis[c.painel] = (contPaineis[c.painel] || 0) + 1);
-            let htmlS = ""; for (const p in contPaineis) htmlS += `${p}: <b>${contPaineis[p]}</b> | `;
-            contElement.innerHTML = htmlS + `Pendentes: <b>${dadosRaw.length}</b>`;
-        }
-
-        window.muralAcao = async (tipo, id, textoAntigo) => {
-            const col = logado.login === 'admin' ? "avisos" : "lembretes_privados";
-            if(tipo === 'add') {
-                const t = prompt("Nova anotação:");
-                if(t) await addDoc(collection(db, col), logado.login === 'admin' ? { textoAviso: t, criadoEm: Date.now() } : { texto: t, usuarioId: logado.login, criadoEm: Date.now() });
-            } else {
-                const acao = confirm("Deseja EXCLUIR? (Cancele para EDITAR)");
-                if(acao) { if(confirm("Apagar nota?")) await deleteDoc(doc(db, col, id)); }
-                else {
-                    const nt = prompt("Editar nota:", textoAntigo);
-                    if(nt && nt !== textoAntigo) await updateDoc(doc(db, col, id), logado.login === 'admin' ? { textoAviso: nt } : { texto: nt });
-                }
-            }
-        };
-
-        function render(lista) {
-            const hoje = new Date(); hoje.setHours(0,0,0,0);
-            const lc = document.getElementById('lista-corpo');
-            if(!lc) return;
-
-            lc.innerHTML = lista.map(c => {
-                const dataExibir = c.dataExibicao || c.data;
-                const [ano, mes, dia] = dataExibir.split('-').map(Number);
-                const v = new Date(ano, mes - 1, dia, 23, 59, 59);
-                const diff = Math.ceil((v - hoje) / 86400000);
-                
-                let classeSelo = "em-dia", textoSelo = "Em Dia", cardClasseExtra = "";
-                
-                // NOVALÓGICA DE VENCIMENTO: 1 DIA ANTES OU JÁ PASSOU = EXPIRADO
-                if (diff <= 1) {
-                    classeSelo = "vencido";
-                    textoSelo = "Expirado";
-                    cardClasseExtra = "vencido-border";
-                } else if (diff <= 2) {
-                    classeSelo = "vence-logo";
-                    textoSelo = "Próx. Vencimento";
-                }
-
-                const seloProlongado = c.prolongado ? `<span class="selo-prolongado">Prolongado</span>` : '';
-                const whatsText = c.whats ? ` | Whats: <b>${c.whats}</b>` : '';
-                const obsText = c.obs ? `<div class="obs-box">📌 ${c.obs}</div>` : '';
-                
-                return `
-                <div class="card-cliente ${cardClasseExtra}">
-                    <h3>${c.nome}</h3>
-                    
-                    <div class="container-badges">
-                        <span class="status-vencimento ${classeSelo}">${textoSelo}</span>
-                        ${seloProlongado}
-                    </div>
-
-                    <p class="info-p">Painel: <b>${c.painel}</b>${whatsText}</p>
-                    <p class="info-p">Vencimento: <b>${dia}/${mes}/${ano}</b></p>
-                    ${obsText}
-                    
-                    <hr class="card-linha">
-
-                    <div class="flex-botoes-icones">
-                        <button class="btn-icone btn-i-renovar" title="RENOVAR" onclick="window.renovarConfirmar('${c.id}', '${c.dataOriginal || c.data}')">
-                            <svg viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.57-1.19"/></svg>
-                        </button>
-                        
-                        <button class="btn-icone btn-i-pago" title="MARCAR PAGO" onclick="window.marcarPago('${c.id}', ${c.pago || false})">
-                            <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                        </button>
-
-                        <button class="btn-icone btn-i-prolongar" title="PROLONGAR" onclick="window.prolongarCliente('${c.id}', '${dataExibir}')">
-                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                        </button>
-                        
-                        <button class="btn-icone btn-i-editar" title="EDITAR" onclick="window.abrirModalEdit('${c.id}','${c.nome}','${c.painel}','${c.whats || ''}','${c.data}','${c.obs || ''}')">
-                            <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                        </button>
-                        
-                        <button class="btn-icone btn-i-arquivar" title="ARQUIVAR" onclick="window.arquivarCliente('${c.id}', true)">
-                            <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                        </button>
-                        
-                        <button class="btn-icone btn-i-excluir" title="EXCLUIR" onclick="window.excluirConfirmar('${c.id}')">
-                            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                        </button>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        window.marcarPago = async (id, statusAtual) => {
-            await updateDoc(doc(db, "clientes", id), { pago: !statusAtual });
-        };
-
-        window.prolongarCliente = async (id, dataAtualStr) => {
-            const diasExtra = prompt("Quantos dias deseja prolongar? (Ex: 1, 2 ou 3):", "2");
-            if(diasExtra && !isNaN(diasExtra)) {
-                const [a, m, d] = dataAtualStr.split('-').map(Number);
-                let nd = new Date(a, m - 1, d);
-                nd.setDate(nd.getDate() + parseInt(diasExtra));
-                
-                const novaDataExibicao = nd.toISOString().split('T')[0];
-                await updateDoc(doc(db, "clientes", id), { 
-                    dataExibicao: novaDataExibicao,
-                    prolongado: true
-                });
-            }
-        };
-
-        window.renovarConfirmar = async (id, dataOriginal) => {
-            if(confirm("Deseja renovar este cliente por +1 mês?")) {
-                const [a, m, d] = dataOriginal.split('-').map(Number);
-                let nd = new Date(a, m - 1, d);
-                nd.setMonth(nd.getMonth() + 1);
-                
-                const novaDataBase = nd.toISOString().split('T')[0];
-                await updateDoc(doc(db, "clientes", id), { 
-                    data: novaDataBase,
-                    dataOriginal: novaDataBase,
-                    dataExibicao: novaDataBase,
-                    pago: false,
-                    prolongado: false 
-                });
-                document.getElementById('modal-pagos').style.display = 'none';
-            }
-        };
-
-        window.abrirModalPagos = () => {
-            const corpo = document.getElementById('lista-pagos-corpo');
-            if(!corpo) return;
-            if(pagosRaw.length === 0) {
-                corpo.innerHTML = "<p style='color:#666;text-align:center;font-size:13px;font-weight:bold;'>Nenhum cliente na lista de pagos.</p>";
-            } else {
-                corpo.innerHTML = pagosRaw.map(c => `
-                    <div style="background:var(--card); padding:14px; border-radius:14px; margin-bottom:8px; border:1px solid var(--card-brd);">
-                        <b style="text-transform:uppercase; color:var(--text); font-size:14px;">${c.nome}</b><br>
-                        <span style="font-size:12px; color:var(--text-sub)">Painel: ${c.painel} | Vencimento: ${c.data}</span>
-                        <div style="display:flex; gap:8px; margin-top:10px;">
-                            <button onclick="window.renovarConfirmar('${c.id}', '${c.dataOriginal || c.data}')" style="background:var(--3d-blue); border:none; border-bottom:3px solid var(--3d-blue-shadow); color:#fff; padding:8px 12px; border-radius:8px; font-size:11px; font-weight:900; cursor:pointer;">RENOVAR (+1 MÊS)</button>
-                            <button onclick="window.marcarPago('${c.id}', true)" style="background:var(--3d-gray); border:none; border-bottom:3px solid var(--3d-gray-shadow); color:#fff; padding:8px 12px; border-radius:8px; font-size:11px; font-weight:900; cursor:pointer;">VOLTA PENDENTE</button>
-                        </div>
-                    </div>
-                `).join('');
-            }
-            document.getElementById('modal-pagos').style.display = 'flex';
-        };
-
-        window.arquivarCliente = async (id, status) => {
-            const msg = status ? "Arquivar este cliente?" : "Desarquivar este cliente?";
-            if(confirm(msg)) {
-                await updateDoc(doc(db, "clientes", id), { arquivado: status });
-                if(!status) document.getElementById('modal-arquivados').style.display = 'none';
-            }
-        };
-
-        window.abrirModalArquivados = () => {
-            const corpo = document.getElementById('lista-arquivados-corpo');
-            if(!corpo) return;
-            if(arquivadosRaw.length === 0) {
-                corpo.innerHTML = "<p style='color:#666;text-align:center;font-size:13px;font-weight:bold;'>Nenhum cliente arquivado.</p>";
-            } else {
-                corpo.innerHTML = arquivadosRaw.map(c => `
-                    <div style="background:var(--card); padding:14px; border-radius:14px; margin-bottom:8px; border:1px solid var(--card-brd);">
-                        <b style="text-transform:uppercase; color:var(--text); font-size:14px;">${c.nome}</b><br>
-                        <span style="font-size:12px; color:var(--text-sub)">Painel: ${c.painel}</span>
-                        <div style="display:flex; gap:8px; margin-top:10px;">
-                            <button onclick="window.arquivarCliente('${c.id}', false)" style="background:var(--3d-blue); border:none; border-bottom:3px solid var(--3d-blue-shadow); color:#fff; padding:8px 12px; border-radius:8px; font-size:11px; font-weight:900; cursor:pointer;">DESARQUIVAR</button>
-                            <button onclick="window.excluirConfirmar('${c.id}')" style="background:linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); border:none; border-bottom:3px solid #7f1d1d; color:#fff; padding:8px 12px; border-radius:8px; font-size:11px; font-weight:900; cursor:pointer;">EXCLUIR</button>
-                        </div>
-                    </div>
-                `).join('');
-            }
-            document.getElementById('modal-arquivados').style.display = 'flex';
-        };
-
-        window.abrirModalAdd = () => { 
-            document.getElementById('edit-id').value = ""; 
-            document.getElementById('cli-nome').value = ""; 
-            document.getElementById('cli-painel').value = ""; 
-            document.getElementById('cli-whats').value = ""; 
-            document.getElementById('cli-vencimento').value = ""; 
-            document.getElementById('cli-obs').value = ""; 
-            document.getElementById('modal-titulo').innerText = "Novo Cliente"; 
-            document.getElementById('modal-cliente').style.display = 'flex'; 
-        };
-
-        window.abrirModalEdit = (id, n, p, w, d, o) => { 
-            document.getElementById('edit-id').value = id; 
-            document.getElementById('cli-nome').value = n; 
-            document.getElementById('cli-painel').value = p; 
-            document.getElementById('cli-whats').value = w; 
-            document.getElementById('cli-vencimento').value = d; 
-            document.getElementById('cli-obs').value = o; 
-            document.getElementById('modal-titulo').innerText = "Editar Cliente"; 
-            document.getElementById('modal-cliente').style.display = 'flex'; 
-        };
-
-        window.fecharModal = () => document.getElementById('modal-cliente').style.display = 'none';
-        
-        window.processarCliente = async () => {
-            const id = document.getElementById('edit-id').value, 
-                  n = document.getElementById('cli-nome').value, 
-                  p = document.getElementById('cli-painel').value.toLowerCase().trim(), 
-                  w = document.getElementById('cli-whats').value.trim(), 
-                  d = document.getElementById('cli-vencimento').value,
-                  o = document.getElementById('cli-obs').value;
-
-            if(!n || !p || !d) return alert("Preencha ao menos Nome, Painel e Vencimento!");
-
-            if(id) {
-                await updateDoc(doc(db, "clientes", id), { 
-                    nome: n, 
-                    painel: p, 
-                    whats: w, 
-                    data: d, 
-                    dataOriginal: d,
-                    dataExibicao: d,
-                    obs: o 
-                });
-            } else {
-                await addDoc(collection(db, "clientes"), { 
-                    nome: n, 
-                    painel: p, 
-                    whats: w, 
-                    data: d, 
-                    dataOriginal: d,
-                    dataExibicao: d,
-                    obs: o,
-                    dono: logado.login, 
-                    arquivado: false, 
-                    pago: false,
-                    prolongado: false
-                });
-            }
-            window.fecharModal();
-        };
-
-        window.excluirConfirmar = async (id) => { 
-            if(confirm("Excluir cliente definitivamente?")) {
-                await deleteDoc(doc(db, "clientes", id));
-                document.getElementById('modal-arquivados').style.display = 'none';
-            } 
-        };
-        
-        window.confirmarSair = () => { localStorage.clear(); location.reload(); };
-        
-        window.filtrar = () => { 
-            const t = document.getElementById('busca').value.toLowerCase(); 
-            const filtrados = dadosRaw.filter(x => 
-                x.nome.toLowerCase().includes(t) || 
-                x.painel.toLowerCase().includes(t) || 
-                (x.whats && x.whats.includes(t))
-            );
-            render(filtrados); 
-        };
-    </script>
-</body>
-</html>
+                const snap = await getDocs(q
