@@ -416,12 +416,13 @@
         };
 
         function atualizarContadores() {
+            const totalGeralGeral = dadosRaw.length + pagosRaw.length + arquivadosRaw.length;
+            
             const btnArq = document.getElementById('btn-aba-arquivados');
-            if(btnArq) btnArq.innerText = `Arquivados (${arquivadosRaw.length})`;
-            
             const btnPagos = document.getElementById('btn-aba-pagos');
+            const contElement = document.getElementById('contagem');
+
             const hoje = new Date(); hoje.setHours(0,0,0,0);
-            
             let pagosExpirando = pagosRaw.some(c => {
                 const dataUso = c.dataExibicao || c.data;
                 const [ano, mes, dia] = dataUso.split('-').map(Number);
@@ -430,19 +431,21 @@
                 return diff <= 1;
             });
 
-            if(btnPagos) {
-                btnPagos.innerText = pagosExpirando ? `Pagos 🔴 (${pagosRaw.length})` : `Pagos (${pagosRaw.length})`;
-            }
-            
-            const contElement = document.getElementById('contagem');
-            if(!contElement) return;
-
-            if(ocultarValores) {
-                contElement.innerHTML = "Dados ocultados!";
+            if (ocultarValores) {
+                if(btnArq) btnArq.innerText = `Arquivados (***)`;
+                if(btnPagos) btnPagos.innerText = pagosExpirando ? `Pagos 🔴 (***)` : `Pagos (***)`;
+                if(contElement) contElement.innerHTML = `Total de Cadastros: <b>***</b>`;
                 return;
             }
 
-            contElement.innerHTML = `Total de Clientes: <b>${dadosRaw.length}</b>`;
+            if(btnArq) btnArq.innerText = `Arquivados (${arquivadosRaw.length})`;
+            if(btnPagos) {
+                btnPagos.innerText = pagosExpirando ? `Pagos 🔴 (${pagosRaw.length})` : `Pagos (${pagosRaw.length})`;
+            }
+
+            if(contElement) {
+                contElement.innerHTML = `Total de Cadastros: <b>${totalGeralGeral}</b>`;
+            }
         }
 
         window.muralAcao = async (tipo, id, textoAntigo) => {
