@@ -102,16 +102,13 @@
 
         /* BOTÕES DE AÇÃO */
         .flex-botoes-icones { display: flex; gap: 8px; justify-content: flex-end; align-items: center; width: 100%; flex-wrap: wrap; }
-        
         .btn-icone { width: 40px; height: 40px; border-radius: 12px; border: 1px solid transparent; background: #f8fafc; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease; padding: 0; box-shadow: var(--shadow-sm); }
-        
         .btn-i-renovar { background: #f3e8ff; border-color: #e9d5ff; }
         .btn-i-editar { background: #fef9c3; border-color: #fef08a; }
         .btn-i-pago { background: #dcfce7; border-color: #bbf7d0; }
         .btn-i-prolongar { background: #fff7ed; border-color: #ffedd5; }
         .btn-i-arquivar { background: #dbeafe; border-color: #bfdbfe; }
         .btn-i-excluir { background: #fee2e2; border-color: #fecaca; }
-
         .btn-icone svg { width: 18px; height: 18px; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
         .btn-i-renovar svg { stroke: #9333ea; }
         .btn-i-editar svg { stroke: #ca8a04; }
@@ -119,7 +116,6 @@
         .btn-i-prolongar svg { stroke: #ea580c; }
         .btn-i-arquivar svg { stroke: #2563eb; }
         .btn-i-excluir svg { stroke: #dc2626; }
-
         .btn-icone:active { transform: scale(0.92); }
 
         /* MODAIS */
@@ -128,7 +124,6 @@
         .modal-content input, .modal-content textarea, .modal-content select { width: 100%; padding: 12px 14px; margin: 8px 0; border-radius: 12px; border: 1px solid var(--card-brd); background: #f8fafc; color: var(--text); font-size: 14px; outline: none; font-weight: 500; }
         .modal-content input:focus, .modal-content textarea:focus { border-color: var(--primary); background: #fff; }
         .modal-content label { display: block; text-align: left; font-size: 11px; font-weight: 800; color: var(--text-sub); margin-top: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-        
         .btn-acao-modal { background: var(--primary); border: none; color: #fff; width: 100%; padding: 14px; border-radius: 14px; font-weight: 700; margin-top: 16px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
     </style>
 </head>
@@ -145,11 +140,12 @@
         </div>
     </div>
 
-    <!-- MODAL CLIENTE (NOVO / EDITAR) -->
+    <!-- MODAL CLIENTE -->
     <div id="modal-cliente" class="modal">
         <div class="modal-content">
             <h2 id="modal-titulo" style="margin-top:0; font-size:18px; font-weight:800;">Novo Cliente</h2>
             <input type="hidden" id="edit-id">
+            <input type="hidden" id="edit-path">
             <input type="text" id="cli-nome" placeholder="Nome do Cliente">
             <input type="text" id="cli-painel" placeholder="Nome do Painel (Ex: unitv, uniplay)">
             <input type="text" id="cli-whats" placeholder="WhatsApp (Ex: 5548999998888)">
@@ -164,10 +160,10 @@
     <div id="modal-robo" class="modal">
         <div class="modal-content">
             <h2 style="margin-top:0; font-size:18px; font-weight:800; color:var(--text);">⚙️ Configurações do Robô</h2>
-            <label>Mensagem: Próximo Vencimento (2 dias)</label>
-            <textarea id="msg-aviso" rows="3" placeholder="Ex: Olá {nome}, seu acesso vence em 2 dias..."></textarea>
-            <label>Mensagem: Expirado / Dia Crítico</label>
-            <textarea id="msg-expirado" rows="3" placeholder="Ex: Atenção {nome}, seu login expira hoje..."></textarea>
+            <label>Mensagem: Próximo Vencimento</label>
+            <textarea id="msg-aviso" rows="3" placeholder="Ex: Olá {nome}, seu acesso vence em breve..."></textarea>
+            <label>Mensagem: Expirado</label>
+            <textarea id="msg-expirado" rows="3" placeholder="Ex: Atenção {nome}, seu login expirou..."></textarea>
             <button id="btn-salvar-robo" class="btn-acao-modal">SALVAR CONFIGURAÇÕES</button>
             <button id="btn-fechar-robo" style="background:none; border:none; color:var(--text-sub); margin-top:14px; font-weight:700; font-size:12px; cursor:pointer; text-transform:uppercase;">FECHAR</button>
         </div>
@@ -226,7 +222,6 @@
             </section>
         </header>
 
-        <!-- CONTAINER EXCLUSIVO PARA ROLAGEM -->
         <div class="conteudo-rolavel">
             <section class="lista-clientes" id="lista-corpo"></section>
         </div>
@@ -234,7 +229,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, where, getDocs, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, where, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDMQbFBbbKFABCwwTxuESpXsz_Knz-V4FI",
@@ -249,8 +244,8 @@
         let logado = null;
         let clientesRaw = [];
         let muralRaw = [];
-        let ocultarValores = false;
         let muralOculto = false;
+        let activeUnsubs = [];
 
         try {
             app = initializeApp(firebaseConfig);
@@ -259,10 +254,9 @@
             alert("Erro Firebase: " + e.message);
         }
 
-        // --- SISTEMA DE LOGIN ---
         async function executarLogin() {
             const btn = document.getElementById('btn-login-submit');
-            const userVal = document.getElementById('u').value.toLowerCase().trim();
+            const userVal = document.getElementById('u').value.trim();
             const passVal = document.getElementById('p').value.trim();
 
             if (!userVal || !passVal) {
@@ -277,8 +271,14 @@
 
             try {
                 let userDocData = null;
-                const docRef = doc(db, "usuarios", userVal);
-                const docSnap = await getDoc(docRef);
+                let finalUserId = userVal;
+
+                // Tenta buscar documento com ID exato ou em minúsculas
+                let docSnap = await getDoc(doc(db, "usuarios", userVal));
+                if (!docSnap.exists()) {
+                    docSnap = await getDoc(doc(db, "usuarios", userVal.toLowerCase()));
+                    if (docSnap.exists()) finalUserId = userVal.toLowerCase();
+                }
 
                 if (docSnap.exists()) {
                     userDocData = docSnap.data();
@@ -286,12 +286,15 @@
                     const q = query(collection(db, "usuarios"), where("login", "==", userVal));
                     const querySnapshot = await getDocs(q);
                     if (!querySnapshot.empty) {
-                        querySnapshot.forEach((d) => { userDocData = d.data(); });
+                        querySnapshot.forEach((d) => { 
+                            userDocData = d.data(); 
+                            finalUserId = d.id;
+                        });
                     }
                 }
 
                 if (userDocData && (userDocData.senha === passVal || userDocData.Senha === passVal)) {
-                    logado = userVal;
+                    logado = finalUserId;
                     
                     if (document.getElementById('remember').checked) {
                         localStorage.setItem('gestor_u', userVal);
@@ -307,377 +310,4 @@
                 } else {
                     alert("Usuário ou senha incorretos.");
                 }
-            } catch (err) {
-                alert("Erro ao conectar: " + err.message);
-            } finally {
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerText = "ENTRAR";
-                }
-            }
-        }
-
-        // --- FIRESTORE LISTENERS ---
-        function iniciarListenersFirestore() {
-            if (!logado) return;
-
-            // Escutar Clientes
-            const colClientes = collection(db, "usuarios", logado, "clientes");
-            onSnapshot(colClientes, (snapshot) => {
-                clientesRaw = [];
-                snapshot.forEach(docSnap => {
-                    clientesRaw.push({ id: docSnap.id, ...docSnap.data() });
-                });
-                renderizarClientes();
-            });
-
-            // Escutar Mural
-            const colMural = collection(db, "usuarios", logado, "mural");
-            onSnapshot(colMural, (snapshot) => {
-                muralRaw = [];
-                snapshot.forEach(docSnap => {
-                    muralRaw.push({ id: docSnap.id, ...docSnap.data() });
-                });
-                renderizarMural();
-            });
-        }
-
-        // --- RENDERIZAÇÃO DA LISTA ---
-        function renderizarClientes() {
-            const termo = document.getElementById('busca').value.toLowerCase().trim();
-            const container = document.getElementById('lista-corpo');
-            container.innerHTML = "";
-
-            const ativos = clientesRaw.filter(c => !c.arquivado && !c.pago);
-            const pagosCount = clientesRaw.filter(c => c.pago && !c.arquivado).length;
-            const arquivadosCount = clientesRaw.filter(c => c.arquivado).length;
-
-            document.getElementById('btn-aba-pagos').innerText = `Pagos (${pagosCount})`;
-            document.getElementById('btn-aba-arquivados').innerText = `Arquivados (${arquivadosCount})`;
-            document.getElementById('contagem').innerHTML = `Total de Ativos: <b>${ativos.length}</b>`;
-
-            const filtrados = ativos.filter(c => {
-                const nome = (c.nome || "").toLowerCase();
-                const painel = (c.painel || "").toLowerCase();
-                const whats = (c.whats || "").toLowerCase();
-                return nome.includes(termo) || painel.includes(termo) || whats.includes(termo);
-            });
-
-            if (filtrados.length === 0) {
-                container.innerHTML = `<p style="text-align:center; color:var(--text-sub); margin-top:20px; font-weight:600;">Nenhum cliente encontrado.</p>`;
-                return;
-            }
-
-            filtrados.forEach(c => {
-                const card = document.createElement('div');
-                card.className = 'card-cliente';
-
-                const hoje = new Date().toISOString().split('T')[0];
-                let statusClass = 'em-dia';
-                let statusTexto = 'EM DIA';
-
-                if (c.vencimento < hoje) {
-                    statusClass = 'vencido';
-                    statusTexto = 'VENCIDO';
-                    card.classList.add('vencido-border');
-                } else if (c.vencimento === hoje) {
-                    statusClass = 'vence-logo';
-                    statusTexto = 'VENCE HOJE';
-                }
-
-                card.innerHTML = `
-                    <div class="container-badges">
-                        <span class="status-vencimento ${statusClass}">${statusTexto}</span>
-                        ${c.prolongado ? `<span class="selo-prolongado">Prolongado</span>` : ''}
-                    </div>
-                    <h3>${c.nome || 'Sem nome'}</h3>
-                    <div class="info-p">Painel: <b>${c.painel || '-'}</b></div>
-                    <div class="info-p">Vencimento: <b>${formatarData(c.vencimento)}</b></div>
-                    <div class="info-p">WhatsApp: <b>${c.whats || '-'}</b></div>
-                    ${c.obs ? `<div class="obs-box">${c.obs}</div>` : ''}
-                    <div class="card-linha"></div>
-                    <div class="flex-botoes-icones">
-                        <button class="btn-icone btn-i-renovar" title="Renovar +1 Mês" data-id="${c.id}" data-action="renovar">
-                            <svg viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-                        </button>
-                        <button class="btn-icone btn-i-pago" title="Marcar como Pago" data-id="${c.id}" data-action="pago">
-                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                        </button>
-                        <button class="btn-icone btn-i-prolongar" title="Prolongar 3 Dias" data-id="${c.id}" data-action="prolongar">
-                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        </button>
-                        <button class="btn-icone btn-i-editar" title="Editar" data-id="${c.id}" data-action="editar">
-                            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                        </button>
-                        <button class="btn-icone btn-i-arquivar" title="Arquivar" data-id="${c.id}" data-action="arquivar">
-                            <svg viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
-                        </button>
-                        <button class="btn-icone btn-i-excluir" title="Excluir" data-id="${c.id}" data-action="excluir">
-                            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                        </button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function formatarData(dataIso) {
-            if (!dataIso) return '-';
-            const partes = dataIso.split('-');
-            if (partes.length !== 3) return dataIso;
-            return `${partes[2]}/${partes[1]}/${partes[0]}`;
-        }
-
-        // --- RENDERIZAÇÃO DO MURAL ---
-        function renderizarMural() {
-            const container = document.getElementById('lista-mural');
-            container.innerHTML = "";
-            muralRaw.forEach(m => {
-                const item = document.createElement('div');
-                item.className = 'card-aviso';
-                item.innerHTML = `
-                    <span>${m.texto}</span>
-                    <button style="border:none; background:none; color:var(--danger); font-weight:800; cursor:pointer;" data-mural-id="${m.id}">✕</button>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        // --- AÇÕES NOS CLIENTES ---
-        async function tratarAcaoCliente(id, acao) {
-            const docRef = doc(db, "usuarios", logado, "clientes", id);
-            const cli = clientesRaw.find(c => c.id === id);
-
-            if (acao === 'excluir') {
-                if (confirm("Tem certeza que deseja excluir permanentemente este cliente?")) {
-                    await deleteDoc(docRef);
-                }
-            } else if (acao === 'arquivar') {
-                await updateDoc(docRef, { arquivado: true });
-            } else if (acao === 'pago') {
-                await updateDoc(docRef, { pago: true });
-            } else if (acao === 'prolongar') {
-                if (!cli || !cli.vencimento) return;
-                let d = new Date(cli.vencimento);
-                d.setDate(d.getDate() + 3);
-                await updateDoc(docRef, { 
-                    vencimento: d.toISOString().split('T')[0],
-                    prolongado: true 
-                });
-            } else if (acao === 'renovar') {
-                if (!cli || !cli.vencimento) return;
-                let d = new Date(cli.vencimento);
-                d.setMonth(d.getMonth() + 1);
-                await updateDoc(docRef, { 
-                    vencimento: d.toISOString().split('T')[0],
-                    prolongado: false,
-                    pago: false
-                });
-            } else if (acao === 'editar') {
-                abrirModalCliente(cli);
-            }
-        }
-
-        // --- MODAL DE CLIENTE ---
-        function abrirModalCliente(cli = null) {
-            const modal = document.getElementById('modal-cliente');
-            if (cli) {
-                document.getElementById('modal-titulo').innerText = "Editar Cliente";
-                document.getElementById('edit-id').value = cli.id;
-                document.getElementById('cli-nome').value = cli.nome || "";
-                document.getElementById('cli-painel').value = cli.painel || "";
-                document.getElementById('cli-whats').value = cli.whats || "";
-                document.getElementById('cli-vencimento').value = cli.vencimento || "";
-                document.getElementById('cli-obs').value = cli.obs || "";
-            } else {
-                document.getElementById('modal-titulo').innerText = "Novo Cliente";
-                document.getElementById('edit-id').value = "";
-                document.getElementById('cli-nome').value = "";
-                document.getElementById('cli-painel').value = "";
-                document.getElementById('cli-whats').value = "";
-                document.getElementById('cli-vencimento').value = "";
-                document.getElementById('cli-obs').value = "";
-            }
-            modal.style.display = 'flex';
-        }
-
-        async function salvarCliente() {
-            const id = document.getElementById('edit-id').value;
-            const dados = {
-                nome: document.getElementById('cli-nome').value.trim(),
-                painel: document.getElementById('cli-painel').value.trim(),
-                whats: document.getElementById('cli-whats').value.trim(),
-                vencimento: document.getElementById('cli-vencimento').value,
-                obs: document.getElementById('cli-obs').value.trim()
-            };
-
-            if (!dados.nome || !dados.vencimento) {
-                alert("Preencha ao menos o nome e a data de vencimento.");
-                return;
-            }
-
-            if (id) {
-                await updateDoc(doc(db, "usuarios", logado, "clientes", id), dados);
-            } else {
-                dados.arquivado = false;
-                dados.pago = false;
-                dados.prolongado = false;
-                await addDoc(collection(db, "usuarios", logado, "clientes"), dados);
-            }
-
-            document.getElementById('modal-cliente').style.display = 'none';
-        }
-
-        // --- MODAL PAGOS E ARQUIVADOS ---
-        function abrirModalPagos() {
-            const container = document.getElementById('lista-pagos-corpo');
-            container.innerHTML = "";
-            const pagos = clientesRaw.filter(c => c.pago && !c.arquivado);
-            
-            if(pagos.length === 0) {
-                container.innerHTML = "<p style='font-size:13px; color:var(--text-sub);'>Nenhum cliente marcado como pago.</p>";
-            } else {
-                pagos.forEach(c => {
-                    const item = document.createElement('div');
-                    item.style.padding = "10px 0";
-                    item.style.borderBottom = "1px solid #f1f5f9";
-                    item.style.display = "flex";
-                    item.style.justifyContent = "space-between";
-                    item.style.alignItems = "center";
-                    item.innerHTML = `
-                        <div>
-                            <strong style="font-size:14px;">${c.nome}</strong>
-                            <div style="font-size:11px; color:var(--text-sub);">${c.painel} - Vence: ${formatarData(c.vencimento)}</div>
-                        </div>
-                        <button style="background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; font-size:10px; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer;" data-desmarcar-pago="${c.id}">REATIVAR</button>
-                    `;
-                    container.appendChild(item);
-                });
-            }
-            document.getElementById('modal-pagos').style.display = 'flex';
-        }
-
-        function abrirModalArquivados() {
-            const container = document.getElementById('lista-arquivados-corpo');
-            container.innerHTML = "";
-            const arq = clientesRaw.filter(c => c.arquivado);
-            
-            if(arq.length === 0) {
-                container.innerHTML = "<p style='font-size:13px; color:var(--text-sub);'>Nenhum cliente arquivado.</p>";
-            } else {
-                arq.forEach(c => {
-                    const item = document.createElement('div');
-                    item.style.padding = "10px 0";
-                    item.style.borderBottom = "1px solid #f1f5f9";
-                    item.style.display = "flex";
-                    item.style.justifyContent = "space-between";
-                    item.style.alignItems = "center";
-                    item.innerHTML = `
-                        <div>
-                            <strong style="font-size:14px;">${c.nome}</strong>
-                            <div style="font-size:11px; color:var(--text-sub);">${c.painel}</div>
-                        </div>
-                        <button style="background:#dbeafe; border:1px solid #bfdbfe; color:#1e40af; font-size:10px; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer;" data-desarquivar="${c.id}">DESARQUIVAR</button>
-                    `;
-                    container.appendChild(item);
-                });
-            }
-            document.getElementById('modal-arquivados').style.display = 'flex';
-        }
-
-        // --- EVENT LISTENERS ---
-        window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('btn-login-submit').addEventListener('click', executarLogin);
-            
-            document.getElementById('u').addEventListener('keypress', (e) => { if(e.key === 'Enter') executarLogin(); });
-            document.getElementById('p').addEventListener('keypress', (e) => { if(e.key === 'Enter') executarLogin(); });
-
-            document.getElementById('busca').addEventListener('input', renderizarClientes);
-            document.getElementById('btn-abrir-add-cli').addEventListener('click', () => abrirModalCliente());
-            document.getElementById('btn-salvar-cli').addEventListener('click', salvarCliente);
-            document.getElementById('btn-fechar-cli').addEventListener('click', () => { document.getElementById('modal-cliente').style.display = 'none'; });
-
-            document.getElementById('btn-aba-pagos').addEventListener('click', abrirModalPagos);
-            document.getElementById('btn-fechar-pagos').addEventListener('click', () => { document.getElementById('modal-pagos').style.display = 'none'; });
-
-            document.getElementById('btn-aba-arquivados').addEventListener('click', abrirModalArquivados);
-            document.getElementById('btn-fechar-arquivados').addEventListener('click', () => { document.getElementById('modal-arquivados').style.display = 'none'; });
-
-            document.getElementById('btn-abrir-robo').addEventListener('click', () => { document.getElementById('modal-robo').style.display = 'flex'; });
-            document.getElementById('btn-fechar-robo').addEventListener('click', () => { document.getElementById('modal-robo').style.display = 'none'; });
-
-            document.getElementById('btn-sair').addEventListener('click', () => {
-                if(confirm("Deseja realmente sair?")) {
-                    localStorage.removeItem('gestor_u');
-                    localStorage.removeItem('gestor_p');
-                    location.reload();
-                }
-            });
-
-            // Clique nos botões dinâmicos de cliente
-            document.getElementById('lista-corpo').addEventListener('click', (e) => {
-                const btn = e.target.closest('[data-action]');
-                if (btn) {
-                    const id = btn.getAttribute('data-id');
-                    const action = btn.getAttribute('data-action');
-                    tratarAcaoCliente(id, action);
-                }
-            });
-
-            // Clique em notas do mural
-            document.getElementById('lista-mural').addEventListener('click', async (e) => {
-                const btn = e.target.closest('[data-mural-id]');
-                if (btn) {
-                    const id = btn.getAttribute('data-mural-id');
-                    await deleteDoc(doc(db, "usuarios", logado, "mural", id));
-                }
-            });
-
-            // Adicionar Nota no Mural
-            document.getElementById('btn-add-mural').addEventListener('click', async () => {
-                const txt = prompt("Digite o aviso/anotação para o mural:");
-                if (txt) {
-                    await addDoc(collection(db, "usuarios", logado, "mural"), { texto: txt });
-                }
-            });
-
-            // Toggle Visual do Mural
-            document.getElementById('btn-hide-mural').addEventListener('click', () => {
-                muralOculto = !muralOculto;
-                document.getElementById('wrapper-mural-retratil').style.display = muralOculto ? 'none' : 'block';
-                document.getElementById('btn-hide-mural').innerText = muralOculto ? 'Exibir Mural' : 'Ocultar Mural';
-            });
-
-            // Desmarcar Pago
-            document.getElementById('lista-pagos-corpo').addEventListener('click', async (e) => {
-                const btn = e.target.closest('[data-desmarcar-pago]');
-                if (btn) {
-                    const id = btn.getAttribute('data-desmarcar-pago');
-                    await updateDoc(doc(db, "usuarios", logado, "clientes", id), { pago: false });
-                    abrirModalPagos();
-                }
-            });
-
-            // Desarquivar
-            document.getElementById('lista-arquivados-corpo').addEventListener('click', async (e) => {
-                const btn = e.target.closest('[data-desarquivar]');
-                if (btn) {
-                    const id = btn.getAttribute('data-desarquivar');
-                    await updateDoc(doc(db, "usuarios", logado, "clientes", id), { arquivado: false });
-                    abrirModalArquivados();
-                }
-            });
-
-            // Auto-login se salvou anteriormente
-            const savedU = localStorage.getItem('gestor_u');
-            const savedP = localStorage.getItem('gestor_p');
-            if (savedU && savedP) { 
-                document.getElementById('u').value = savedU; 
-                document.getElementById('p').value = savedP; 
-                document.getElementById('remember').checked = true; 
-                executarLogin(); 
-            }
-        });
-    </script>
-</body>
-</html>
+       
