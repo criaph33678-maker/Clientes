@@ -303,9 +303,8 @@
 
         window.logar = async () => {
             const btn = document.querySelector('.btn-login-3d');
-            try {
-                const login = document.getElementById('u').value.toLowerCase().trim();
-                const pass = document.getElementById('p').value;
+            const userVal = document.getElementById('u').value.toLowerCase().trim();
+            const passVal = document.getElementById('p').value.trim();
 
-                if(!login || !pass) {
-                    return al
+            if(!userVal || !passVal) {
+                alert("Preencha o usuário 
