@@ -1,152 +1,204 @@
-let clientes = JSON.parse(localStorage.getItem("flextv_clientes")) || [];
-let escondeContagem = JSON.parse(localStorage.getItem("flextv_ocultar")) || false;
-let idClienteEmEdicao = null;
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestor Flex TV</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-function salvarNoStorage() {
-  localStorage.setItem("flextv_clientes", JSON.stringify(clientes));
-  localStorage.setItem("flextv_ocultar", JSON.stringify(escondeContagem));
-}
+  <div class="app-container">
+    <header class="app-header">
+      <h1>FLEX TV</h1>
+      <p class="subtitle">Gestor de Assinaturas & Logins</p>
+    </header>
+    
+    <!-- CONTADOR DE CLIENTES ATIVOS (Ignora Arquivados) -->
+    <div class="dashboard-card">
+      <div class="counter-box">
+        <div class="counter-header">
+          <span>Clientes Ativos</span>
+          <button id="btn-toggle-eye" class="btn-eye" title="Esconder/Mostrar Contagens">👁️</button>
+        </div>
+        <h2 id="total-clientes" class="counter-value">0</h2>
+      </div>
+    </div>
 
-function renderizarApp() {
-  const container = document.getElementById("lista-clientes");
-  const elTotal = document.getElementById("total-clientes");
-  const btnEye = document.getElementById("btn-toggle-eye");
-  
-  container.innerHTML = "";
+    <!-- PAINEL DE CADASTRO -->
+    <section class="card-form">
+      <h3>Novo Cliente / Login</h3>
+      <div class="input-group">
+        <input type="text" id="novo-nome" placeholder="Nome do Cliente">
+        <input type="text" id="novo-login" placeholder="Login / Usuário">
+        <input type="date" id="novo-vencimento">
+        <button id="btn-cadastrar" class="btn-primary">Adicionar Cliente</button>
+      </div>
+    </section>
 
-  // MODIFICAÇÃO 3: Filtra clientes NÃO arquivados
-  const clientesAtivos = clientes.filter(c => !c.arquivado);
+    <!-- LISTA DE CLIENTES -->
+    <section class="lista-section">
+      <h3>Lista de Clientes Ativos</h3>
+      <div id="lista-clientes" class="lista-container"></div>
+    </section>
 
-  // MODIFICAÇÃO 3: Exibe o contador ignorando os arquivados
-  if (escondeContagem) {
-    elTotal.innerText = "***";
-    btnEye.innerText = "🙈";
-  } else {
-    elTotal.innerText = clientesAtivos.length;
-    btnEye.innerText = "👁️";
-  }
+    <!-- MODAL DE PAGO / EXTENSÃO DE PRAZO -->
+    <div id="modal-pago" class="modal hidden">
+      <div class="modal-box">
+        <h3>Estender Prazo de Login</h3>
+        <p id="modal-cliente-info"></p>
+        <label for="nova-data-vencimento">Selecione a nova data para estender:</label>
+        <input type="date" id="nova-data-vencimento">
+        <div class="modal-buttons">
+          <button id="btn-confirmar-pago" class="btn-verde">Confirmar Pago</button>
+          <button id="btn-cancelar-modal" class="btn-cinza">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  // MODIFICAÇÃO 1: Ordenação por data de vencimento próxima
-  // Clientes marcados como PAGO com vencimento próximo sobem para o TOPO em VERDE
-  clientesAtivos.sort((a, b) => new Date(a.dataVencimento) - new Date(b.dataVencimento));
+  <!-- CÓDIGO JAVASCRIPT EMBUTIDO CORRETAMENTE -->
+  <script>
+    let clientes = JSON.parse(localStorage.getItem("flextv_clientes")) || [];
+    let escondeContagem = JSON.parse(localStorage.getItem("flextv_ocultar")) || false;
+    let idClienteEmEdicao = null;
 
-  if (clientesAtivos.length === 0) {
-    container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">Nenhum cliente ativo.</p>';
-  } else {
-    clientesAtivos.forEach(cliente => {
-      const card = document.createElement("div");
+    function salvarNoStorage() {
+      localStorage.setItem("flextv_clientes", JSON.stringify(clientes));
+      localStorage.setItem("flextv_ocultar", JSON.stringify(escondeContagem));
+    }
+
+    function renderizarApp() {
+      const container = document.getElementById("lista-clientes");
+      const elTotal = document.getElementById("total-clientes");
+      const btnEye = document.getElementById("btn-toggle-eye");
       
-      // MODIFICAÇÃO 1: Fica verde quando o cliente tiver status PAGO
-      card.className = `cliente-card ${cliente.pago ? 'pago' : ''}`;
+      container.innerHTML = "";
 
-      card.innerHTML = `
-        <div class="cliente-detalhes">
-          <h4>${cliente.nome}</h4>
-          <p>Login: <strong>${cliente.login || 'Não informado'}</strong></p>
-          <!-- MODIFICAÇÃO 1: A data de cadastro do cliente PERMANECE INTACTA -->
-          <p><small>Cadastro: ${formatarData(cliente.dataCadastro)}</small></p>
-          <p>Vencimento: <strong>${formatarData(cliente.dataVencimento)}</strong></p>
-          ${cliente.pago ? '<span class="badge-pago">PAGO</span>' : ''}
-        </div>
-        <div class="actions">
-          <button class="btn-verde" onclick="abrirModalPago(${cliente.id})">Pago</button>
-          <button class="btn-arquivar" onclick="arquivarCliente(${cliente.id})">Arquivar</button>
-        </div>
-      `;
+      const clientesAtivos = clientes.filter(c => !c.arquivado);
 
-      container.appendChild(card);
+      if (escondeContagem) {
+        elTotal.innerText = "***";
+        btnEye.innerText = "🙈";
+      } else {
+        elTotal.innerText = clientesAtivos.length;
+        btnEye.innerText = "👁️";
+      }
+
+      clientesAtivos.sort((a, b) => new Date(a.dataVencimento) - new Date(b.dataVencimento));
+
+      if (clientesAtivos.length === 0) {
+        container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">Nenhum cliente ativo.</p>';
+      } else {
+        clientesAtivos.forEach(cliente => {
+          const card = document.createElement("div");
+          card.className = `cliente-card ${cliente.pago ? 'pago' : ''}`;
+
+          card.innerHTML = `
+            <div class="cliente-detalhes">
+              <h4>${cliente.nome}</h4>
+              <p>Login: <strong>${cliente.login || 'Não informado'}</strong></p>
+              <p><small>Cadastro: ${formatarData(cliente.dataCadastro)}</small></p>
+              <p>Vencimento: <strong>${formatarData(cliente.dataVencimento)}</strong></p>
+              ${cliente.pago ? '<span class="badge-pago">PAGO</span>' : ''}
+            </div>
+            <div class="actions">
+              <button class="btn-verde" onclick="abrirModalPago(${cliente.id})">Pago</button>
+              <button class="btn-arquivar" onclick="arquivarCliente(${cliente.id})">Arquivar</button>
+            </div>
+          `;
+
+          container.appendChild(card);
+        });
+      }
+    }
+
+    document.getElementById("btn-toggle-eye").addEventListener("click", () => {
+      escondeContagem = !escondeContagem;
+      salvarNoStorage();
+      renderizarApp();
     });
-  }
-}
 
-// Botão de alternar olho
-document.getElementById("btn-toggle-eye").addEventListener("click", () => {
-  escondeContagem = !escondeContagem;
-  salvarNoStorage();
-  renderizarApp();
-});
+    function formatarData(dataIso) {
+      if (!dataIso) return "";
+      const partes = dataIso.split("-");
+      return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
 
-function formatarData(dataIso) {
-  if (!dataIso) return "";
-  const partes = dataIso.split("-");
-  return `${partes[2]}/${partes[1]}/${partes[0]}`;
-}
+    document.getElementById("btn-cadastrar").addEventListener("click", () => {
+      const nome = document.getElementById("novo-nome").value;
+      const login = document.getElementById("novo-login").value;
+      const vencimento = document.getElementById("novo-vencimento").value;
 
-// Cadastrar Novo Cliente
-document.getElementById("btn-cadastrar").addEventListener("click", () => {
-  const nome = document.getElementById("novo-nome").value;
-  const login = document.getElementById("novo-login").value;
-  const vencimento = document.getElementById("novo-vencimento").value;
+      if (!nome || !vencimento) {
+        alert("Informe ao menos o nome e a data de vencimento!");
+        return;
+      }
 
-  if (!nome || !vencimento) {
-    alert("Informe ao menos o nome e a data de vencimento!");
-    return;
-  }
+      const hoje = new Date().toISOString().split("T")[0];
 
-  const hoje = new Date().toISOString().split("T")[0];
+      const novo = {
+        id: Date.now(),
+        nome: nome,
+        login: login,
+        dataCadastro: hoje,
+        dataVencimento: vencimento,
+        pago: false,
+        arquivado: false
+      };
 
-  const novo = {
-    id: Date.now(),
-    nome: nome,
-    login: login,
-    dataCadastro: hoje, // Data fixada na criação
-    dataVencimento: vencimento,
-    pago: false,
-    arquivado: false
-  };
+      clientes.push(novo);
+      salvarNoStorage();
+      renderizarApp();
 
-  clientes.push(novo);
-  salvarNoStorage();
-  renderizarApp();
+      document.getElementById("novo-nome").value = "";
+      document.getElementById("novo-login").value = "";
+      document.getElementById("novo-vencimento").value = "";
+    });
 
-  document.getElementById("novo-nome").value = "";
-  document.getElementById("novo-login").value = "";
-  document.getElementById("novo-vencimento").value = "";
-});
+    function abrirModalPago(id) {
+      idClienteEmEdicao = id;
+      const cliente = clientes.find(c => c.id === id);
+      document.getElementById("modal-cliente-info").innerText = `Cliente: ${cliente.nome}`;
+      document.getElementById("modal-pago").classList.remove("hidden");
+    }
 
-// MODIFICAÇÃO 1: Pede a data para estender ao clicar em PAGO
-function abrirModalPago(id) {
-  idClienteEmEdicao = id;
-  const cliente = clientes.find(c => c.id === id);
-  document.getElementById("modal-cliente-info").innerText = `Cliente: ${cliente.nome}`;
-  document.getElementById("modal-pago").classList.remove("hidden");
-}
+    function fecharModal() {
+      document.getElementById("modal-pago").classList.add("hidden");
+      document.getElementById("nova-data-vencimento").value = "";
+      idClienteEmEdicao = null;
+    }
 
-function fecharModal() {
-  document.getElementById("modal-pago").classList.add("hidden");
-  document.getElementById("nova-data-vencimento").value = "";
-  idClienteEmEdicao = null;
-}
+    document.getElementById("btn-confirmar-pago").addEventListener("click", () => {
+      const novaData = document.getElementById("nova-data-vencimento").value;
+      if (!novaData) {
+        alert("Selecione a nova data para prolongar!");
+        return;
+      }
 
-// MODIFICAÇÃO 1: Estende a data do vencimento mantendo a data inicial salva e marca verde
-document.getElementById("btn-confirmar-pago").addEventListener("click", () => {
-  const novaData = document.getElementById("nova-data-vencimento").value;
-  if (!novaData) {
-    alert("Selecione a nova data para prolongar!");
-    return;
-  }
+      const cliente = clientes.find(c => c.id === idClienteEmEdicao);
+      if (cliente) {
+        cliente.dataVencimento = novaData;
+        cliente.pago = true;
+        salvarNoStorage();
+      }
 
-  const cliente = clientes.find(c => c.id === idClienteEmEdicao);
-  if (cliente) {
-    cliente.dataVencimento = novaData; // Atualiza a data estendida
-    cliente.pago = true;               // Fica verde e reorganiza na lista
-    salvarNoStorage();
-  }
+      fecharModal();
+      renderizarApp();
+    });
 
-  fecharModal();
-  renderizarApp();
-});
+    document.getElementById("btn-cancelar-modal").addEventListener("click", fecharModal);
 
-document.getElementById("btn-cancelar-modal").addEventListener("click", fecharModal);
+    function arquivarCliente(id) {
+      const cliente = clientes.find(c => c.id === id);
+      if (cliente) {
+        cliente.arquivado = true;
+        salvarNoStorage();
+        renderizarApp();
+      }
+    }
 
-// MODIFICAÇÃO 3: Arquiva o cliente (Removendo-o da contagem e lista ativa)
-function arquivarCliente(id) {
-  const cliente = clientes.find(c => c.id === id);
-  if (cliente) {
-    cliente.arquivado = true;
-    salvarNoStorage();
     renderizarApp();
-  }
-}
-
-renderizarApp();
+  </script>
+</body>
+</html>
