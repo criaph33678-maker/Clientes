@@ -75,7 +75,7 @@
         .btn-toggle-mural { background: transparent; border: none; color: var(--text-sub); font-size: 11px; font-weight: 700; padding: 8px; cursor: pointer; }
         
         #wrapper-mural-retratil { max-height: 100px; overflow-y: auto; margin-top: 8px; }
-        .card-aviso { background: #ffffff; padding: 10px 14px; border-radius: 12px; margin-bottom: 6px; font-size: 12px; font-weight: 600; border-left: 4px solid var(--primary); color: var(--text); box-shadow: var(--shadow-sm); border-top: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
+        .card-aviso { background: #ffffff; padding: 10px 14px; border-radius: 12px; margin-bottom: 6px; font-size: 12px; font-weight: 600; border-left: 4px solid var(--primary); color: var(--text); box-shadow: var(--shadow-sm); border-top: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
 
         /* CONTEÚDO ROLÁVEL */
         .conteudo-rolavel { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px; background: var(--bg); }
@@ -257,7 +257,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, where, getDocs, orderBy, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDMQbFBbbKFABCwwTxuESpXsz_Knz-V4FI",
@@ -272,6 +272,7 @@
         let dadosRaw = [];
         let pagosRaw = [];
         let arquivadosRaw = [];
+        let muralRaw = [];
         let logado = null;
         let ocultarValores = false;
         let muralOculto = false;
@@ -302,10 +303,381 @@
         });
 
         window.logar = async () => {
-            const btn = document.querySelector('.btn-login-3d');
-            try {
-                const login = document.getElementById('u').value.toLowerCase().trim();
-                const pass = document.getElementById('p').value;
+            const login = document.getElementById('u').value.toLowerCase().trim();
+            const pass = document.getElementById('p').value;
 
-                if(!login || !pass) {
-                    return al
+            if(!login || !pass) {
+                alert("Preencha o usuário e a senha.");
+                return;
+            }
+
+            try {
+                const userDoc = await getDoc(doc(db, "usuarios", login));
+                if (userDoc.exists() && userDoc.data().senha === pass) {
+                    logado = login;
+                    if (document.getElementById('remember').checked) {
+                        localStorage.setItem('gestor_u', login);
+                        localStorage.setItem('gestor_p', pass);
+                    } else {
+                        localStorage.removeItem('gestor_u');
+                        localStorage.removeItem('gestor_p');
+                    }
+                    document.getElementById('tela-login').style.display = 'none';
+                    document.getElementById('app').style.display = 'flex';
+                    iniciarEscuta();
+                } else {
+                    alert("Usuário ou senha incorretos.");
+                }
+            } catch (err) {
+                alert("Erro ao efetuar login: " + err.message);
+            }
+        };
+
+        window.confirmarSair = () => {
+            if(confirm("Deseja realmente sair?")) {
+                localStorage.removeItem('gestor_u');
+                localStorage.removeItem('gestor_p');
+                location.reload();
+            }
+        };
+
+        function iniciarEscuta() {
+            if(!logado) return;
+
+            // Clientes
+            onSnapshot(collection(db, "usuarios", logado, "clientes"), (snapshot) => {
+                dadosRaw = [];
+                pagosRaw = [];
+                arquivadosRaw = [];
+
+                snapshot.forEach(docSnap => {
+                    const item = { id: docSnap.id, ...docSnap.data() };
+                    if (item.arquivado) {
+                        arquivadosRaw.push(item);
+                    } else if (item.pago) {
+                        pagosRaw.push(item);
+                    } else {
+                        dadosRaw.push(item);
+                    }
+                });
+
+                renderizarApp();
+            });
+
+            // Mural
+            onSnapshot(collection(db, "usuarios", logado, "mural"), (snapshot) => {
+                muralRaw = [];
+                snapshot.forEach(docSnap => {
+                    muralRaw.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                renderizarMural();
+            });
+        }
+
+        function renderizarApp() {
+            const container = document.getElementById('lista-corpo');
+            container.innerHTML = '';
+
+            const buscaVal = document.getElementById('busca').value.toLowerCase();
+            
+            const filtrados = dadosRaw.filter(c => 
+                (c.nome && c.nome.toLowerCase().includes(buscaVal)) ||
+                (c.painel && c.painel.toLowerCase().includes(buscaVal)) ||
+                (c.whats && c.whats.includes(buscaVal))
+            );
+
+            // Ordenação por vencimento próximo
+            filtrados.sort((a, b) => new Date(a.vencimento) - new Date(b.vencimento));
+
+            document.getElementById('btn-aba-pagos').innerText = `Pagos (${pagosRaw.length})`;
+            document.getElementById('btn-aba-arquivados').innerText = `Arquivados (${arquivadosRaw.length})`;
+
+            const elContagem = document.getElementById('contagem');
+            if (ocultarValores) {
+                elContagem.innerHTML = `Ativos: <b>***</b>`;
+            } else {
+                elContagem.innerHTML = `Ativos: <b>${filtrados.length}</b>`;
+            }
+
+            filtrados.forEach(c => {
+                const card = document.createElement('div');
+                const statusInfo = calcularStatus(c.vencimento);
+                card.className = `card-cliente ${statusInfo.classe === 'vencido' ? 'vencido-border' : ''}`;
+
+                card.innerHTML = `
+                    <div class="container-badges">
+                        <span class="status-vencimento ${statusInfo.classe}">${statusInfo.texto}</span>
+                        ${c.prolongado ? '<span class="selo-prolongado">Prolongado</span>' : ''}
+                    </div>
+                    <h3>${c.nome}</h3>
+                    <p class="info-p">Painel: <b>${c.painel || 'Não informado'}</b></p>
+                    <p class="info-p">WhatsApp: <b>${c.whats || 'Não informado'}</b></p>
+                    <p class="info-p">Vencimento: <b>${formatarDataBr(c.vencimento)}</b></p>
+                    ${c.obs ? `<div class="obs-box">${c.obs}</div>` : ''}
+                    <div class="card-linha"></div>
+                    <div class="flex-botoes-icones">
+                        <button class="btn-icone btn-i-renovar" title="Renovar +30 dias" onclick="window.renovarCliente('${c.id}', '${c.vencimento}')">
+                            <svg viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                        </button>
+                        <button class="btn-icone btn-i-editar" title="Editar" onclick="window.abrirModalEdit('${c.id}')">
+                            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        <button class="btn-icone btn-i-pago" title="Marcar Pago" onclick="window.marcarPago('${c.id}')">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                        </button>
+                        <button class="btn-icone btn-i-prolongar" title="Prolongar Prazo" onclick="window.prolongarPrazo('${c.id}')">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </button>
+                        <button class="btn-icone btn-i-arquivar" title="Arquivar" onclick="window.arquivarCliente('${c.id}')">
+                            <svg viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                        </button>
+                        <button class="btn-icone btn-i-excluir" title="Excluir" onclick="window.excluirCliente('${c.id}')">
+                            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderizarMural() {
+            const container = document.getElementById('lista-mural');
+            container.innerHTML = '';
+            muralRaw.forEach(n => {
+                const el = document.createElement('div');
+                el.className = 'card-aviso';
+                el.innerHTML = `
+                    <span>${n.texto}</span>
+                    <button onclick="window.deletarMural('${n.id}')" style="background:none; border:none; color:var(--danger); font-weight:bold; cursor:pointer; margin-left:10px;">✕</button>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function calcularStatus(vencimentoIso) {
+            if(!vencimentoIso) return { texto: 'Indefinido', classe: 'em-dia' };
+            const hoje = new Date();
+            hoje.setHours(0,0,0,0);
+            const dataVenc = new Date(vencimentoIso + 'T00:00:00');
+            const diffDias = Math.ceil((dataVenc - hoje) / (1000 * 60 * 60 * 24));
+
+            if (diffDias < 0) return { texto: 'Vencido', classe: 'vencido' };
+            if (diffDias <= 2) return { texto: 'Vence Logo', classe: 'vence-logo' };
+            return { texto: 'Em Dia', classe: 'em-dia' };
+        }
+
+        function formatarDataBr(dataIso) {
+            if(!dataIso) return '-';
+            const p = dataIso.split('-');
+            return `${p[2]}/${p[1]}/${p[0]}`;
+        }
+
+        /* OPERAÇÕES DOS CLIENTES */
+        window.abrirModalAdd = () => {
+            document.getElementById('modal-titulo').innerText = "Novo Cliente";
+            document.getElementById('edit-id').value = "";
+            document.getElementById('cli-nome').value = "";
+            document.getElementById('cli-painel').value = "";
+            document.getElementById('cli-whats').value = "";
+            document.getElementById('cli-vencimento').value = "";
+            document.getElementById('cli-obs').value = "";
+            document.getElementById('modal-cliente').style.display = 'flex';
+        };
+
+        window.abrirModalEdit = (id) => {
+            const c = dadosRaw.find(item => item.id === id);
+            if(!c) return;
+            document.getElementById('modal-titulo').innerText = "Editar Cliente";
+            document.getElementById('edit-id').value = c.id;
+            document.getElementById('cli-nome').value = c.nome || "";
+            document.getElementById('cli-painel').value = c.painel || "";
+            document.getElementById('cli-whats').value = c.whats || "";
+            document.getElementById('cli-vencimento').value = c.vencimento || "";
+            document.getElementById('cli-obs').value = c.obs || "";
+            document.getElementById('modal-cliente').style.display = 'flex';
+        };
+
+        window.fecharModal = () => {
+            document.getElementById('modal-cliente').style.display = 'none';
+        };
+
+        window.processarCliente = async () => {
+            const id = document.getElementById('edit-id').value;
+            const nome = document.getElementById('cli-nome').value;
+            const painel = document.getElementById('cli-painel').value;
+            const whats = document.getElementById('cli-whats').value;
+            const vencimento = document.getElementById('cli-vencimento').value;
+            const obs = document.getElementById('cli-obs').value;
+
+            if(!nome || !vencimento) {
+                alert("Nome e Data de Vencimento são obrigatórios!");
+                return;
+            }
+
+            const dados = { nome, painel, whats, vencimento, obs };
+
+            try {
+                if(id) {
+                    await updateDoc(doc(db, "usuarios", logado, "clientes", id), dados);
+                } else {
+                    dados.pago = false;
+                    dados.arquivado = false;
+                    dados.prolongado = false;
+                    await addDoc(collection(db, "usuarios", logado, "clientes"), dados);
+                }
+                window.fecharModal();
+            } catch(e) {
+                alert("Erro ao salvar dados: " + e.message);
+            }
+        };
+
+        window.renovarCliente = async (id, vencimentoAtual) => {
+            if(!confirm("Deseja renovar este cliente por +30 dias?")) return;
+            let base = new Date();
+            if(vencimentoAtual) {
+                const dt = new Date(vencimentoAtual + 'T00:00:00');
+                if(dt > base) base = dt;
+            }
+            base.setDate(base.getDate() + 30);
+            const novaData = base.toISOString().split('T')[0];
+
+            await updateDoc(doc(db, "usuarios", logado, "clientes", id), {
+                vencimento: novaData,
+                prolongado: false,
+                pago: false
+            });
+        };
+
+        window.marcarPago = async (id) => {
+            await updateDoc(doc(db, "usuarios", logado, "clientes", id), { pago: true });
+        };
+
+        window.prolongarPrazo = async (id) => {
+            const dias = prompt("Quantos dias deseja prolongar o acesso?", "3");
+            if(!dias || isNaN(dias)) return;
+
+            const c = dadosRaw.find(i => i.id === id);
+            if(!c) return;
+
+            let dt = c.vencimento ? new Date(c.vencimento + 'T00:00:00') : new Date();
+            dt.setDate(dt.getDate() + parseInt(dias));
+            const novaData = dt.toISOString().split('T')[0];
+
+            await updateDoc(doc(db, "usuarios", logado, "clientes", id), {
+                vencimento: novaData,
+                prolongado: true
+            });
+        };
+
+        window.arquivarCliente = async (id) => {
+            if(!confirm("Arquivar este cliente? Ele deixará de ser contado nos ativos.")) return;
+            await updateDoc(doc(db, "usuarios", logado, "clientes", id), { arquivado: true });
+        };
+
+        window.excluirCliente = async (id) => {
+            if(!confirm("Confirma a exclusão permanente deste cliente?")) return;
+            await deleteDoc(doc(db, "usuarios", logado, "clientes", id));
+        };
+
+        /* MODAIS DE AUXÍLIO */
+        window.abrirModalPagos = () => {
+            const c = document.getElementById('lista-pagos-corpo');
+            c.innerHTML = pagosRaw.length === 0 ? '<p style="font-size:13px; color:#666;">Nenhum cliente em pagos.</p>' : '';
+            pagosRaw.forEach(item => {
+                c.innerHTML += `
+                    <div style="background:#f8fafc; padding:10px; border-radius:10px; margin-bottom:8px; border:1px solid #e2e8f0;">
+                        <b>${item.nome}</b> - ${formatarDataBr(item.vencimento)}
+                        <br><button onclick="window.desfazerPago('${item.id}')" style="background:none; border:none; color:var(--primary); font-size:11px; font-weight:bold; cursor:pointer; padding:0; margin-top:4px;">Retornar para Ativos</button>
+                    </div>
+                `;
+            });
+            document.getElementById('modal-pagos').style.display = 'flex';
+        };
+
+        window.desfazerPago = async (id) => {
+            await updateDoc(doc(db, "usuarios", logado, "clientes", id), { pago: false });
+            document.getElementById('modal-pagos').style.display = 'none';
+        };
+
+        window.abrirModalArquivados = () => {
+            const c = document.getElementById('lista-arquivados-corpo');
+            c.innerHTML = arquivadosRaw.length === 0 ? '<p style="font-size:13px; color:#666;">Nenhum cliente arquivado.</p>' : '';
+            arquivadosRaw.forEach(item => {
+                c.innerHTML += `
+                    <div style="background:#f8fafc; padding:10px; border-radius:10px; margin-bottom:8px; border:1px solid #e2e8f0;">
+                        <b>${item.nome}</b>
+                        <br><button onclick="window.desarquivar('${item.id}')" style="background:none; border:none; color:var(--primary); font-size:11px; font-weight:bold; cursor:pointer; padding:0; margin-top:4px;">Desarquivar</button>
+                    </div>
+                `;
+            });
+            document.getElementById('modal-arquivados').style.display = 'flex';
+        };
+
+        window.desarquivar = async (id) => {
+            await updateDoc(doc(db, "usuarios", logado, "clientes", id), { arquivado: false });
+            document.getElementById('modal-arquivados').style.display = 'none';
+        };
+
+        /* MURAL & AUXILIARES */
+        window.muralAcao = async (tipo) => {
+            if(tipo === 'add') {
+                const txt = prompt("Insira o texto da nota para o mural:");
+                if(txt) {
+                    await addDoc(collection(db, "usuarios", logado, "mural"), { texto: txt, criadoEm: new Date().toISOString() });
+                }
+            }
+        };
+
+        window.deletarMural = async (id) => {
+            await deleteDoc(doc(db, "usuarios", logado, "mural", id));
+        };
+
+        window.toggleMuralVisivel = () => {
+            muralOculto = !muralOculto;
+            localStorage.setItem('mural_oculto', muralOculto);
+            document.getElementById('wrapper-mural-retratil').style.display = muralOculto ? 'none' : 'block';
+            document.getElementById('btn-hide-mural').innerText = muralOculto ? "Exibir Mural" : "Ocultar Mural";
+        };
+
+        window.toggleOcultarStatus = () => {
+            ocultarValores = !ocultarValores;
+            document.getElementById('btn-ocultar-olho').innerText = ocultarValores ? '🙈' : '👁️';
+            renderizarApp();
+        };
+
+        window.filtrar = () => {
+            renderizarApp();
+        };
+
+        /* CONFIGS ROBÔ */
+        window.abrirModalRobo = async () => {
+            try {
+                const docSnap = await getDoc(doc(db, "usuarios", logado, "configuracoes", "robo"));
+                if(docSnap.exists()) {
+                    const d = docSnap.data();
+                    document.getElementById('msg-aviso').value = d.msgAviso || '';
+                    document.getElementById('msg-expirado').value = d.msgExpirado || '';
+                    document.getElementById('robo-frequencia').value = d.frequencia || '1';
+                    document.getElementById('hora-disparo-1').value = d.hora1 || '';
+                    document.getElementById('hora-disparo-2').value = d.hora2 || '';
+                }
+            } catch(e) {}
+            document.getElementById('modal-robo').style.display = 'flex';
+        };
+
+        window.salvarConfigRobo = async () => {
+            const dados = {
+                msgAviso: document.getElementById('msg-aviso').value,
+                msgExpirado: document.getElementById('msg-expirado').value,
+                frequencia: document.getElementById('robo-frequencia').value,
+                hora1: document.getElementById('hora-disparo-1').value,
+                hora2: document.getElementById('hora-disparo-2').value
+            };
+
+            await setDoc(doc(db, "usuarios", logado, "configuracoes", "robo"), dados);
+            alert("Configurações do robô salvas!");
+            document.getElementById('modal-robo').style.display = 'none';
+        };
+    </script>
+</body>
+</html>
