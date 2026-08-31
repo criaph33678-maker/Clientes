@@ -43,7 +43,7 @@
         /* APP MAIN DARK */
         #app { display: none; height: 100vh; width: 100vw; flex-direction: column; background: var(--bg); }
 
-        .header-fixo { background: rgba(19, 27, 46, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 16px; padding-top: calc(env(safe-area-inset-top) + 12px); z-index: 4000; border-bottom: 1px solid var(--card-brd); display: flex; flex-direction: column; gap: 12px; width: 100%; }
+        .header-fixo { background: rgba(19, 27, 46, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 16px; padding-top: calc(env(safe-area-inset-top) + 12px); z-index: 4000; border-bottom: 1px solid var(--card-brd); display: flex; flex-direction: column; gap: 10px; width: 100%; }
         
         .busca-container { background: #0b0f19; display: flex; align-items: center; padding: 10px 16px; border-radius: 16px; border: 1px solid var(--card-brd); gap: 10px; }
         .busca-container input { background: none; border: none; color: var(--text); flex: 1; outline: none; font-size: 14px; font-weight: 600; }
@@ -56,10 +56,13 @@
         .stats-topo { font-size: 13px; color: var(--text-sub); font-weight: 700; display: flex; align-items: center; justify-content: space-between; padding: 0 4px; }
         .stats-topo b { color: #60a5fa; font-size: 15px; }
 
-        .btn-novo-cliente-topo { background: var(--primary); border: none; color: white; width: 100%; padding: 14px; border-radius: 16px; font-weight: 800; font-size: 13px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
-        .botoes-topo-flex { display: flex; gap: 8px; }
-        .btn-topo-acao { flex: 1; background: #0b0f19; border: 1px solid var(--card-brd); color: var(--text); padding: 10px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
-        .btn-topo-pagos { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); color: #34d399; }
+        /* BARRA COM OS 3 BOTÕES LADO A LADO */
+        .botoes-topo-flex { display: flex; gap: 6px; width: 100%; }
+        .btn-topo-acao { flex: 1; padding: 10px 4px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; text-transform: uppercase; text-align: center; white-space: nowrap; }
+        
+        .btn-novo-cliente-inline { background: var(--primary); border: 1px solid rgba(59, 130, 246, 0.5); color: #fff; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3); }
+        .btn-topo-pagos { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; }
+        .btn-topo-arquivados { background: #0b0f19; border: 1px solid var(--card-brd); color: var(--text); }
 
         /* MURAL DARK */
         .secao-mural { background: transparent; padding: 0; width: 100%; }
@@ -214,11 +217,11 @@
                 <span id="btn-ocultar-olho" style="cursor:pointer;">👁️</span>
             </div>
 
-            <button class="btn-novo-cliente-topo" id="btn-abrir-add-cli">+ Adicionar Cliente</button>
-            
+            <!-- TRÊS BOTÕES LADO A LADO -->
             <div class="botoes-topo-flex">
+                <button class="btn-topo-acao btn-novo-cliente-inline" id="btn-abrir-add-cli">+ Novo</button>
                 <button class="btn-topo-acao btn-topo-pagos" id="btn-aba-pagos">Pagos (0)</button>
-                <button class="btn-topo-acao" id="btn-aba-arquivados">Arquivados (0)</button>
+                <button class="btn-topo-acao btn-topo-arquivados" id="btn-aba-arquivados">Arquivados (0)</button>
             </div>
 
             <!-- MURAL INTEGRADO -->
@@ -385,7 +388,6 @@
             const container = document.getElementById('lista-corpo');
             container.innerHTML = "";
 
-            // Clientes Ativos (Não arquivados)
             const ativos = clientesRaw.filter(c => !c.arquivado);
             const pagosCount = clientesRaw.filter(c => c.pago && !c.arquivado).length;
             const arquivadosCount = clientesRaw.filter(c => c.arquivado).length;
@@ -393,7 +395,6 @@
             document.getElementById('btn-aba-pagos').innerText = `Pagos (${pagosCount})`;
             document.getElementById('btn-aba-arquivados').innerText = `Arquivados (${arquivadosCount})`;
             
-            // CONTAGEM TOTAL PERMANECE INALTERADA QUANDO MARCA PAGO
             document.getElementById('contagem').innerHTML = `Total de Clientes: <b>${ativos.length}</b>`;
 
             const filtrados = ativos.filter(c => {
@@ -403,7 +404,7 @@
                 return nome.includes(termo) || painel.includes(termo) || whats.includes(termo);
             });
 
-            // LÓGICA DE ORDENAÇÃO: VENCIDOS E PRÓXIMOS DO VENCIMENTO NO TOPO DA TELA
+            // Lógica de ordenação (Vencidos e próximos no topo)
             filtrados.sort((a, b) => {
                 const dtA = extrairDataISO(obterValorCampo(a, 'vencimento', 'dataVencimento', 'Vencimento', 'data'));
                 const dtB = extrairDataISO(obterValorCampo(b, 'vencimento', 'dataVencimento', 'Vencimento', 'data'));
@@ -411,11 +412,6 @@
                 const diasA = calcularDiferencaDias(dtA);
                 const diasB = calcularDiferencaDias(dtB);
 
-                // Definição de níveis de prioridade (quanto menor o número, mais alto fica no topo)
-                // 1: Vencido (dias < 0)
-                // 2: Vence Hoje ou Próximo (dias <= 3)
-                // 3: Pago (com estendimento ativado)
-                // 4: Em dia normal (> 3 dias)
                 const getPrioridade = (c, dias) => {
                     if (dias < 0 && !c.pago) return 1;
                     if (dias <= 3 && !c.pago) return 2;
@@ -426,11 +422,7 @@
                 const prioA = getPrioridade(a, diasA);
                 const prioB = getPrioridade(b, diasB);
 
-                if (prioA !== prioB) {
-                    return prioA - prioB;
-                }
-
-                // Se tiverem a mesma prioridade, ordena pela data mais próxima
+                if (prioA !== prioB) return prioA - prioB;
                 return diasA - diasB;
             });
 
@@ -438,8 +430,6 @@
                 container.innerHTML = `<p style="text-align:center; color:var(--text-sub); margin-top:30px; font-weight:600;">Nenhum cliente encontrado.</p>`;
                 return;
             }
-
-            const hojeStr = new Date().toISOString().split('T')[0];
 
             filtrados.forEach(c => {
                 const card = document.createElement('div');
@@ -483,7 +473,6 @@
                     <div class="info-p">Vencimento Original: <b>${formatarDataExibicao(rawVenc)}</b></div>
                     <div class="info-p">WhatsApp: <b>${whatsExibir}</b></div>
 
-                    <!-- OBSERVAÇÃO VERDE SE ESTIVER PAGO -->
                     ${c.pago ? `
                         <div class="obs-pago-verde">
                             <span>✅ PAGO</span> ${isoEstendida ? `(Estendido até ${formatarDataExibicao(isoEstendida)})` : ''}
@@ -542,7 +531,6 @@
             } else if (acao === 'arquivar') {
                 await updateDoc(docRef, { arquivado: true });
             } else if (acao === 'pago') {
-                // ABRE O MODAL AUTOMATICAMENTE PARA DEFINIR/ALTERAR A DATA ESTENDIDA
                 document.getElementById('pago-id').value = id;
                 document.getElementById('pago-path').value = path;
                 const isoEst = extrairDataISO(cli.dataEstendida) || extrairDataISO(obterValorCampo(cli, 'vencimento', 'dataVencimento'));
@@ -578,7 +566,6 @@
             }
 
             const docRef = doc(db, path);
-            // Salva status PAGO, define a data estendida, sem excluir o cliente ou alterar a contagem total
             await updateDoc(docRef, { 
                 pago: true, 
                 dataEstendida: novaData 
