@@ -3,9 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#090d16">
     <title>Gestor Business - Dark Edition</title>
     
@@ -20,12 +17,10 @@
             --text-sub: #94a3b8;
             
             --primary: #2563eb;
-            --primary-hover: #1d4ed8;
             --danger: #ef4444;
             --warning: #eab308;
             --success: #10b981;
             
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.4);
             --shadow-md: 0 4px 14px rgba(0,0,0,0.5);
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.7);
         }
@@ -34,22 +29,20 @@
 
         body { background-color: var(--bg); color: var(--text); margin: 0; padding: 0; -webkit-font-smoothing: antialiased; overflow: hidden; }
 
-        /* TELA DE LOGIN DARK */
+        /* LOGIN DARK */
         .login-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; width: 100vw; background: #05070a; padding: 20px; position: relative; z-index: 5000; }
         .login-card { background: var(--card); padding: 36px 28px; border-radius: 28px; width: 100%; max-width: 320px; text-align: center; border: 1px solid var(--card-brd); box-shadow: var(--shadow-lg); }
-        .login-card h2 { color: var(--text); font-size: 22px; font-weight: 800; margin-top: 0; margin-bottom: 24px; letter-spacing: -0.5px; }
+        .login-card h2 { color: var(--text); font-size: 22px; font-weight: 800; margin-top: 0; margin-bottom: 24px; }
         .login-card input[type="text"], .login-card input[type="password"] { width: 100%; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--card-brd); background: #0b0f19; color: var(--text); margin-bottom: 14px; outline: none; font-size: 14px; font-weight: 600; }
         .login-card input:focus { border-color: var(--primary); }
-        .remember-box { display: flex; align-items: center; gap: 10px; color: var(--text-sub); font-size: 13px; margin-bottom: 24px; cursor: pointer; justify-content: flex-start; width: 100%; font-weight: 600; }
-        .remember-box input { accent-color: var(--primary); width: 18px; height: 18px; border-radius: 6px; }
+        .remember-box { display: flex; align-items: center; gap: 10px; color: var(--text-sub); font-size: 13px; margin-bottom: 24px; cursor: pointer; font-weight: 600; }
+        .remember-box input { accent-color: var(--primary); width: 18px; height: 18px; }
         
         .btn-login-3d { background: var(--primary); border: none; color: #fff; width: 100%; padding: 14px; border-radius: 14px; font-weight: 700; font-size: 15px; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); }
-        .btn-login-3d:active { transform: scale(0.98); }
 
-        /* ESTRUTURA DO APP DARK */
+        /* APP MAIN DARK */
         #app { display: none; height: 100vh; width: 100vw; flex-direction: column; background: var(--bg); }
 
-        /* HEADER FIXO NO TOPO */
         .header-fixo { background: rgba(19, 27, 46, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 16px; padding-top: calc(env(safe-area-inset-top) + 12px); z-index: 4000; border-bottom: 1px solid var(--card-brd); display: flex; flex-direction: column; gap: 12px; width: 100%; }
         
         .busca-container { background: #0b0f19; display: flex; align-items: center; padding: 10px 16px; border-radius: 16px; border: 1px solid var(--card-brd); gap: 10px; }
@@ -58,7 +51,7 @@
         
         .botoes-header-direita { display: flex; align-items: center; gap: 10px; }
         .btn-robo-config { background: #1e293b; border: 1px solid #334155; color: #fff; font-size: 16px; cursor: pointer; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-        .btn-sair-input { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--danger); font-size: 11px; font-weight: 800; cursor: pointer; padding: 8px 12px; border-radius: 10px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .btn-sair-input { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--danger); font-size: 11px; font-weight: 800; cursor: pointer; padding: 8px 12px; border-radius: 10px; text-transform: uppercase; }
 
         .stats-topo { font-size: 13px; color: var(--text-sub); font-weight: 700; display: flex; align-items: center; justify-content: space-between; padding: 0 4px; }
         .stats-topo b { color: #60a5fa; font-size: 15px; }
@@ -75,33 +68,36 @@
         .btn-toggle-mural { background: transparent; border: none; color: var(--text-sub); font-size: 11px; font-weight: 700; padding: 8px; cursor: pointer; }
         
         #wrapper-mural-retratil { max-height: 100px; overflow-y: auto; margin-top: 8px; }
-        .card-aviso { background: #0b0f19; padding: 10px 14px; border-radius: 12px; margin-bottom: 6px; font-size: 12px; font-weight: 600; border-left: 4px solid var(--primary); color: var(--text); border: 1px solid var(--card-brd); border-left-width: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .card-aviso { background: #0b0f19; padding: 10px 14px; border-radius: 12px; margin-bottom: 6px; font-size: 12px; font-weight: 600; border: 1px solid var(--card-brd); border-left: 4px solid var(--primary); color: var(--text); display: flex; justify-content: space-between; align-items: center; }
 
-        /* CONTEÚDO ROLÁVEL */
+        /* LISTA ROLÁVEL */
         .conteudo-rolavel { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px; background: var(--bg); }
         
-        /* CARDS DOS CLIENTES DARK */
-        .card-cliente { background: var(--card); border: 1px solid var(--card-brd); border-radius: 20px; padding: 18px; margin-bottom: 14px; position: relative; display: flex; flex-direction: column; box-shadow: var(--shadow-md); transition: transform 0.2s; }
-        .card-cliente.vencido-border { border: 1.5px solid rgba(239, 68, 68, 0.6) !important; }
-        .card-cliente.pago-border { border: 1.5px solid rgba(16, 185, 129, 0.6) !important; }
+        /* CARDS DOS CLIENTES */
+        .card-cliente { background: var(--card); border: 1px solid var(--card-brd); border-radius: 20px; padding: 18px; margin-bottom: 14px; position: relative; display: flex; flex-direction: column; box-shadow: var(--shadow-md); }
+        .card-cliente.vencido-border { border: 1.5px solid rgba(239, 68, 68, 0.8) !important; background: linear-gradient(180deg, rgba(239,68,68,0.05) 0%, var(--card) 100%); }
+        .card-cliente.vence-hoje-border { border: 1.5px solid rgba(234, 179, 8, 0.8) !important; background: linear-gradient(180deg, rgba(234,179,8,0.05) 0%, var(--card) 100%); }
+        .card-cliente.pago-border { border: 1.5px solid rgba(16, 185, 129, 0.8) !important; background: linear-gradient(180deg, rgba(16,185,129,0.05) 0%, var(--card) 100%); }
         
-        .card-cliente h3 { margin: 0 0 6px 0; font-size: 17px; font-weight: 800; color: #fff; width: 60%; letter-spacing: -0.3px; }
+        .card-cliente h3 { margin: 0 0 6px 0; font-size: 17px; font-weight: 800; color: #fff; width: 60%; }
         .info-p { font-size: 13px; color: var(--text-sub); margin: 3px 0; font-weight: 500; }
         .info-p b { color: #f1f5f9; font-weight: 700; }
         .obs-box { background: #0b0f19; border: 1px dashed #334155; padding: 10px; border-radius: 10px; font-size: 12px; color: #cbd5e1; margin-top: 8px; font-weight: 500; }
         
+        .obs-pago-verde { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 700; margin-top: 10px; display: flex; align-items: center; gap: 6px; }
+
         .card-linha { height: 1px; background: #1e293b; margin: 14px 0; border: none; width: 100%; }
 
         .container-badges { position: absolute; top: 18px; right: 18px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
         .selo-prolongado { background: rgba(249, 115, 22, 0.15); color: #fb923c; font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 8px; text-transform: uppercase; border: 1px solid rgba(249, 115, 22, 0.3); }
         
         .status-vencimento { font-size: 10px; font-weight: 800; padding: 5px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.3px; }
-        .status-vencimento.em-dia { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-        .status-vencimento.vence-logo { background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3); }
-        .status-vencimento.vencido { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-        .status-vencimento.pago-status { background: rgba(16, 185, 129, 0.25); color: #10b981; border: 1px solid #10b981; }
+        .status-vencimento.em-dia { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .status-vencimento.vence-logo { background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.4); }
+        .status-vencimento.vencido { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+        .status-vencimento.pago-status { background: rgba(16, 185, 129, 0.25); color: #34d399; border: 1px solid #10b981; }
 
-        /* BOTÕES DE AÇÃO */
+        /* BOTÕES */
         .flex-botoes-icones { display: flex; gap: 8px; justify-content: flex-end; align-items: center; width: 100%; flex-wrap: wrap; }
         .btn-icone { width: 40px; height: 40px; border-radius: 12px; border: 1px solid transparent; background: #0b0f19; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease; padding: 0; }
         .btn-i-renovar { background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.3); }
@@ -124,8 +120,8 @@
         .modal-content { background: var(--card); width: 100%; max-width: 360px; padding: 28px; border-radius: 24px; box-shadow: var(--shadow-lg); text-align: center; border: 1px solid var(--card-brd); max-height: 90vh; overflow-y: auto; color: var(--text); }
         .modal-content input, .modal-content textarea, .modal-content select { width: 100%; padding: 12px 14px; margin: 8px 0; border-radius: 12px; border: 1px solid var(--card-brd); background: #0b0f19; color: var(--text); font-size: 14px; outline: none; font-weight: 500; }
         .modal-content input:focus, .modal-content textarea:focus { border-color: var(--primary); }
-        .modal-content label { display: block; text-align: left; font-size: 11px; font-weight: 800; color: var(--text-sub); margin-top: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn-acao-modal { background: var(--primary); border: none; color: #fff; width: 100%; padding: 14px; border-radius: 14px; font-weight: 700; margin-top: 16px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); }
+        .modal-content label { display: block; text-align: left; font-size: 11px; font-weight: 800; color: var(--text-sub); margin-top: 12px; text-transform: uppercase; }
+        .btn-acao-modal { background: var(--primary); border: none; color: #fff; width: 100%; padding: 14px; border-radius: 14px; font-weight: 700; margin-top: 16px; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); }
     </style>
 </head>
 <body>
@@ -157,11 +153,11 @@
         </div>
     </div>
 
-    <!-- MODAL ESTENDER PAGO -->
+    <!-- MODAL DEFINIR DATA DE PAGO -->
     <div id="modal-pago-data" class="modal">
         <div class="modal-content">
-            <h2 style="margin-top:0; font-size:18px; font-weight:800; color:var(--success);">Marcar como Pago</h2>
-            <p style="font-size:13px; color:var(--text-sub);">Escolha até qual data deseja estender o acesso deste cliente:</p>
+            <h2 style="margin-top:0; font-size:18px; font-weight:800; color:var(--success);">Confirmar Pagamento</h2>
+            <p style="font-size:13px; color:var(--text-sub);">Defina a nova data de vencimento estendida para este cliente:</p>
             <input type="hidden" id="pago-id">
             <input type="hidden" id="pago-path">
             <label>Nova Data Estendida</label>
@@ -171,7 +167,7 @@
         </div>
     </div>
 
-    <!-- MODAL CONFIGURAÇÃO DO ROBÔ -->
+    <!-- MODAL CONFIGURAR ROBÔ -->
     <div id="modal-robo" class="modal">
         <div class="modal-content">
             <h2 style="margin-top:0; font-size:18px; font-weight:800; color:var(--text);">⚙️ Configurações do Robô</h2>
@@ -184,10 +180,10 @@
         </div>
     </div>
 
-    <!-- MODAL LISTA DE PAGOS -->
+    <!-- MODAL PAGOS -->
     <div id="modal-pagos" class="modal">
         <div class="modal-content">
-            <h2 style="margin-top:0; font-size:18px; font-weight:800; color:var(--success);">Clientes Pagos</h2>
+            <h2 style="margin-top:0; font-size:18px; font-weight:800; color:var(--success);">Área de Clientes Pagos</h2>
             <div id="lista-pagos-corpo" style="text-align:left; margin-top:12px; max-height: 50vh; overflow-y: auto;"></div>
             <button id="btn-fechar-pagos" class="btn-acao-modal" style="background:#1e293b; color:var(--text); box-shadow:none;">FECHAR JANELA</button>
         </div>
@@ -202,7 +198,7 @@
         </div>
     </div>
 
-    <!-- APLICATIVO -->
+    <!-- APP PRINCIPAL -->
     <div id="app">
         <header class="header-fixo">
             <div class="busca-container">
@@ -214,7 +210,7 @@
             </div>
 
             <div class="stats-topo">
-                <span id="contagem">Buscando dados no Firebase...</span>
+                <span id="contagem">Carregando dados...</span>
                 <span id="btn-ocultar-olho" style="cursor:pointer;">👁️</span>
             </div>
 
@@ -375,12 +371,21 @@
             } catch(e) {}
         }
 
+        function calcularDiferencaDias(dataRef) {
+            if(!dataRef) return 999;
+            const hoje = new Date();
+            hoje.setHours(0,0,0,0);
+            const ref = new Date(dataRef + "T00:00:00");
+            const diffTime = ref - hoje;
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+
         function renderizarClientes() {
             const termo = document.getElementById('busca').value.toLowerCase().trim();
             const container = document.getElementById('lista-corpo');
             container.innerHTML = "";
 
-            // 3- FILTRAGEM: Arquivados NÃO entram no Total de Clientes
+            // Clientes Ativos (Não arquivados)
             const ativos = clientesRaw.filter(c => !c.arquivado);
             const pagosCount = clientesRaw.filter(c => c.pago && !c.arquivado).length;
             const arquivadosCount = clientesRaw.filter(c => c.arquivado).length;
@@ -388,8 +393,8 @@
             document.getElementById('btn-aba-pagos').innerText = `Pagos (${pagosCount})`;
             document.getElementById('btn-aba-arquivados').innerText = `Arquivados (${arquivadosCount})`;
             
-            // Total de Ativos (Sem contar arquivados)
-            document.getElementById('contagem').innerHTML = `Total de Ativos: <b>${ativos.length}</b>`;
+            // CONTAGEM TOTAL PERMANECE INALTERADA QUANDO MARCA PAGO
+            document.getElementById('contagem').innerHTML = `Total de Clientes: <b>${ativos.length}</b>`;
 
             const filtrados = ativos.filter(c => {
                 const nome = String(obterValorCampo(c, 'nome', 'cliente', 'Nome', 'name')).toLowerCase();
@@ -398,26 +403,43 @@
                 return nome.includes(termo) || painel.includes(termo) || whats.includes(termo);
             });
 
-            // Lógica de ordenação (Clientes Pagos próximos da data estendida vão para o topo)
-            const hoje = new Date().toISOString().split('T')[0];
-            
+            // LÓGICA DE ORDENAÇÃO: VENCIDOS E PRÓXIMOS DO VENCIMENTO NO TOPO DA TELA
             filtrados.sort((a, b) => {
-                const dataExtA = extrairDataISO(a.dataEstendida);
-                const dataExtB = extrairDataISO(b.dataEstendida);
-                
-                // Se a tem pago e está próximo, tem prioridade alta (-1)
-                const aProximo = a.pago && dataExtA && calcularDiferencaDias(hoje, dataExtA) <= 3;
-                const bProximo = b.pago && dataExtB && calcularDiferencaDias(hoje, dataExtB) <= 3;
+                const dtA = extrairDataISO(obterValorCampo(a, 'vencimento', 'dataVencimento', 'Vencimento', 'data'));
+                const dtB = extrairDataISO(obterValorCampo(b, 'vencimento', 'dataVencimento', 'Vencimento', 'data'));
 
-                if (aProximo && !bProximo) return -1;
-                if (!aProximo && bProximo) return 1;
-                return 0;
+                const diasA = calcularDiferencaDias(dtA);
+                const diasB = calcularDiferencaDias(dtB);
+
+                // Definição de níveis de prioridade (quanto menor o número, mais alto fica no topo)
+                // 1: Vencido (dias < 0)
+                // 2: Vence Hoje ou Próximo (dias <= 3)
+                // 3: Pago (com estendimento ativado)
+                // 4: Em dia normal (> 3 dias)
+                const getPrioridade = (c, dias) => {
+                    if (dias < 0 && !c.pago) return 1;
+                    if (dias <= 3 && !c.pago) return 2;
+                    if (c.pago) return 3;
+                    return 4;
+                };
+
+                const prioA = getPrioridade(a, diasA);
+                const prioB = getPrioridade(b, diasB);
+
+                if (prioA !== prioB) {
+                    return prioA - prioB;
+                }
+
+                // Se tiverem a mesma prioridade, ordena pela data mais próxima
+                return diasA - diasB;
             });
 
             if (filtrados.length === 0) {
                 container.innerHTML = `<p style="text-align:center; color:var(--text-sub); margin-top:30px; font-weight:600;">Nenhum cliente encontrado.</p>`;
                 return;
             }
+
+            const hojeStr = new Date().toISOString().split('T')[0];
 
             filtrados.forEach(c => {
                 const card = document.createElement('div');
@@ -427,21 +449,23 @@
                 const isoVenc = extrairDataISO(rawVenc);
                 const isoEstendida = extrairDataISO(c.dataEstendida);
                 
+                const diffDias = calcularDiferencaDias(isoVenc);
+
                 let statusClass = 'em-dia';
                 let statusTexto = 'EM DIA';
 
-                // 1- REGRAS PARA PAGO / DATA ESTENDIDA
-                if (c.pago && isoEstendida) {
+                if (c.pago) {
                     statusClass = 'pago-status';
-                    statusTexto = `PAGO ATÉ ${formatarDataExibicao(isoEstendida)}`;
+                    statusTexto = 'PAGO';
                     card.classList.add('pago-border');
-                } else if (isoVenc && isoVenc < hoje) {
+                } else if (diffDias < 0) {
                     statusClass = 'vencido';
                     statusTexto = 'VENCIDO';
                     card.classList.add('vencido-border');
-                } else if (isoVenc && isoVenc === hoje) {
+                } else if (diffDias <= 3) {
                     statusClass = 'vence-logo';
-                    statusTexto = 'VENCE HOJE';
+                    statusTexto = diffDias === 0 ? 'VENCE HOJE' : `VENCE EM ${diffDias} DIA(S)`;
+                    card.classList.add('vence-hoje-border');
                 }
 
                 const nomeExibir = obterValorCampo(c, 'nome', 'cliente', 'Nome', 'name') || 'Sem nome';
@@ -456,16 +480,23 @@
                     </div>
                     <h3>${nomeExibir}</h3>
                     <div class="info-p">Painel: <b>${painelExibir}</b></div>
-                    <div class="info-p">Data Original: <b>${formatarDataExibicao(rawVenc)}</b></div>
-                    ${c.dataEstendida ? `<div class="info-p">Prazo Estendido: <b style="color:#34d399;">${formatarDataExibicao(c.dataEstendida)}</b></div>` : ''}
+                    <div class="info-p">Vencimento Original: <b>${formatarDataExibicao(rawVenc)}</b></div>
                     <div class="info-p">WhatsApp: <b>${whatsExibir}</b></div>
+
+                    <!-- OBSERVAÇÃO VERDE SE ESTIVER PAGO -->
+                    ${c.pago ? `
+                        <div class="obs-pago-verde">
+                            <span>✅ PAGO</span> ${isoEstendida ? `(Estendido até ${formatarDataExibicao(isoEstendida)})` : ''}
+                        </div>
+                    ` : ''}
+
                     ${obsExibir ? `<div class="obs-box">${obsExibir}</div>` : ''}
                     <div class="card-linha"></div>
                     <div class="flex-botoes-icones">
                         <button class="btn-icone btn-i-renovar" title="Renovar +1 Mês" data-id="${c.id}" data-path="${c._fullPath}" data-action="renovar">
                             <svg viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                         </button>
-                        <button class="btn-icone btn-i-pago" title="Marcar como Pago e Estender" data-id="${c.id}" data-path="${c._fullPath}" data-action="pago">
+                        <button class="btn-icone btn-i-pago" title="Marcar/Alterar Pago" data-id="${c.id}" data-path="${c._fullPath}" data-action="pago">
                             <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
                         </button>
                         <button class="btn-icone btn-i-prolongar" title="Prolongar 3 Dias" data-id="${c.id}" data-path="${c._fullPath}" data-action="prolongar">
@@ -484,13 +515,6 @@
                 `;
                 container.appendChild(card);
             });
-        }
-
-        function calcularDiferencaDias(data1, data2) {
-            const d1 = new Date(data1);
-            const d2 = new Date(data2);
-            const diffTime = d2 - d1;
-            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         }
 
         function renderizarMural() {
@@ -518,9 +542,11 @@
             } else if (acao === 'arquivar') {
                 await updateDoc(docRef, { arquivado: true });
             } else if (acao === 'pago') {
-                // 1- ABRIR MODAL DE SELEÇÃO DE DATA AO CLICAR EM PAGO
+                // ABRE O MODAL AUTOMATICAMENTE PARA DEFINIR/ALTERAR A DATA ESTENDIDA
                 document.getElementById('pago-id').value = id;
                 document.getElementById('pago-path').value = path;
+                const isoEst = extrairDataISO(cli.dataEstendida) || extrairDataISO(obterValorCampo(cli, 'vencimento', 'dataVencimento'));
+                document.getElementById('pago-nova-data').value = isoEst;
                 document.getElementById('modal-pago-data').style.display = 'flex';
             } else if (acao === 'prolongar') {
                 const rawVenc = obterValorCampo(cli, 'vencimento', 'dataVencimento', 'Vencimento', 'data');
@@ -547,12 +573,12 @@
             const novaData = document.getElementById('pago-nova-data').value;
 
             if (!novaData) {
-                alert("Por favor, selecione uma data para estender o login.");
+                alert("Por favor, selecione uma data.");
                 return;
             }
 
             const docRef = doc(db, path);
-            // Salva status pago e registra a data estendida SEM alterar a data original do cliente
+            // Salva status PAGO, define a data estendida, sem excluir o cliente ou alterar a contagem total
             await updateDoc(docRef, { 
                 pago: true, 
                 dataEstendida: novaData 
@@ -626,10 +652,9 @@
             const pagos = clientesRaw.filter(c => c.pago && !c.arquivado);
             
             if(pagos.length === 0) {
-                container.innerHTML = "<p style='font-size:13px; color:var(--text-sub);'>Nenhum cliente pago.</p>";
+                container.innerHTML = "<p style='font-size:13px; color:var(--text-sub);'>Nenhum cliente na lista de pagos.</p>";
             } else {
                 pagos.forEach(c => {
-                    const rawVenc = obterValorCampo(c, 'vencimento', 'dataVencimento', 'Vencimento', 'data');
                     const item = document.createElement('div');
                     item.style.padding = "10px 0";
                     item.style.borderBottom = "1px solid #1e293b";
@@ -641,7 +666,7 @@
                             <strong style="font-size:14px; color:#fff;">${obterValorCampo(c, 'nome', 'cliente', 'Nome')}</strong>
                             <div style="font-size:11px; color:var(--text-sub);">${obterValorCampo(c, 'painel', 'Painel') || '-'} - Pago até: ${formatarDataExibicao(c.dataEstendida)}</div>
                         </div>
-                        <button style="background:rgba(16, 185, 129, 0.2); border:1px solid #10b981; color:#34d399; font-size:10px; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer;" data-desmarcar-pago="${c.id}" data-path="${c._fullPath}">REATIVAR</button>
+                        <button style="background:rgba(239, 68, 68, 0.2); border:1px solid #ef4444; color:#f87171; font-size:10px; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer;" data-desmarcar-pago="${c.id}" data-path="${c._fullPath}">DESMARCAR PAGO</button>
                     `;
                     container.appendChild(item);
                 });
