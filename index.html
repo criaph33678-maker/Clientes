@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#ffffff">
-    <title>Gestor Business V15.0 - Universal</title>
+    <title>Gestor Business V16.0 - Universal Datas</title>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -45,7 +45,6 @@
         
         .btn-login-3d { background: var(--primary); border: none; color: #fff; width: 100%; padding: 14px; border-radius: 14px; font-weight: 700; font-size: 15px; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); transition: transform 0.1s, background 0.2s; }
         .btn-login-3d:active { transform: scale(0.98); }
-        .btn-login-3d:disabled { background: #94a3b8; cursor: not-allowed; box-shadow: none; }
 
         /* ESTRUTURA DO APP */
         #app { display: none; height: 100vh; width: 100vw; flex-direction: column; background: var(--bg); }
@@ -254,6 +253,52 @@
             alert("Erro de conexão Firebase: " + e.message);
         }
 
+        /* CAPTURA UNIVERSAL DE PROPRIEDADES (EVITA FALHAS DE NOMES DE CAMPOS DIFERENTES) */
+        function obterValorCampo(obj, ...chaves) {
+            for (let k of chaves) {
+                if (obj && obj[k] !== undefined && obj[k] !== null && obj[k] !== '') {
+                    return obj[k];
+                }
+            }
+            return '';
+        }
+
+        function extrairDataISO(val) {
+            if (!val) return '';
+            try {
+                // Se for Timestamp do Firestore
+                if (typeof val === 'object' && val.seconds) {
+                    return new Date(val.seconds * 1000).toISOString().split('T')[0];
+                }
+                // Se for objeto Date
+                if (val instanceof Date) {
+                    return val.toISOString().split('T')[0];
+                }
+                // Se for String tipo "2026-05-10" ou "10/05/2026"
+                let str = String(val).trim();
+                if (str.includes('/')) {
+                    let p = str.split('/');
+                    if (p.length === 3) {
+                        if (p[2].length === 4) return `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+                        if (p[0].length === 4) return `${p[0]}-${p[1].padStart(2,'0')}-${p[2].padStart(2,'0')}`;
+                    }
+                }
+                if (str.includes('-')) {
+                    let p = str.split('T')[0].split('-');
+                    if (p.length === 3) return `${p[0]}-${p[1].padStart(2,'0')}-${p[2].padStart(2,'0')}`;
+                }
+            } catch (e) { console.error("Erro extraindo data", e); }
+            return '';
+        }
+
+        function formatarDataExibicao(val) {
+            const iso = extrairDataISO(val);
+            if (!iso) return '-';
+            const partes = iso.split('-');
+            if (partes.length !== 3) return String(val);
+            return `${partes[2]}/${partes[1]}/${partes[0]}`;
+        }
+
         function executarLogin() {
             const userVal = document.getElementById('u').value.trim();
             const passVal = document.getElementById('p').value.trim();
@@ -267,411 +312,4 @@
             
             if (document.getElementById('remember').checked) {
                 localStorage.setItem('gestor_u', userVal);
-                localStorage.setItem('gestor_p', passVal);
-            } else {
-                localStorage.removeItem('gestor_u');
-                localStorage.removeItem('gestor_p');
-            }
-
-            document.getElementById('tela-login').style.display = 'none';
-            document.getElementById('app').style.display = 'flex';
-            iniciarListenersFirestore();
-        }
-
-        function iniciarListenersFirestore() {
-            if (!logado) return;
-            
-            activeUnsubs.forEach(unsub => unsub());
-            activeUnsubs = [];
-
-            // VARREDURA UNIVERSAL DE CLIENTES
-            try {
-                const unsubGroup = onSnapshot(collectionGroup(db, 'clientes'), (snapshot) => {
-                    const temp = [];
-                    snapshot.forEach(d => {
-                        const path = d.ref.path;
-                        const data = d.data();
-                        
-                        // Captura documentos da raiz 'clientes' ou pertencentes ao usuário logado
-                        if (!data.usuario || path.toLowerCase().includes(logado.toLowerCase()) || data.usuario.toLowerCase() === logado.toLowerCase()) {
-                            temp.push({ id: d.id, _fullPath: path, ...data });
-                        }
-                    });
-
-                    clientesRaw = temp;
-                    renderizarClientes();
-                }, (error) => {
-                    console.error("Erro no escaneamento de clientes:", error);
-                    alert("Aviso de acesso Firestore: " + error.message);
-                });
-
-                activeUnsubs.push(unsubGroup);
-            } catch (err) {
-                console.error("Falha ao criar listener:", err);
-            }
-
-            // VARREDURA DE MURAL (Subcoleção ou Raiz)
-            try {
-                const unsubMural = onSnapshot(collection(db, "usuarios", logado, "mural"), (snapshot) => {
-                    muralRaw = [];
-                    snapshot.forEach(d => muralRaw.push({ id: d.id, _fullPath: d.ref.path, ...d.data() }));
-                    renderizarMural();
-                }, (e) => console.log("Mural não configurado ou vazio."));
-                
-                activeUnsubs.push(unsubMural);
-            } catch(e) {}
-        }
-
-        function renderizarClientes() {
-            const termo = document.getElementById('busca').value.toLowerCase().trim();
-            const container = document.getElementById('lista-corpo');
-            container.innerHTML = "";
-
-            const ativos = clientesRaw.filter(c => !c.arquivado && !c.pago);
-            const pagosCount = clientesRaw.filter(c => c.pago && !c.arquivado).length;
-            const arquivadosCount = clientesRaw.filter(c => c.arquivado).length;
-
-            document.getElementById('btn-aba-pagos').innerText = `Pagos (${pagosCount})`;
-            document.getElementById('btn-aba-arquivados').innerText = `Arquivados (${arquivadosCount})`;
-            document.getElementById('contagem').innerHTML = `Total de Ativos: <b>${ativos.length}</b>`;
-
-            const filtrados = ativos.filter(c => {
-                const nome = (c.nome || c.cliente || c.Nome || "").toLowerCase();
-                const painel = (c.painel || c.Painel || "").toLowerCase();
-                const whats = (c.whats || c.whatsapp || c.Whats || "").toLowerCase();
-                return nome.includes(termo) || painel.includes(termo) || whats.includes(termo);
-            });
-
-            if (filtrados.length === 0) {
-                if (clientesRaw.length === 0) {
-                    container.innerHTML = `<div style="text-align:center; color:var(--text-sub); margin-top:30px; padding:20px; background:#fff; border-radius:16px; border:1px solid #e2e8f0;">
-                        <p style="font-weight:700; margin-bottom:8px;">Nenhum cliente cadastrado ainda.</p>
-                        <p style="font-size:12px; color:#94a3b8;">Clique em <b>"+ ADICIONAR CLIENTE"</b> no topo para incluir seu primeiro registro.</p>
-                    </div>`;
-                } else {
-                    container.innerHTML = `<p style="text-align:center; color:var(--text-sub); margin-top:30px; font-weight:600;">Nenhum resultado para a busca.</p>`;
-                }
-                return;
-            }
-
-            filtrados.forEach(c => {
-                const card = document.createElement('div');
-                card.className = 'card-cliente';
-
-                const hoje = new Date().toISOString().split('T')[0];
-                const venc = c.vencimento || c.dataVencimento || c.Vencimento || "";
-                let statusClass = 'em-dia';
-                let statusTexto = 'EM DIA';
-
-                if (venc && venc < hoje) {
-                    statusClass = 'vencido';
-                    statusTexto = 'VENCIDO';
-                    card.classList.add('vencido-border');
-                } else if (venc && venc === hoje) {
-                    statusClass = 'vence-logo';
-                    statusTexto = 'VENCE HOJE';
-                }
-
-                const nomeExibir = c.nome || c.cliente || c.Nome || 'Sem nome';
-                const painelExibir = c.painel || c.Painel || '-';
-                const whatsExibir = c.whats || c.whatsapp || c.Whats || '-';
-                const obsExibir = c.obs || c.observacao || c.Obs || '';
-
-                card.innerHTML = `
-                    <div class="container-badges">
-                        <span class="status-vencimento ${statusClass}">${statusTexto}</span>
-                        ${c.prolongado ? `<span class="selo-prolongado">Prolongado</span>` : ''}
-                    </div>
-                    <h3>${nomeExibir}</h3>
-                    <div class="info-p">Painel: <b>${painelExibir}</b></div>
-                    <div class="info-p">Vencimento: <b>${formatarData(venc)}</b></div>
-                    <div class="info-p">WhatsApp: <b>${whatsExibir}</b></div>
-                    ${obsExibir ? `<div class="obs-box">${obsExibir}</div>` : ''}
-                    <div class="card-linha"></div>
-                    <div class="flex-botoes-icones">
-                        <button class="btn-icone btn-i-renovar" title="Renovar +1 Mês" data-id="${c.id}" data-path="${c._fullPath}" data-action="renovar">
-                            <svg viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-                        </button>
-                        <button class="btn-icone btn-i-pago" title="Marcar como Pago" data-id="${c.id}" data-path="${c._fullPath}" data-action="pago">
-                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                        </button>
-                        <button class="btn-icone btn-i-prolongar" title="Prolongar 3 Dias" data-id="${c.id}" data-path="${c._fullPath}" data-action="prolongar">
-                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 16 14 14"/></svg>
-                        </button>
-                        <button class="btn-icone btn-i-editar" title="Editar" data-id="${c.id}" data-path="${c._fullPath}" data-action="editar">
-                            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                        </button>
-                        <button class="btn-icone btn-i-arquivar" title="Arquivar" data-id="${c.id}" data-path="${c._fullPath}" data-action="arquivar">
-                            <svg viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
-                        </button>
-                        <button class="btn-icone btn-i-excluir" title="Excluir" data-id="${c.id}" data-path="${c._fullPath}" data-action="excluir">
-                            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                        </button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function formatarData(dataIso) {
-            if (!dataIso) return '-';
-            const partes = dataIso.split('-');
-            if (partes.length !== 3) return dataIso;
-            return `${partes[2]}/${partes[1]}/${partes[0]}`;
-        }
-
-        function renderizarMural() {
-            const container = document.getElementById('lista-mural');
-            container.innerHTML = "";
-            muralRaw.forEach(m => {
-                const item = document.createElement('div');
-                item.className = 'card-aviso';
-                item.innerHTML = `
-                    <span>${m.texto || m.Texto}</span>
-                    <button style="border:none; background:none; color:var(--danger); font-weight:800; cursor:pointer;" data-mural-id="${m.id}" data-path="${m._fullPath}">✕</button>
-                `;
-                container.appendChild(item);
-            });
-        }
-
-        async function tratarAcaoCliente(id, path, acao) {
-            const docRef = doc(db, path);
-            const cli = clientesRaw.find(c => c.id === id);
-
-            if (acao === 'excluir') {
-                if (confirm("Tem certeza que deseja excluir este cliente?")) {
-                    await deleteDoc(docRef);
-                }
-            } else if (acao === 'arquivar') {
-                await updateDoc(docRef, { arquivado: true });
-            } else if (acao === 'pago') {
-                await updateDoc(docRef, { pago: true });
-            } else if (acao === 'prolongar') {
-                const venc = cli.vencimento || cli.dataVencimento || cli.Vencimento;
-                if (!venc) return;
-                let d = new Date(venc);
-                d.setDate(d.getDate() + 3);
-                await updateDoc(docRef, { 
-                    vencimento: d.toISOString().split('T')[0],
-                    prolongado: true 
-                });
-            } else if (acao === 'renovar') {
-                const venc = cli.vencimento || cli.dataVencimento || cli.Vencimento;
-                if (!venc) return;
-                let d = new Date(venc);
-                d.setMonth(d.getMonth() + 1);
-                await updateDoc(docRef, { 
-                    vencimento: d.toISOString().split('T')[0],
-                    prolongado: false,
-                    pago: false
-                });
-            } else if (acao === 'editar') {
-                abrirModalCliente(cli);
-            }
-        }
-
-        function abrirModalCliente(cli = null) {
-            const modal = document.getElementById('modal-cliente');
-            if (cli) {
-                document.getElementById('modal-titulo').innerText = "Editar Cliente";
-                document.getElementById('edit-id').value = cli.id;
-                document.getElementById('edit-path').value = cli._fullPath;
-                document.getElementById('cli-nome').value = cli.nome || cli.cliente || cli.Nome || "";
-                document.getElementById('cli-painel').value = cli.painel || cli.Painel || "";
-                document.getElementById('cli-whats').value = cli.whats || cli.whatsapp || cli.Whats || "";
-                document.getElementById('cli-vencimento').value = cli.vencimento || cli.dataVencimento || cli.Vencimento || "";
-                document.getElementById('cli-obs').value = cli.obs || cli.observacao || cli.Obs || "";
-            } else {
-                document.getElementById('modal-titulo').innerText = "Novo Cliente";
-                document.getElementById('edit-id').value = "";
-                document.getElementById('edit-path').value = "";
-                document.getElementById('cli-nome').value = "";
-                document.getElementById('cli-painel').value = "";
-                document.getElementById('cli-whats').value = "";
-                document.getElementById('cli-vencimento').value = "";
-                document.getElementById('cli-obs').value = "";
-            }
-            modal.style.display = 'flex';
-        }
-
-        async function salvarCliente() {
-            const id = document.getElementById('edit-id').value;
-            const targetPath = document.getElementById('edit-path').value;
-            
-            const dados = {
-                nome: document.getElementById('cli-nome').value.trim(),
-                painel: document.getElementById('cli-painel').value.trim(),
-                whats: document.getElementById('cli-whats').value.trim(),
-                vencimento: document.getElementById('cli-vencimento').value,
-                obs: document.getElementById('cli-obs').value.trim()
-            };
-
-            if (!dados.nome || !dados.vencimento) {
-                alert("Preencha ao menos o nome e o vencimento.");
-                return;
-            }
-
-            try {
-                if (id && targetPath) {
-                    await updateDoc(doc(db, targetPath), dados);
-                } else {
-                    dados.arquivado = false;
-                    dados.pago = false;
-                    dados.prolongado = false;
-                    dados.usuario = logado;
-                    await addDoc(collection(db, "usuarios", logado, "clientes"), dados);
-                }
-                document.getElementById('modal-cliente').style.display = 'none';
-            } catch (err) {
-                alert("Erro ao salvar dados: " + err.message);
-            }
-        }
-
-        function abrirModalPagos() {
-            const container = document.getElementById('lista-pagos-corpo');
-            container.innerHTML = "";
-            const pagos = clientesRaw.filter(c => c.pago && !c.arquivado);
-            
-            if(pagos.length === 0) {
-                container.innerHTML = "<p style='font-size:13px; color:var(--text-sub);'>Nenhum cliente pago.</p>";
-            } else {
-                pagos.forEach(c => {
-                    const item = document.createElement('div');
-                    item.style.padding = "10px 0";
-                    item.style.borderBottom = "1px solid #f1f5f9";
-                    item.style.display = "flex";
-                    item.style.justifyContent = "space-between";
-                    item.style.alignItems = "center";
-                    item.innerHTML = `
-                        <div>
-                            <strong style="font-size:14px;">${c.nome || c.cliente || c.Nome}</strong>
-                            <div style="font-size:11px; color:var(--text-sub);">${c.painel || '-'} - Vence: ${formatarData(c.vencimento || c.dataVencimento)}</div>
-                        </div>
-                        <button style="background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; font-size:10px; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer;" data-desmarcar-pago="${c.id}" data-path="${c._fullPath}">REATIVAR</button>
-                    `;
-                    container.appendChild(item);
-                });
-            }
-            document.getElementById('modal-pagos').style.display = 'flex';
-        }
-
-        function abrirModalArquivados() {
-            const container = document.getElementById('lista-arquivados-corpo');
-            container.innerHTML = "";
-            const arq = clientesRaw.filter(c => c.arquivado);
-            
-            if(arq.length === 0) {
-                container.innerHTML = "<p style='font-size:13px; color:var(--text-sub);'>Nenhum cliente arquivado.</p>";
-            } else {
-                arq.forEach(c => {
-                    const item = document.createElement('div');
-                    item.style.padding = "10px 0";
-                    item.style.borderBottom = "1px solid #f1f5f9";
-                    item.style.display = "flex";
-                    item.style.justifyContent = "space-between";
-                    item.style.alignItems = "center";
-                    item.innerHTML = `
-                        <div>
-                            <strong style="font-size:14px;">${c.nome || c.cliente || c.Nome}</strong>
-                            <div style="font-size:11px; color:var(--text-sub);">${c.painel || '-'}</div>
-                        </div>
-                        <button style="background:#dbeafe; border:1px solid #bfdbfe; color:#1e40af; font-size:10px; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer;" data-desarquivar="${c.id}" data-path="${c._fullPath}">DESARQUIVAR</button>
-                    `;
-                    container.appendChild(item);
-                });
-            }
-            document.getElementById('modal-arquivados').style.display = 'flex';
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('btn-login-submit').addEventListener('click', executarLogin);
-            
-            document.getElementById('u').addEventListener('keypress', (e) => { if(e.key === 'Enter') executarLogin(); });
-            document.getElementById('p').addEventListener('keypress', (e) => { if(e.key === 'Enter') executarLogin(); });
-
-            document.getElementById('busca').addEventListener('input', renderizarClientes);
-            document.getElementById('btn-abrir-add-cli').addEventListener('click', () => abrirModalCliente());
-            document.getElementById('btn-salvar-cli').addEventListener('click', salvarCliente);
-            document.getElementById('btn-fechar-cli').addEventListener('click', () => { document.getElementById('modal-cliente').style.display = 'none'; });
-
-            document.getElementById('btn-aba-pagos').addEventListener('click', abrirModalPagos);
-            document.getElementById('btn-fechar-pagos').addEventListener('click', () => { document.getElementById('modal-pagos').style.display = 'none'; });
-
-            document.getElementById('btn-aba-arquivados').addEventListener('click', abrirModalArquivados);
-            document.getElementById('btn-fechar-arquivados').addEventListener('click', () => { document.getElementById('modal-arquivados').style.display = 'none'; });
-
-            document.getElementById('btn-abrir-robo').addEventListener('click', () => { document.getElementById('modal-robo').style.display = 'flex'; });
-            document.getElementById('btn-fechar-robo').addEventListener('click', () => { document.getElementById('modal-robo').style.display = 'none'; });
-
-            document.getElementById('btn-sair').addEventListener('click', () => {
-                if(confirm("Deseja realmente sair?")) {
-                    localStorage.removeItem('gestor_u');
-                    localStorage.removeItem('gestor_p');
-                    location.reload();
-                }
-            });
-
-            document.getElementById('lista-corpo').addEventListener('click', (e) => {
-                const btn = e.target.closest('[data-action]');
-                if (btn) {
-                    const id = btn.getAttribute('data-id');
-                    const path = btn.getAttribute('data-path');
-                    const action = btn.getAttribute('data-action');
-                    tratarAcaoCliente(id, path, action);
-                }
-            });
-
-            document.getElementById('lista-mural').addEventListener('click', async (e) => {
-                const btn = e.target.closest('[data-mural-id]');
-                if (btn) {
-                    const id = btn.getAttribute('data-mural-id');
-                    const path = btn.getAttribute('data-path');
-                    await deleteDoc(doc(db, path || `usuarios/${logado}/mural/${id}`));
-                }
-            });
-
-            document.getElementById('btn-add-mural').addEventListener('click', async () => {
-                const txt = prompt("Digite a anotação para o mural:");
-                if (txt) {
-                    await addDoc(collection(db, "usuarios", logado, "mural"), { texto: txt });
-                }
-            });
-
-            document.getElementById('btn-hide-mural').addEventListener('click', () => {
-                muralOculto = !muralOculto;
-                document.getElementById('wrapper-mural-retratil').style.display = muralOculto ? 'none' : 'block';
-                document.getElementById('btn-hide-mural').innerText = muralOculto ? 'Exibir Mural' : 'Ocultar Mural';
-            });
-
-            document.getElementById('lista-pagos-corpo').addEventListener('click', async (e) => {
-                const btn = e.target.closest('[data-desmarcar-pago]');
-                if (btn) {
-                    const id = btn.getAttribute('data-desmarcar-pago');
-                    const path = btn.getAttribute('data-path');
-                    await updateDoc(doc(db, path), { pago: false });
-                    abrirModalPagos();
-                }
-            });
-
-            document.getElementById('lista-arquivados-corpo').addEventListener('click', async (e) => {
-                const btn = e.target.closest('[data-desarquivar]');
-                if (btn) {
-                    const id = btn.getAttribute('data-desarquivar');
-                    const path = btn.getAttribute('data-path');
-                    await updateDoc(doc(db, path), { arquivado: false });
-                    abrirModalArquivados();
-                }
-            });
-
-            const savedU = localStorage.getItem('gestor_u');
-            const savedP = localStorage.getItem('gestor_p');
-            if (savedU && savedP) { 
-                document.getElementById('u').value = savedU; 
-                document.getElementById('p').value = savedP; 
-                document.getElementById('remember').checked = true; 
-                executarLogin(); 
-            }
-        });
-    </script>
-</body>
-</html>
+                localStorage.set
