@@ -6,6 +6,13 @@
     <meta name="theme-color" content="#090d16">
     <title>Gestor Business - Dark Edition</title>
     
+    <!-- CONFIGURAÇÕES PWA (FAZ O APP FICAR INSTALÁVEL) -->
+    <link rel="manifest" id="manifest-placeholder">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Gestor">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
@@ -243,6 +250,43 @@
         </div>
     </div>
 
+    <!-- GERADOR DINÂMICO DE MANIFESTO PWA -->
+    <script>
+        const myManifest = {
+            "name": "Gestor Business",
+            "short_name": "Gestor",
+            "start_url": "./",
+            "display": "standalone",
+            "background_color": "#090d16",
+            "theme_color": "#090d16",
+            "icons": [
+                {
+                    "src": "https://cdn-icons-png.flaticon.com/512/1041/1041883.png",
+                    "sizes": "512x512",
+                    "type": "image/png",
+                    "purpose": "any maskable"
+                }
+            ]
+        };
+        const stringManifest = JSON.stringify(myManifest);
+        const blob = new Blob([stringManifest], {type: 'application/json'});
+        const manifestURL = URL.createObjectURL(blob);
+        document.getElementById('manifest-placeholder').setAttribute('href', manifestURL);
+
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                self.addEventListener('install', (e) => self.skipWaiting());
+                self.addEventListener('activate', (e) => self.clients.claim());
+                self.addEventListener('fetch', (e) => {
+                    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+                });
+            `;
+            const swBlob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(swBlob);
+            navigator.serviceWorker.register(swUrl).catch(err => console.log('SW Error:', err));
+        }
+    </script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, collectionGroup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -423,19 +467,8 @@
             document.getElementById('btn-aba-pagos').innerText = `Pagos (${pagosCount})`;
             document.getElementById('btn-aba-arquivados').innerText = `Arquivados (${arquivadosCount})`;
 
-            // REGRA: Cliente prolongado ou pago só reaparece se faltar 1 dia ou menos para a nova data estendida
-            const visiveisTelaInicial = ativos.filter(c => {
-                const isoEstendida = extrairDataISO(c.dataEstendida) || extrairDataISO(obterValorCampo(c, 'vencimento', 'dataVencimento'));
-                const diasPraDataEstendida = calcularDiferencaDias(isoEstendida);
-
-                if (termo) return true;
-
-                if (c.pago || c.prolongado) {
-                    return diasPraDataEstendida <= 1;
-                }
-
-                return true;
-            });
+            // TODOS OS CLIENTES ATIVOS CONTINUAM NA TELA INICIAL
+            const visiveisTelaInicial = ativos;
 
             document.getElementById('contagem').innerHTML = `Exibindo: <b>${visiveisTelaInicial.length}</b> / ${ativos.length}`;
 
@@ -446,7 +479,6 @@
                 return nome.includes(termo) || painel.includes(termo) || whats.includes(termo);
             });
 
-            // Ordenação da tela inicial
             filtrados.sort((a, b) => {
                 const dtA = extrairDataISO(obterValorCampo(a, 'vencimento', 'dataVencimento', 'Vencimento', 'data'));
                 const dtB = extrairDataISO(obterValorCampo(b, 'vencimento', 'dataVencimento', 'Vencimento', 'data'));
@@ -469,7 +501,7 @@
             });
 
             if (filtrados.length === 0) {
-                container.innerHTML = `<p style="text-align:center; color:var(--text-sub); margin-top:30px; font-weight:600;">Nenhum cliente para exibir na tela inicial.</p>`;
+                container.innerHTML = `<p style="text-align:center; color:var(--text-sub); margin-top:30px; font-weight:600;">Nenhum cliente para exibir.</p>`;
                 return;
             }
 
@@ -736,7 +768,6 @@
             document.getElementById('modal-arquivados').style.display = 'flex';
         }
 
-        // EVENT LISTENERS SEGUROS (Garantia contra congelamento no load)
         document.addEventListener('DOMContentLoaded', () => {
             const btnLogin = document.getElementById('btn-login-submit');
             if (btnLogin) {
@@ -823,7 +854,6 @@
                 }
             });
 
-            // LOGIN AUTOMÁTICO SEGURO
             try {
                 const savedU = localStorage.getItem('gestor_u');
                 const savedP = localStorage.getItem('gestor_p');
