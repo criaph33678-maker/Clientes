@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#090d16">
     <title>Gestor Business - Dark Edition</title>
     
-    <!-- CONFIGURAÇÕES PWA (FAZ O APP FICAR INSTALÁVEL) -->
+    <!-- CONFIGURAÇÕES PWA -->
     <link rel="manifest" id="manifest-placeholder">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -64,7 +64,7 @@
         .stats-topo { font-size: 13px; color: var(--text-sub); font-weight: 700; display: flex; align-items: center; justify-content: space-between; padding: 0 4px; }
         .stats-topo b { color: #60a5fa; font-size: 15px; }
 
-        /* BARRA COM OS 3 BOTÕES LADO A LADO */
+        /* TRÊS BOTÕES LADO A LADO */
         .botoes-topo-flex { display: flex; gap: 6px; width: 100%; }
         .btn-topo-acao { flex: 1; padding: 10px 4px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; text-transform: uppercase; text-align: center; white-space: nowrap; }
         
@@ -88,7 +88,7 @@
         .card-cliente { background: var(--card); border: 1px solid var(--card-brd); border-radius: 20px; padding: 18px; margin-bottom: 14px; position: relative; display: flex; flex-direction: column; box-shadow: var(--shadow-md); }
         .card-cliente.vencido-border { border: 1.5px solid rgba(239, 68, 68, 0.8) !important; background: linear-gradient(180deg, rgba(239,68,68,0.05) 0%, var(--card) 100%); }
         .card-cliente.vence-hoje-border { border: 1.5px solid rgba(234, 179, 8, 0.8) !important; background: linear-gradient(180deg, rgba(234,179,8,0.05) 0%, var(--card) 100%); }
-        .card-cliente.pago-border { border: 1.5px solid rgba(16, 185, 129, 0.8) !important; background: linear-gradient(180deg, rgba(16,185,129,0.05) 0%, var(--card) 100%); }
+        .card-cliente.pago-border { border: 1.5px solid rgba(16, 185, 129, 0.9) !important; background: linear-gradient(180deg, rgba(16,185,129,0.08) 0%, var(--card) 100%); }
         
         .card-cliente h3 { margin: 0 0 6px 0; font-size: 17px; font-weight: 800; color: #fff; width: 60%; }
         .info-p { font-size: 13px; color: var(--text-sub); margin: 3px 0; font-weight: 500; }
@@ -108,7 +108,7 @@
         .status-vencimento.vencido { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
         .status-vencimento.pago-status { background: rgba(16, 185, 129, 0.25); color: #34d399; border: 1px solid #10b981; }
 
-        /* BOTÕES */
+        /* BOTÕES DE AÇÃO DOS CARDS */
         .flex-botoes-icones { display: flex; gap: 8px; justify-content: flex-end; align-items: center; width: 100%; flex-wrap: wrap; }
         .btn-icone { width: 40px; height: 40px; border-radius: 12px; border: 1px solid transparent; background: #0b0f19; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease; padding: 0; }
         .btn-i-renovar { background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.3); }
@@ -192,10 +192,10 @@
         </div>
     </div>
 
-    <!-- MODAL PAGOS -->
+    <!-- MODAL PAGOS (EXIBE APENAS NOME, PAINEL E DATA DE FORMA COMPACTA) -->
     <div id="modal-pagos" class="modal">
         <div class="modal-content">
-            <h2 style="margin-top:0; font-size:18px; font-weight:800; color:var(--success);">Área de Clientes Pagos</h2>
+            <h2 style="margin-top:0; font-size:18px; font-weight:800; color:var(--success);">Clientes Pagos</h2>
             <div id="lista-pagos-corpo" style="text-align:left; margin-top:12px; max-height: 50vh; overflow-y: auto;"></div>
             <button id="btn-fechar-pagos" class="btn-acao-modal" style="background:#1e293b; color:var(--text); box-shadow:none;">FECHAR JANELA</button>
         </div>
@@ -467,10 +467,10 @@
             document.getElementById('btn-aba-pagos').innerText = `Pagos (${pagosCount})`;
             document.getElementById('btn-aba-arquivados').innerText = `Arquivados (${arquivadosCount})`;
 
-            // TODOS OS CLIENTES ATIVOS CONTINUAM NA TELA INICIAL
+            // TODOS OS CLIENTES ATIVOS PERMANECEM NA TELA INICIAL
             const visiveisTelaInicial = ativos;
 
-            document.getElementById('contagem').innerHTML = `Exibindo: <b>${visiveisTelaInicial.length}</b> / ${ativos.length}`;
+            document.getElementById('contagem').innerHTML = `Total de Clientes: <b>${ativos.length}</b>`;
 
             const filtrados = visiveisTelaInicial.filter(c => {
                 const nome = String(obterValorCampo(c, 'nome', 'cliente', 'Nome', 'name')).toLowerCase();
@@ -479,6 +479,7 @@
                 return nome.includes(termo) || painel.includes(termo) || whats.includes(termo);
             });
 
+            // ORDENAÇÃO: VENCIDOS E PRÓXIMOS NO TOPO
             filtrados.sort((a, b) => {
                 const dtA = extrairDataISO(obterValorCampo(a, 'vencimento', 'dataVencimento', 'Vencimento', 'data'));
                 const dtB = extrairDataISO(obterValorCampo(b, 'vencimento', 'dataVencimento', 'Vencimento', 'data'));
@@ -501,7 +502,7 @@
             });
 
             if (filtrados.length === 0) {
-                container.innerHTML = `<p style="text-align:center; color:var(--text-sub); margin-top:30px; font-weight:600;">Nenhum cliente para exibir.</p>`;
+                container.innerHTML = `<p style="text-align:center; color:var(--text-sub); margin-top:30px; font-weight:600;">Nenhum cliente encontrado.</p>`;
                 return;
             }
 
@@ -521,7 +522,7 @@
                 if (c.pago || c.prolongado) {
                     statusClass = 'pago-status';
                     statusTexto = 'PAGO';
-                    card.classList.add('pago-border');
+                    card.classList.add('pago-border'); // Borda verde neon na tela inicial
                 } else if (diffDias < 0) {
                     statusClass = 'vencido';
                     statusTexto = 'VENCIDO';
@@ -549,7 +550,7 @@
 
                     ${(c.pago || c.prolongado) ? `
                         <div class="obs-pago-verde">
-                            <span>✅ PAGO / PROLONGADO</span> ${isoEstendida ? `(Até ${formatarDataExibicao(isoEstendida)})` : ''}
+                            <span>✅ PAGO</span> ${isoEstendida ? `(Até ${formatarDataExibicao(isoEstendida)})` : ''}
                         </div>
                     ` : ''}
 
@@ -712,27 +713,32 @@
             }
         }
 
+        // JANELA DE PAGOS COMPACTA: APENAS NOME, PAINEL E DATA
         function abrirModalPagos() {
             const container = document.getElementById('lista-pagos-corpo');
             container.innerHTML = "";
             const pagos = clientesRaw.filter(c => (c.pago || c.prolongado) && !c.arquivado);
             
             if(pagos.length === 0) {
-                container.innerHTML = "<p style='font-size:13px; color:var(--text-sub);'>Nenhum cliente na lista de pagos.</p>";
+                container.innerHTML = "<p style='font-size:13px; color:var(--text-sub); text-align:center;'>Nenhum cliente pago registrado.</p>";
             } else {
                 pagos.forEach(c => {
+                    const nome = obterValorCampo(c, 'nome', 'cliente', 'Nome', 'name') || 'Sem nome';
+                    const painel = obterValorCampo(c, 'painel', 'Painel', 'servico') || '-';
+                    const dataVenc = formatarDataExibicao(c.dataEstendida || c.vencimento);
+
                     const item = document.createElement('div');
-                    item.style.padding = "10px 0";
+                    item.style.padding = "8px 0";
                     item.style.borderBottom = "1px solid #1e293b";
                     item.style.display = "flex";
                     item.style.justifyContent = "space-between";
                     item.style.alignItems = "center";
                     item.innerHTML = `
-                        <div>
-                            <strong style="font-size:14px; color:#fff;">${obterValorCampo(c, 'nome', 'cliente', 'Nome')}</strong>
-                            <div style="font-size:11px; color:var(--text-sub);">${obterValorCampo(c, 'painel', 'Painel') || '-'} - Até: ${formatarDataExibicao(c.dataEstendida || c.vencimento)}</div>
+                        <div style="font-size: 13px;">
+                            <strong style="color:#fff; font-size:14px;">${nome}</strong><br>
+                            <span style="color:var(--text-sub);">${painel} • Venc: ${dataVenc}</span>
                         </div>
-                        <button style="background:rgba(239, 68, 68, 0.2); border:1px solid #ef4444; color:#f87171; font-size:10px; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer;" data-desmarcar-pago="${c.id}" data-path="${c._fullPath}">DESMARCAR PAGO</button>
+                        <button style="background:rgba(239, 68, 68, 0.2); border:1px solid #ef4444; color:#f87171; font-size:10px; font-weight:800; padding:6px 10px; border-radius:8px; cursor:pointer;" data-desmarcar-pago="${c.id}" data-path="${c._fullPath}">Desfazer</button>
                     `;
                     container.appendChild(item);
                 });
@@ -746,7 +752,7 @@
             const arq = clientesRaw.filter(c => c.arquivado);
             
             if(arq.length === 0) {
-                container.innerHTML = "<p style='font-size:13px; color:var(--text-sub);'>Nenhum cliente arquivado.</p>";
+                container.innerHTML = "<p style='font-size:13px; color:var(--text-sub); text-align:center;'>Nenhum cliente arquivado.</p>";
             } else {
                 arq.forEach(c => {
                     const item = document.createElement('div');
